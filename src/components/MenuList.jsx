@@ -12,6 +12,29 @@ const MenuList = () => {
 
     const menuItems = [
         { 
+            key: 'empresa',
+            icon: <AppstoreOutlined />,
+            label: "Empresa",
+            children: [
+                {
+                    key:'empresaCadastro',
+                    label: 'Cadastro',
+                    children: [
+                        {
+                            key: 'Empresa',
+//                            icon: <FunnelPlotOutlined />,
+                            icon: <BiUnite/>,
+                            label: 
+                                <Link to="/companys">
+                                    Empresa
+                                </Link>,
+
+                        },
+                    ],
+                },
+            ],
+        },
+        { 
             key: 'estoque',
             icon: <AppstoreOutlined />,
             label: "Estoque",
