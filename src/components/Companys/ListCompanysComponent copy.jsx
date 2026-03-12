@@ -27,22 +27,10 @@ const ListCompanysComponent = () => {
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
-    const [isEditing, setIsEditing]             = useState(true);
+    const [isEditing, setIsEditing]                 = useState(true);
     const [idCompany, setIdCompany]             = useState();
     
-    // 1. Função para aplicar a máscara no CNPJ
-    const formatarCNPJ = (cnpj) => {
-        if (!cnpj) return '';
-
-        // Remove caracteres não numéricos
-        const valor = cnpj.toString().replace(/\D/g, '');
-
-        // Aplica a máscara: 00.000.000/0000-00
-        return valor.replace(
-            /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
-            '$1.$2.$3/$4-$5'
-        );
-    };
+    const { Option, OptGroup } = Select;
 
     const estadosBrasileiro = [
         { label: 'ACRE',                value: 'AC' },
@@ -177,7 +165,6 @@ const ListCompanysComponent = () => {
             ...getColumnSearchProps('cnpj'),
             onFilter: (value, record) => record.cnpj.indexOf(value) === 0,      
             ellipsis: true,
-            render: (text) => formatarCNPJ(text)
         },
         {
             title:      "Nome",
@@ -215,19 +202,19 @@ const ListCompanysComponent = () => {
 
         const company = {
             _id:               values._id,
-            cnpj:              values.cnpj ? values.cnpj.replace(/\D/g, '') : '', //Para enviar apenas os números:
-            nome:              values.nome.toUpperCase(),
+            cnpj:              values.cnpj, //values.cnpj.replace(/\D/g, ''), Para enviar apenas os números:
             razaoSocial:       values.razaoSocial.toUpperCase(),
-            inscricaoEstadual: values.inscricaoEstadual ? values.inscricaoEstadual.toUpperCase() : '',
+            nome:              values.nome.toUpperCase(),
+            inscricaoEstadual: values.inscricaoEstadual.toUpperCase(),
             endereco:          values.endereco.toUpperCase(),
-            numero:            values.numero ? values.numero.toUpperCase() : '',
-            complemento:       values.complemento ? values.complemento.toUpperCase() : '',
-            bairro:            values.bairro ? values.bairro.toUpperCase() : '',
-            municipio:         values.municipio ? values.municipio.toUpperCase() : '',
-            estado:            values.estado ? values.estado.toUpperCase() : '',
-            cep:               values.cep ? values.cep.replace(/\D/g, '') : "",
-            email:             values.email ? values.email.toUpperCase() : '',
-            telefone:          values.telefone ? values.telefone.replace(/\D/g, '') : ""
+            numero:            values.numero.toUpperCase(),
+            complemento:       values.complemento.toUpperCase(),
+            bairro:            values.bairro.toUpperCase(),
+            municipio:         values.municipio.toUpperCase(),
+            estado:            values.estado.toUpperCase(),
+            cep:               values.cep,
+            email:             values.email.toUpperCase(),
+            telefone:          values.telefone
         };
 
         setLoading(true);    
@@ -267,7 +254,6 @@ const ListCompanysComponent = () => {
             });
             
         }        
-            
         setLoading(false);    
  
     };
@@ -279,7 +265,7 @@ const ListCompanysComponent = () => {
         carregarDados();
     };
 
-    const handleOk = async (event) => {
+    const handleOk = async () => {
 
         if (isEditing) {
 
@@ -557,7 +543,6 @@ const ListCompanysComponent = () => {
                     >
                         {/* Componente de Máscara integrado ao Input do Antd */}
                         <PatternFormat
-                            disabled={!isEditing || idCompany}
                             customInput={Input} // Usa o estilo do Ant Design
                             format="##.###.###/####-##"
                             mask="_"
@@ -571,8 +556,8 @@ const ListCompanysComponent = () => {
                         label="Insc Estadual"
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -589,8 +574,8 @@ const ListCompanysComponent = () => {
                         rules={[{required: true, message: 'Informar Nome'}]}
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -601,8 +586,8 @@ const ListCompanysComponent = () => {
                         rules={[{required: true, message: 'Informar Razão Social'}]}
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -615,8 +600,8 @@ const ListCompanysComponent = () => {
                         rules={[{required: true, message: 'Informar Endereço'}]}
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -626,8 +611,8 @@ const ListCompanysComponent = () => {
                         label="Nro"
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -637,8 +622,8 @@ const ListCompanysComponent = () => {
                         label="Complemento"
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -650,8 +635,8 @@ const ListCompanysComponent = () => {
                         label="Bairro"
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -661,8 +646,8 @@ const ListCompanysComponent = () => {
                         label="Município"
                         >
                         <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
                             />
                     </Item>
                 </Col>
@@ -672,10 +657,10 @@ const ListCompanysComponent = () => {
                         label="Estado"
                         >
                         <Select
+                            disabled={!isEditing}
                             placeholder="Selecionar um Estado"
                             allowClear  //Permite limpar seleção
                             options={estadosBrasileiro}
-                            disabled={!isEditing}
                         />
                     </Item>
                 </Col>
@@ -684,13 +669,19 @@ const ListCompanysComponent = () => {
                         name={"cep"}
                         label="CEP"
                         >
+                        {/* Componente de Máscara integrado ao Input do Antd */}
                         <PatternFormat
-                            disabled={!isEditing}
                             customInput={Input} // Usa o estilo do Ant Design
                             format="#####-###"   // A- Letra, # Numero
                             mask="_"
                             placeholder="00000-000"
-                        />            
+                            onValueChange={(values) => {
+                                // Isso garante que o valor seja atualizado no estado do formulário do Ant Design
+                                Form.useForm()[0]?.setFieldsValue({
+                                    cep: values.value,
+                                });      
+                            }}
+                        />                                    
                     </Item>
                 </Col>
             </Row>
@@ -702,11 +693,16 @@ const ListCompanysComponent = () => {
                         >
                         {/* Componente de Máscara integrado ao Input do Antd */}
                         <PatternFormat
-                            disabled={!isEditing}
                             customInput={Input} // Usa o estilo do Ant Design
                             format="(##) #####-####"   // A- Letra, # Numero
                             mask="_"
                             placeholder="(00) 00000-0000"
+                            onValueChange={(values) => {
+                                // Isso garante que o valor seja atualizado no estado do formulário do Ant Design
+                                Form.useForm()[0]?.setFieldsValue({
+                                    telefone: values.value,
+                                });      
+                            }}
                         />            
                     </Item>
                 </Col>
@@ -733,8 +729,6 @@ const ListCompanysComponent = () => {
 
       <Modal
         title={ "Eliminar Empresa"}
-        width={"100vw"}
-        style={{ top: 20, padding: 0, margin: 15 }}
         open={deleteModal}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}        
@@ -782,7 +776,6 @@ const ListCompanysComponent = () => {
                     >
                         {/* Componente de Máscara integrado ao Input do Antd */}
                         <PatternFormat
-                            disabled={!isEditing}
                             customInput={Input} // Usa o estilo do Ant Design
                             format="##.###.###/####-##"
                             mask="_"
@@ -911,7 +904,6 @@ const ListCompanysComponent = () => {
                         >
                         {/* Componente de Máscara integrado ao Input do Antd */}
                         <PatternFormat
-                            disabled={!isEditing}
                             customInput={Input} // Usa o estilo do Ant Design
                             format="#####-###"   // A- Letra, # Numero
                             mask="_"
@@ -934,7 +926,6 @@ const ListCompanysComponent = () => {
                         >
                         {/* Componente de Máscara integrado ao Input do Antd */}
                         <PatternFormat
-                            disabled={!isEditing}
                             customInput={Input} // Usa o estilo do Ant Design
                             format="(##) #####-####"   // A- Letra, # Numero
                             mask="_"

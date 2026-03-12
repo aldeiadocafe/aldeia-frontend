@@ -3,7 +3,7 @@ import { AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined
 
 import { Menu, ConfigProvider } from 'antd';
 import { Link } from 'react-router-dom';
-import { BiBadgeCheck, BiBox, BiUnite } from 'react-icons/bi';
+import { BiBadgeCheck, BiBox, BiBuilding, BiUnite } from 'react-icons/bi';
 import { BsArrowLeftRight, BsBoxSeam, BsCashStack, BsCurrencyDollar, BsReceiptCutoff } from 'react-icons/bs';
 
 const MenuList = () => {
@@ -11,29 +11,6 @@ const MenuList = () => {
     const [current, setCurrent] = useState('1');
 
     const menuItems = [
-        { 
-            key: 'empresa',
-            icon: <AppstoreOutlined />,
-            label: "Empresa",
-            children: [
-                {
-                    key:'empresaCadastro',
-                    label: 'Cadastro',
-                    children: [
-                        {
-                            key: 'Empresa',
-//                            icon: <FunnelPlotOutlined />,
-                            icon: <BiUnite/>,
-                            label: 
-                                <Link to="/companys">
-                                    Empresa
-                                </Link>,
-
-                        },
-                    ],
-                },
-            ],
-        },
         { 
             key: 'estoque',
             icon: <AppstoreOutlined />,
@@ -168,6 +145,15 @@ const MenuList = () => {
             icon: <SettingOutlined />,
             label: "Configuração",
             children: [
+                {
+                    key: 'Empresa',
+                    icon: <BiBuilding/>,
+                    label: 
+                        <Link to="/companys">
+                            Empresa
+                        </Link>,
+
+                },
                 {
                     key: 'usuario',
                     icon: <UserOutlined />,
