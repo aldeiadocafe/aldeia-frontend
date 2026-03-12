@@ -157,7 +157,10 @@ const MenuList = () => {
                 {
                     key: 'usuario',
                     icon: <UserOutlined />,
-                    label: "Usuário"
+                    label:
+                        <Link to="/users">
+                            Usuário
+                        </Link>,
                 }
             ]
         },

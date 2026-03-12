@@ -28,7 +28,8 @@ import ListStockBalanceComponent from './components/Stock/ListStockBalanceCompon
 import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
 import ImportEstoqueGComComponent from './components/GComs/ImportGComComponent';
 import ListConversationsComponent from './components/Stock/ListConversationsComponent';
-import ListCompanysComponent from './components/Companys/ListCompanysComponent';
+import ListCompanysComponent from './components/Configuracoes/ListCompanysComponent';
+import ListUsersComponent from './components/Configuracoes/ListUsersComponent';
 
 // 3. Definir o locale do dayjs globalmente
 dayjs.locale('pt-br');
@@ -83,6 +84,9 @@ function App() {
 
                   {/* http://localhost:5173/companys */}
                   <Route path='/companys'    element={<ListCompanysComponent/>}/>
+
+                  {/* http://localhost:5173/users */}
+                  <Route path='/users'    element={<ListUsersComponent/>}/>
 
                   {/* http://localhost:5173/units */}
                   <Route path='/units'    element={<ListUnitComponent/>}/>
