@@ -1,22 +1,8 @@
-import { useState } from 'react';
-
-import { Button, Layout} from 'antd';
-
-import Logo from './components/Logo';
-import MenuList from './components/MenuList';
-import { Content } from 'antd/es/layout/layout';
-import ListUnitComponent from './components/Stock/ListUnitComponent';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import IndexComponent from './components/IndexComponent';
-import ListItemComponent from './components/Stock/ListItemComponent';
-import ConferenceComponent from './components/Inventorys/ConferenceComponent';
-import ItemConfComponent from './components/Inventorys/ItemConfComponent';
-import ListInventoryComponent from './components/Inventorys/ListInventoryComponent';
-import ListPlacesInventoryComponent from './components/Inventorys/ListPlacesInventoryComponent';
-import ListDatesItemBalanceComponent from './components/Stock/ListDatesItemBalanceComponent';
-
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { DatePicker, ConfigProvider } from 'antd'
+
+import { AuthProvider } from './AuthContext'
 
 // 1. Importar o locale do Antd
 import ptBR from 'antd/locale/pt_BR';
@@ -24,23 +10,35 @@ import ptBR from 'antd/locale/pt_BR';
 // 2. Importar o locale do Day.js
 import 'dayjs/locale/pt-br';
 import dayjs from 'dayjs';
-import ListStockBalanceComponent from './components/Stock/ListStockBalanceComponent';
-import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
-import ImportEstoqueGComComponent from './components/GComs/ImportGComComponent';
-import ListConversationsComponent from './components/Stock/ListConversationsComponent';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'antd/dist/reset.css'; // Para Ant Design v5
+
+import Login from './Pages/Login';
+import { PrivateRoute } from './PrivateRoute';
+import MainLayout from './Pages/MainLayout';
+import DashComponent from './components/DashComponent';
 import ListCompanysComponent from './components/Configuracoes/ListCompanysComponent';
 import ListUsersComponent from './components/Configuracoes/ListUsersComponent';
+import ListConversationsComponent from './components/Stock/ListConversationsComponent';
+import ListItemComponent from './components/Stock/ListItemComponent';
+import ImportEstoqueGComComponent from './components/GComs/ImportGComComponent';
+import ListStockBalanceComponent from './components/Stock/ListStockBalanceComponent';
+import ListDatesItemBalanceComponent from './components/Stock/ListDatesItemBalanceComponent';
+import ListInventoryComponent from './components/Inventorys/ListInventoryComponent';
+import ListPlacesInventoryComponent from './components/Inventorys/ListPlacesInventoryComponent';
+import ConferenceComponent from './components/Inventorys/ConferenceComponent';
+import ItemConfComponent from './components/Inventorys/ItemConfComponent';
+import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
+import ListUnitsComponent from './components/Stock/ListUnitComponent';
 
 // 3. Definir o locale do dayjs globalmente
 dayjs.locale('pt-br');
 
 const { RangePicker } = DatePicker
 
-const { Header, Sider} = Layout;
-
 function App() {
 
-  const [collapsed, setCollapsed] = useState(true);
 
   return (
 
@@ -49,82 +47,139 @@ function App() {
       <ConfigProvider locale={ptBR}>
       
         <BrowserRouter>      
-          <Layout className="full-height-layout">
-            <Sider 
-              width={220}
-              collapsedWidth='40px'
-              collapsed={collapsed} 
-              collapsible
-              trigger={null}
-              onMouseLeave={() => setCollapsed(true)}
-              onMouseEnter={() => setCollapsed(false)}
-              style={{ background: 'var(--primary-color)' /* Sua cor personalizada */ }}
-              >
-              <div className='sider-logo'>          
-                <Button
-                  type='text'
-                  className='toogle'
-                  onClick={() => setCollapsed(!collapsed)}
-                  >
-                    <Logo/>
-                  </Button>
-              </div>
-              <MenuList/>
-            </Sider>
-            <Content
-                style={{
-                  padding: '10px',
-                  height: '100vh',
-                  }}
-              >
-                <Routes>
 
-                  {/* http://localhost:5173/ */}
-                  <Route path='/'         element={<IndexComponent/>}/>
+          <AuthProvider>
+
+            <Routes>
+
+              {/* Rotas Protegidas com Sidebar */}
+              <Route path="/login" element={<Login/>} />
+
+              <Route 
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <MainLayout/>
+                  </PrivateRoute>
+                }
+              >
+                  <Route index 
+                    element={
+                      <PrivateRoute>
+                        <DashComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/companys */}
-                  <Route path='/companys'    element={<ListCompanysComponent/>}/>
+                  <Route path='/companys'    
+                    element={
+                      <PrivateRoute>
+                        <ListCompanysComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/users */}
-                  <Route path='/users'    element={<ListUsersComponent/>}/>
+                  <Route path='/users'    
+                    element={
+                      <PrivateRoute>
+                        <ListUsersComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/units */}
-                  <Route path='/units'    element={<ListUnitComponent/>}/>
+                  <Route path='/units'    
+                    element={
+                      <PrivateRoute>
+                        <ListUnitsComponent/>
+                      </PrivateRoute>
+                    }/>
 
-                  {/* http://localhost:5173/units */}
-                  <Route path='/items'    element={<ListItemComponent/>}/>
+                  {/* http://localhost:5173/items */}
+                  <Route path='/items'    
+                    element={
+                      <PrivateRoute>
+                        <ListItemComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/conversationsitem */}
-                  <Route path='/conversationsitem'    element={<ListConversationsComponent/>}/>
+                  <Route path='/conversationsitem'    
+                    element={
+                      <PrivateRoute>
+                        <ListConversationsComponent/>
+                      </PrivateRoute>
+                    }/>
 
-                  {/* http://localhost:5173/gcom */}
-                  <Route path='/estoquegcom'    element={<ImportEstoqueGComComponent/>}/>
+                  {/* http://localhost:5173/estoquegcom */}
+                  <Route path='/estoquegcom'    
+                    element={
+                      <PrivateRoute>
+                        <ImportEstoqueGComComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/stockbalance */}
-                  <Route path='/stockbalance' element={<ListStockBalanceComponent/>} />
+                  <Route path='/stockbalance'    
+                    element={
+                      <PrivateRoute>
+                        <ListStockBalanceComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/datesitemsbalance */}
-                  <Route path='/datesitemsbalance' element={<ListDatesItemBalanceComponent/>} />
+                  <Route path='/datesitemsbalance'    
+                    element={
+                      <PrivateRoute>
+                        <ListDatesItemBalanceComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/inventorys */}
-                  <Route path='/inventorys'    element={<ListInventoryComponent />}/>
+                  <Route path='/inventorys'    
+                    element={
+                      <PrivateRoute>
+                        <ListInventoryComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/placesinventory */}
-                  <Route path='/placesinventory'    element={<ListPlacesInventoryComponent />}/>
+                  <Route path='/placesinventory'    
+                    element={
+                      <PrivateRoute>
+                        <ListPlacesInventoryComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/conferences */}
-                  <Route path='/conferences'    element={<ConferenceComponent/>}/>
+                  <Route path='/conferences'    
+                    element={
+                      <PrivateRoute>
+                        <ConferenceComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/item-conference */}
-                  <Route path='/item-conference/:id'    element={<ItemConfComponent/>}/>
+                  <Route path='/item-conference/:id'    
+                    element={
+                      <PrivateRoute>
+                        <ItemConfComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/invoices */}
-                  <Route path='/importarnfe'    element={<ImportInvoicesComponent />}/>
+                  <Route path='/importarnfe'    
+                    element={
+                      <PrivateRoute>
+                        <ImportInvoicesComponent/>
+                      </PrivateRoute>
+                    }/>
 
-                </Routes>
+              </Route>
+              
+            </Routes>
 
-            </Content>
-          </Layout>
+          </AuthProvider>
+        
         </BrowserRouter>
 
       </ConfigProvider>

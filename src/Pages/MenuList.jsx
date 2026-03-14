@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 
 import { Menu, ConfigProvider } from 'antd';
 import { Link } from 'react-router-dom';

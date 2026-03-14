@@ -13,7 +13,7 @@ import { getAllStockBalances } from '../services/StockBalanceService'
 
 dayjs.extend(utc)
 
-const IndexComponent = () => {
+const DashComponent = () => {
 
   const [ datesItem,    setDatesItem]   = useState([])
   const [ loading,      setLoading]     = useState(false)
@@ -422,4 +422,4 @@ const IndexComponent = () => {
   )
 }
 
-export default IndexComponent
+export default DashComponent
