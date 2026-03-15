@@ -13,10 +13,14 @@ const MainLayout = () => {
 
     const [collapsed, setCollapsed] = useState(true);
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+
         console.log('Logout realizado!');
+
         localStorage.removeItem('auth-token');
+        sessionStorage.removeItem('auth-token');
         window.location.href = '/login';
+
     };
 
     return (

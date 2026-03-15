@@ -1,29 +1,42 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-  
-  const [user, setUser] = useState(localStorage.getItem('auth-token'));
+
   const navigate = useNavigate();
-  
-  const login = (token) => {
-    localStorage.setItem('auth-token', token);
+
+  const [user, setUser] = useState(() => {
+    return localStorage.getItem('auth-token') ? localStorage.getItem('auth-token') : null
+  });
+
+  const login = async (token, remember) => {    
+
+    sessionStorage.setItem('auth-token', token);
     setUser(token);
-    navigate('/dashboard'); // Redireciona após login
+
+    if (remember) {
+      // PERSISTIR: Salva no localStorage (não apaga ao fechar)
+      localStorage.setItem('auth-token', token);
+    }
+
   };
 
-  const logout = () => {
+  const logout = async () => {
+
     localStorage.removeItem('auth-token');
+    sessionStorage.removeItem('auth-token');
     setUser(null);
-    navigate('/login');
+//    navigate('/login');
   };
+
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
 export const useAuth = () => useContext(AuthContext);

@@ -17,7 +17,7 @@ import 'antd/dist/reset.css'; // Para Ant Design v5
 import Login from './Pages/Login';
 import { PrivateRoute } from './PrivateRoute';
 import MainLayout from './Pages/MainLayout';
-import DashComponent from './components/DashComponent';
+import DashComponent from './Pages/DashComponent';
 import ListCompanysComponent from './components/Configuracoes/ListCompanysComponent';
 import ListUsersComponent from './components/Configuracoes/ListUsersComponent';
 import ListConversationsComponent from './components/Stock/ListConversationsComponent';
@@ -31,6 +31,7 @@ import ConferenceComponent from './components/Inventorys/ConferenceComponent';
 import ItemConfComponent from './components/Inventorys/ItemConfComponent';
 import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
 import ListUnitsComponent from './components/Stock/ListUnitComponent';
+
 
 // 3. Definir o locale do dayjs globalmente
 dayjs.locale('pt-br');
@@ -55,7 +56,7 @@ function App() {
               {/* Rotas Protegidas com Sidebar */}
               <Route path="/login" element={<Login/>} />
 
-              <Route 
+              <Route
                 path="/"
                 element={
                   <PrivateRoute>
@@ -63,12 +64,14 @@ function App() {
                   </PrivateRoute>
                 }
               >
-                  <Route index 
-                    element={
-                      <PrivateRoute>
-                        <DashComponent/>
-                      </PrivateRoute>
-                    }/>
+
+                <Route index 
+                  element={
+                    <PrivateRoute>
+                      <DashComponent/>
+                    </PrivateRoute>
+                  }
+                  />
 
                   {/* http://localhost:5173/companys */}
                   <Route path='/companys'    
