@@ -3,13 +3,13 @@ import { Column } from '@ant-design/plots'
 import { Button, Card, Col, Input, Layout, Row, Space, Table } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 
-import { getAllDatesItem } from '../services/DatesItemBalanceService'
-import { getAllUnits } from '../services/UnitService'
+import { getAllDatesItem } from '../../services/DatesItemBalanceService'
+import { getAllUnits } from '../../services/UnitService'
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { SearchOutlined } from '@ant-design/icons'
-import { getAllStockBalances } from '../services/StockBalanceService'
+import { getAllStockBalances } from '../../services/StockBalanceService'
 
 dayjs.extend(utc)
 

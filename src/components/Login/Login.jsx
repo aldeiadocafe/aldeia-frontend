@@ -5,8 +5,8 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/reset.css'; // Antd v5
 
-import { useAuth } from '../AuthContext';
-import { getLogin } from '../services/LoginService';
+import { useAuth } from './AuthContext';
+import { getLogin } from '../../services/LoginService';
 import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
@@ -24,16 +24,7 @@ const Login = () => {
         senha:  values.senha
       }
       const res = await getLogin(loginAux)
-/*
-      // Armazena o token no localStorage
-      if (values.remember) {
-        // PERSISTIR: Salva no localStorage (não apaga ao fechar)
-        localStorage.setItem('auth-token', res.data.token);
-      } else {
-        // SESSÃO: Salva no sessionStorage (apaga ao fechar)
-        sessionStorage.setItem('auth-token', res.data.token);
-      }
-*/
+
       await login(res.data.token,values.remember ? values.remember : false);
       message.success(`Bem-vindo, ${values.email}!`);
 //      window.location.href = '/';
@@ -43,17 +34,6 @@ const Login = () => {
       message.error(`Erro ao logar: ${err.response.data.message}!`);
     }
   };
-
-  useEffect(() => {
-/*    
-    // Verifica se o token existe no localStorage
-    const token = localStorage.getItem('auth-token');
-    if (token) {
-        message.success(`Bem-vindo, ${values.email}!`);
-        window.location.href = '/';
-    }
-*/        
-  }, []);
 
   return (
     <div className="container d-flex justify-content-center align-items-center min-vh-100">

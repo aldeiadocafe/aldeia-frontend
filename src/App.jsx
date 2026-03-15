@@ -2,8 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { DatePicker, ConfigProvider } from 'antd'
 
-import { AuthProvider } from './AuthContext'
-
 // 1. Importar o locale do Antd
 import ptBR from 'antd/locale/pt_BR';
 
@@ -14,10 +12,11 @@ import dayjs from 'dayjs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/reset.css'; // Para Ant Design v5
 
-import Login from './Pages/Login';
-import { PrivateRoute } from './PrivateRoute';
-import MainLayout from './Pages/MainLayout';
-import DashComponent from './Pages/DashComponent';
+import { AuthProvider } from './components/Login/AuthContext';
+import Login from './components/Login/Login';
+import { PrivateRoute } from './components/Login/PrivateRoute';
+import MainLayout from './components/Main/MainLayout';
+import DashComponent from './components/Main/DashComponent';
 import ListCompanysComponent from './components/Configuracoes/ListCompanysComponent';
 import ListUsersComponent from './components/Configuracoes/ListUsersComponent';
 import ListConversationsComponent from './components/Stock/ListConversationsComponent';
