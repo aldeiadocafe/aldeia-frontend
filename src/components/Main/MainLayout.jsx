@@ -1,17 +1,53 @@
 import React, { useState } from 'react';
 import { Content } from 'antd/es/layout/layout';
-import { Button, Layout } from 'antd';
+import { Avatar, Button, Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 
 
 import Logo from './Logo';
 import MenuList from './MenuList';
 import { Outlet } from 'react-router-dom';
-import { LogoutOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, UpOutlined, UserOutlined } from '@ant-design/icons';
+import { Dropdown, Space } from 'antd';
+
+import { useAuth } from '../Login/AuthContext';
 
 const MainLayout = () => {
 
     const [collapsed, setCollapsed] = useState(true);
+
+    const { nome } = useAuth();
+    
+    // 1. Defina os itens do menu como um objeto de configuração
+    const items = [
+        {
+            key: '1',
+            label: 'Perfil',
+            icon: <SettingOutlined />,
+        },
+        {
+            type: 'divider',
+        },
+        {
+            key: '3',
+            label: 'Logout',
+            icon: <LogoutOutlined />,
+            danger: true,
+        },
+    ];
+
+    // 2. Função de callback para lidar com cliques nos itens
+    const onClick = ({ key }) => {
+/*
+        console.log(`Clicou no item com a chave: ${key}`);
+        alert(`Você selecionou o item ${key}`);
+*/
+
+        if (key === '3')
+            handleLogout()
+
+    };
+
 
     const handleLogout = async () => {
 
@@ -55,24 +91,27 @@ const MainLayout = () => {
 
                     <MenuList/>
 
-                    {/* Botão Logout no Rodapé da Sidebar */}
-                    <div style={{ padding: '11px', marginTop: 'auto' }}>
-                        <Button
-                        type="text"
-                        icon={<LogoutOutlined />}
-                        onClick={handleLogout}
-                        style={{ 
-                            color: 'white', 
-                            width: '100%', 
-                            display: 'flex', 
-                            alignItems: 'center',
-                            justifyContent: 'flex-start'
-                        }}
-                        >
-                            {!collapsed && 'Logout'}
-                        </Button>
-                    </div>
+                    {/* Botão Logout no Rodapé da Sidebar  */}
+                    <div style={{ padding: '8px', 
+                                  marginTop: 'auto',
+                                  color: 'white',}}>
 
+                        <Dropdown
+                            menu={{
+                                items,
+                                onClick,
+                            }}
+                        // O trigger padrão é 'hover', mas você pode mudar para ['click']
+                        //      trigger={['click']} 
+                        >
+                            <Space>
+                                <Avatar shape="square" 
+                                    size="small" 
+                                    icon={<UserOutlined />} />            
+                                {!collapsed && nome}
+                            </Space>
+                        </Dropdown>
+                    </div>
                 </div>
 
             </Sider>

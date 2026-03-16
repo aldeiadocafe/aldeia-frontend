@@ -24,8 +24,7 @@ const Login = () => {
         senha:  values.senha
       }
       const res = await getLogin(loginAux)
-
-      await login(res.data.token,values.remember ? values.remember : false);
+      await login(res.data,values.remember ? values.remember : false);
       message.success(`Bem-vindo, ${values.email}!`);
 //      window.location.href = '/';
       navigate('/')

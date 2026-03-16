@@ -3,9 +3,9 @@ import { useAuth } from './AuthContext';
 
 export const PrivateRoute = ({ children }) => {
 
-  const { user } = useAuth();
+  const { token } = useAuth();
 
-  if (user === null) {
+  if (token === null) {
     return <Navigate to="/login" />;
   } else {
     return children;
