@@ -31,6 +31,7 @@ import ItemConfComponent from './components/Inventorys/ItemConfComponent';
 import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
 import ListUnitsComponent from './components/Stock/ListUnitComponent';
 import Email from './components/Email';
+import ProfilesComponent from './components/Profile/ProfilesComponent';
 
 
 // 3. Definir o locale do dayjs globalmente
@@ -76,6 +77,14 @@ function App() {
                     </PrivateRoute>
                   }
                   />
+
+                  {/* http://localhost:5173/companys */}
+                  <Route path='/profiles'    
+                    element={
+                      <PrivateRoute>
+                        <ProfilesComponent/>
+                      </PrivateRoute>
+                    }/>
 
                   {/* http://localhost:5173/companys */}
                   <Route path='/companys'    

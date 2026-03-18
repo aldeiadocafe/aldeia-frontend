@@ -480,6 +480,8 @@ const ListInventoryComponent = () => {
             size={'small'}
             scroll={{ y: 'calc(80vh - 90px)' }}                
             rowKey={(record) => record._id}
+            pagination={false}
+/*            
             pagination={{
                 tabela,
                 // The available options for items per page
@@ -495,6 +497,7 @@ const ListInventoryComponent = () => {
                 setTabela(page);
                 },
             }}        
+*/                
         />
 
       {/* Modal de Form */}

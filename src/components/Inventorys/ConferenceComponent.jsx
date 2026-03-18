@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 
 import { Table, Input, Space, Button, Form, DatePicker, message, Row, Col, Card, Spin, Tooltip } from 'antd'
 
@@ -188,6 +188,10 @@ const ConferenceComponent = () => {
 //        alert(`Você clicou na linha de: ${record._id}`);
     };
 
+    useEffect(() => {
+        btnPesquisar();
+    }, [])
+
   return (
     <>
         <div style={{ textAlign: 'center' }}>
@@ -275,21 +279,7 @@ const ConferenceComponent = () => {
             size={'small'}
             scroll={{ y: 'calc(80vh - 90px)' }}    
             rowKey={(record) => record._id}
-            pagination={{
-                tabela,
-                // The available options for items per page
-                pageSizeOptions: ['5', '10', '20', '30'], 
-                // Display the size changer
-                showSizeChanger: true, 
-                // Set the default page size
-        //        defaultPageSize: 5,
-                // Optional: show total items count
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                // Optional: update tabela page state on change
-                onChange: (page) => {
-                    setTabela(page);
-                },
-            }} 
+            pagination={false}
             onRow={(record, rowIndex) => {
                 return {
                 onClick: (event) => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Column } from '@ant-design/plots'
-import { Button, Card, Col, Input, Layout, Row, Space, Table } from 'antd'
+import { Button, Card, Col, Input, Layout, Row, Space, Table, Grid } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 
 import { getAllDatesItem } from '../../services/DatesItemBalanceService'
@@ -12,6 +12,8 @@ import { SearchOutlined } from '@ant-design/icons'
 import { getAllStockBalances } from '../../services/StockBalanceService'
 
 dayjs.extend(utc)
+
+const { useBreakpoint } = Grid;
 
 const DashComponent = () => {
 
@@ -32,6 +34,16 @@ const DashComponent = () => {
       style: 'decimal',
       minimumFractionDigits: 3,
   });
+
+  const screens = useBreakpoint();
+
+  // Define a altura baseada no breakpoint xs
+  const plotHeight = screens.xs ? 120 : 150;
+  const gcomHeight = screens.xs ? 120 : 93;
+  const validadeHeight = screens.xs ? 120 : 215;
+
+    // Define a altura baseada se é xs ou menor
+  const cardBarra = screens.xs ? '135px' : '180px';
 
   const handleReset = (clearFilters, confirm) => {
       clearFilters();
@@ -188,6 +200,15 @@ const DashComponent = () => {
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
     },
+    {
+        title: 'GCom - Estoq', 
+        dataIndex: 'diferenca', 
+        key: 'diferenca',
+        align: 'right',
+        sorter: (a, b) => a.diferenca - b.diferenca,
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        render: (value) => formatter.format(value),
+    },
   ];
 
   const carregarDados = async () => {
@@ -213,7 +234,8 @@ const DashComponent = () => {
           descricao:    item.item.descricao,
           unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
           quantidade:   item.quantidade,
-          gcomEstoque:  item.gcomEstoque
+          gcomEstoque:  item.gcomEstoque,
+          diferenca:    item.gcomEstoque - item.quantidade
         }))
 
         setDadosGCom(dados)
@@ -246,47 +268,54 @@ const DashComponent = () => {
           const hoje = dayjs(new Date().toISOString().split('T')[0])
 
           const dataAux = [
-            { dias: '5 dias',  total: 0 },
-            { dias: '10 dias', total: 0 },
-            { dias: '15 dias', total: 0 },
-            { dias: '20 dias', total: 0 },
-            { dias: '25 dias', total: 0 },
-            { dias: '30 dias', total: 0 },
+            { dias: 'Venc',  total: 0 },
+            { dias: '5 dias',    total: 0 },
+            { dias: '10 dias',   total: 0 },
+            { dias: '15 dias',   total: 0 },
+            { dias: '20 dias',   total: 0 },
+            { dias: '25 dias',   total: 0 },
+            { dias: '30 dias',   total: 0 },
           ];
           
-          // 5 dias
+          // Vencidos
           dataAux[0].total = dados
                         .filter(item => (
-                          dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day')) <= 4 
+                          dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day')) <= 0 
                         )
                         .reduce((sum, item) => sum + item.quantidade, 0)
 
-          // 10 dias
+          // 5 dias
           dataAux[1].total = dados
+                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 0)
+                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 4)
+                        .reduce((sum, item) => sum + item.quantidade, 0)
+
+          // 10 dias
+          dataAux[2].total = dados
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 4)
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 9)
                         .reduce((sum, item) => sum + item.quantidade, 0)
 
           // 15 dias
-          dataAux[2].total = dados
+          dataAux[3].total = dados
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 9)
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 14)
                         .reduce((sum, item) => sum + item.quantidade, 0)
 
           // 20 dias
-          dataAux[3].total = dados
+          dataAux[4].total = dados
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 14)
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 19)
                         .reduce((sum, item) => sum + item.quantidade, 0)
 
           // 25 dias
-          dataAux[4].total = dados
+          dataAux[5].total = dados
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 19)
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 24)
                         .reduce((sum, item) => sum + item.quantidade, 0)
 
           // 30 dias
-          dataAux[5].total = dados
+          dataAux[6].total = dados
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 24)
                         .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 29)
                         .reduce((sum, item) => sum + item.quantidade, 0)
@@ -324,7 +353,7 @@ const DashComponent = () => {
         fill: '#f7f5f5',
       },
     },
-    height: 180, // Optional: set a fixed height
+    height: plotHeight, // Optional: set a fixed height
     // Opcional: animação ao carregar
     animation: {
       appear: {
@@ -343,17 +372,33 @@ const DashComponent = () => {
   return (
     <Layout >      
       <Content style={{ margin: '10px'}}>
-        <Row gutter={16}>
+        <Row gutter={[16, 16]}>
 
-          <Col span={8}>
+          {/* xs={24} para celular (1 card por linha) */}
+          {/* md={12} para desktop (2 cards por linha) */}
+          <Col 
+            xs={24}
+            md={8}
+            span={8}
+            >
+          
             <Card
               title="Total de Produtos à Vencer"
-            >
+              bodyStyle={{ 
+                  height: cardBarra,
+                  overflow: 'hidden' 
+                }}
+            >            
               <Column {...config} />
             </Card>
+
           </Col>
 
-          <Col span={16}>
+          <Col 
+            xs={24}
+            md={16}
+            span={16}
+            >
             <Card
               title="Aldeia X GCom"
             >
@@ -363,8 +408,11 @@ const DashComponent = () => {
                   dataSource={dadosGCom}      
                   showSorterTooltip={true}
                   size={'small'}
-                  scroll={{ y: 'calc(50vh - 235px)' }}                
+                  tableLayout="auto"
+                  scroll={{ y: gcomHeight}}                
                   rowKey={(record) => record._id}
+                  pagination={false}
+/*                  
                   pagination={{
                       tabela,
                       // The available options for items per page
@@ -380,6 +428,7 @@ const DashComponent = () => {
                       setTabela(page);
                       },
                   }}        
+*/                      
               />
 
             </Card>
@@ -396,24 +445,10 @@ const DashComponent = () => {
               showSorterTooltip={true}
               size={'small'}
               tableLayout="auto"
-              scroll={{ y: 'calc(17vh)' }}                
+              scroll={{ y: validadeHeight }}                
 //              scroll={{ y: 110 }}                
               rowKey={(record) => record._id}
-              pagination={{
-                  tabela,
-                  // The available options for items per page
-                  pageSizeOptions: ['5', '10', '20', '30'], 
-                  // Display the size changer
-                  showSizeChanger: true, 
-                  // Set the default page size
-          //        defaultPageSize: 5,
-                  // Optional: show total items count
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                  // Optional: update tabela page state on change
-                  onChange: (page) => {
-                  setTabela(page);
-                  },
-              }}        
+              pagination={false}        
           />
 
         </Card>

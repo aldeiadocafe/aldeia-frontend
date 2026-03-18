@@ -6,7 +6,7 @@ import Sider from 'antd/es/layout/Sider';
 
 import Logo from './Logo';
 import MenuList from './MenuList';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { LogoutOutlined, SettingOutlined, UpOutlined, UserOutlined } from '@ant-design/icons';
 import { Dropdown, Space } from 'antd';
 
@@ -14,9 +14,11 @@ import { useAuth } from '../Login/AuthContext';
 
 const MainLayout = () => {
 
+    const navigator = useNavigate()
+
     const [collapsed, setCollapsed] = useState(true);
 
-    const { nome } = useAuth();
+    const { user } = useAuth();
     
     // 1. Defina os itens do menu como um objeto de configuração
     const items = [
@@ -43,6 +45,9 @@ const MainLayout = () => {
         alert(`Você selecionou o item ${key}`);
 */
 
+        if (key === '1')
+            navigator('/profiles') 
+
         if (key === '3')
             handleLogout()
 
@@ -55,6 +60,10 @@ const MainLayout = () => {
 
         localStorage.removeItem('auth-token');
         sessionStorage.removeItem('auth-token');
+
+        localStorage.removeItem('auth-user');
+        sessionStorage.removeItem('auth-user');        
+
         window.location.href = '/login';
 
     };
@@ -79,15 +88,17 @@ const MainLayout = () => {
                         height: '100%',
                     }}
                 >
-                    <div className='sider-logo'>          
-                    <Button
-                        type='text'
-                        className='toogle'
-                        onClick={() => setCollapsed(!collapsed)}
-                        >
-                        <Logo/>
-                        </Button>
-                    </div>
+                    <a href='/'>
+                        <div className='sider-logo'>          
+                            <Button
+                                type='text'
+                                className='toogle'
+                                onClick={() => setCollapsed(!collapsed)}
+                                >
+                                <Logo/>
+                            </Button>
+                        </div>
+                    </a>
 
                     <MenuList/>
 
@@ -108,7 +119,7 @@ const MainLayout = () => {
                                 <Avatar shape="square" 
                                     size="small" 
                                     icon={<UserOutlined />} />            
-                                {!collapsed && nome}
+                                {!collapsed && user ? user.nome : ''}
                             </Space>
                         </Dropdown>
                     </div>

@@ -111,19 +111,6 @@ const ImportGComEstoqueComponent = () => {
   ];
 
 
-/*
-  const [api, contextHolder]  = notification.useNotification()
-
-  const openNotification = () => {
-    api.open({
-      message: 'Processing Action',
-      description: 'This notification will close automatically with a progress bar.',
-      showProgress: true, // Enables the progress bar
-      duration: 5,        // Duration in seconds
-      pauseOnHover: true, // Optional: pause bar on hover
-    });
-  };
-*/
   // Propriedades de configuração do Upload
   const props = {    
 
@@ -131,7 +118,7 @@ const ImportGComEstoqueComponent = () => {
     multiple: false, // Permitir apenas um arquivo    
     fileList, // 1. Limitar os tipos de arquivo (.xls.xlsx)
     listType: 'picture',
-    accept: '.xls.xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // 2. Validação antes de enviar
+    accept: 'xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // 2. Validação antes de enviar
 
     showUploadList: {
       extra: ({ size = 0 }) => (
@@ -236,7 +223,7 @@ const ImportGComEstoqueComponent = () => {
 
           return {
             _id:  stock ? stock._id : null,
-            gcomEstoque: item.quantidade
+            gcomEstoque: item.quantidade,
           }
         })
 
@@ -394,21 +381,7 @@ const ImportGComEstoqueComponent = () => {
                 size={'small'}
                 scroll={{ y: 'calc(80vh - 90px)' }}                
                 rowKey={(record) => record._id}
-                pagination={{
-                    tabela,
-                    // The available options for items per page
-                    pageSizeOptions: ['5', '10', '20', '30'], 
-                    // Display the size changer
-                    showSizeChanger: true, 
-                    // Set the default page size
-            //        defaultPageSize: 5,
-                    // Optional: show total items count
-                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                    // Optional: update tabela page state on change
-                    onChange: (page) => {
-                    setTabela(page);
-                    },
-                }}        
+                pagination={false}
             />
 
           </Card>

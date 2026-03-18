@@ -24,6 +24,7 @@ const Login = () => {
         senha:  values.senha
       }
       const res = await getLogin(loginAux)
+
       await login(res.data,values.remember ? values.remember : false);
       message.success(`Bem-vindo, ${values.email}!`);
 //      window.location.href = '/';
@@ -77,9 +78,6 @@ const Login = () => {
             <Button type="primary" htmlType="submit" className="w-100" size="large">
               Entrar
             </Button>
-            <div className="text-center mt-3">
-                Ou <a href="/">registre-se agora!</a>
-            </div>
           </Form.Item>
         </Form>
       </Card>

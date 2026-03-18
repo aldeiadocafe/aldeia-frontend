@@ -12,6 +12,7 @@ import utc from 'dayjs/plugin/utc'
 import { getPlacesInventoryById } from '../../services/PlacesInventoryService';
 import { getAllItems } from '../../services/ItemService';
 import { createCountPlaces, deleteCountPlaces, getAllByPlaces } from '../../services/CountPlacesService';
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 dayjs.extend(utc)
 
@@ -181,7 +182,7 @@ const ItemConfComponent = () => {
 
     // onSearch é acionado quando o usuário digita no input
     const onSearchDescricao = (value) => {
-
+        
         let res = []
         if (!value) {
             res = []
@@ -189,7 +190,7 @@ const ItemConfComponent = () => {
 
             res = items
                 .filter((item) =>
-                    item.descricao.toUpperCase().includes(value.toUpperCase())
+                    normalizarTexto(item.descricao).toUpperCase().includes(normalizarTexto(value).toUpperCase())
                 )
                 .map((item) => ({
                     // 'value' é o que preenche o input quando selecionado
@@ -317,9 +318,10 @@ const ItemConfComponent = () => {
 
     }
 
-    const carregarCount = () => {
+    const carregarCount = async() => {
 
         setLoading(true);        
+        setDados([])
         getAllByPlaces(placesId).then((response) => {
 
             const dados = response.data.map((count) => ({
@@ -375,6 +377,35 @@ const ItemConfComponent = () => {
         } else {
             focusDescricao()
         }
+
+    }
+
+    const validateDataValidade = (_, value) => {
+
+        if (!value) return Promise.resolve(); // Permite que a validação de campo obrigatório trate a ausência de valor
+
+        return new Promise((resolve, reject) => {
+
+            //Verifica se a data é anterio a hoje
+            if (value.isBefore(dayjs().startOf('day'))) {
+    //            return Promise.reject(new Error('A data não pode ser anterior a hoje!'));
+                Modal.confirm(
+                    {
+                        title: 'Data de Validade Vencida',
+                        content: 'A data de validade informada é anterior a hoje. Deseja continuar?',
+                        onOk: () => { resolve()},
+                        onCancel: () => {
+                            reject();
+//                            formCountPlaces.resetFields(['dataValidade'])
+                        }
+                    })
+
+            } else {
+                resolve();
+            }
+
+
+        })
 
     }
 
@@ -517,7 +548,7 @@ const ItemConfComponent = () => {
                 layout='horizontal'
                 size='small'
                 onFinish={onFinishFormItems}
-                onFinishFailed={onFinishFailedFormItems}
+//                onFinishFailed={onFinishFailedFormItems}
             >
                 <Item
                     name={"_id"}
@@ -565,7 +596,7 @@ const ItemConfComponent = () => {
                                 //onBlur={onBlurDescricao}     // Leave do campo
 
                                 // --- Props de Comportamento ---
-                                style={{ minWidth: 260}}
+                                style={{ minWidth: 260 }}
                                 placeholder="Descrição do Item"
 //                                allowClear // Mostra ícone para limpar o input
 //                                filterOption={false} // Desabilita filtro automático (filtramos no handleSearch)
@@ -602,19 +633,19 @@ const ItemConfComponent = () => {
                         <Item
                             name={"dataValidade"}
                             label="Dt Validade"
-                            required
+                            validateTrigger={['onBluir']}
                             rules={[{required: true, 
-                                    message: 'Informar Data de Validade'}]}
-                            >
+                                    message: 'Informar Data de Validade'},
+                                    {validator: validateDataValidade}
+                                    ]}
+                            
+                            >                                
                                 <DatePicker 
                                     placeholder='Dt Validade'
                                     selected={startDate}
                                     ref={refDataValidade}
                                     style={{ width: 140 }}
-                                    format={{
-                                        format: "DD/MM/YYYY",
-                                        type: 'mask',
-                                    }}
+                                    format={"DD/MM/YYYY"}
                                 />
                         </Item>
                     </Space>
@@ -623,9 +654,15 @@ const ItemConfComponent = () => {
                     name={"quantidade"}
                     label="Quantidade"
                     required
-                    rules={[{required: true, 
-                            message: 'Quantidade'}]}
-                >
+                    rules={[
+                        {required: true},
+                        {
+                            validator: (_, value) => 
+                                value > 0 
+                                ? Promise.resolve()
+                                : Promise.reject(new Error('A quantidade deve ser maior que zero')),                                    
+                        }
+                        ]}                >
                     <InputNumber
                         style={{ width: 140 }}
                         step={1}
@@ -637,11 +674,11 @@ const ItemConfComponent = () => {
 
                 <Item>
                     <Space>
-                        <Button type="primary" htmlType="submit">
-                            Gravar
-                        </Button>
                         <Button onClick={handleVoltar}>
                             Cancelar
+                        </Button>
+                        <Button type="primary" htmlType="submit">
+                            Gravar
                         </Button>
                         <Checkbox
                             onChange={()=> {setCardCount(!cardCount)}}
@@ -675,21 +712,7 @@ const ItemConfComponent = () => {
                     size={'small'}
                     scroll={{ y: 'calc(80vh - 370px)' }}                
                     rowKey={(record) => record._id}
-                    pagination={{
-                        tabela,
-                        // The available options for items per page
-                        pageSizeOptions: ['5', '10', '20', '30'], 
-                        // Display the size changer
-                        showSizeChanger: true, 
-                        // Set the default page size
-                //        defaultPageSize: 5,
-                        // Optional: show total items count
-                        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                        // Optional: update tabela page state on change
-                        onChange: (page) => {
-                        setTabela(page);
-                        },
-                    }}        
+                    pagination={false}
                 />
             </Card>
         )}
