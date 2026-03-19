@@ -27,12 +27,10 @@ const Email = () => {
         'fhQYQ-Ntr84l_55IR'      //YOUR_PUBLIC_KEY
       )
 */
-emailjs.send("service_umls6wu","template_5mebi5m",{
-        title: "Titulo",
-        name: "Edgar",
-        message: "Mensagem",
-        email: "edgar.bispo@aldeiadocafe.com.br",
-        },
+    emailjs.send("service_umls6wu","template_s7r5d5d",{
+        user_name: "Edgar",
+        link: "https://sakamoto.aldeiadocafe.com.br/item-conference/69bc317b9c8715ba3d0ba9a4",
+        email: "edgar.bispo@aldeiadocafe.com.br"},
       'fhQYQ-Ntr84l_55IR')        
       .then(
         (result) => {

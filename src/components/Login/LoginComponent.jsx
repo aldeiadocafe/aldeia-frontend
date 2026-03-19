@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 
-const Login = () => {
+const LoginComponent = () => {
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -39,7 +39,9 @@ const Login = () => {
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <Card className="shadow-lg" style={{ width: 400 }}>
         <div className="text-center mb-4">
-          <Title level={2}>Login</Title>
+          <Title 
+            level={1}
+            >Login</Title>
         </div>
         
         <Form
@@ -71,7 +73,7 @@ const Login = () => {
             <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox>Lembrar-me</Checkbox>
             </Form.Item>
-            <a className="float-end" href="/">Esqueci minha senha</a>
+            <a className="float-end" href="/recover">Esqueci minha senha</a>
           </Form.Item>
 
           <Form.Item>
@@ -85,4 +87,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginComponent;

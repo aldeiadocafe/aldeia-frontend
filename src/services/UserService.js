@@ -4,6 +4,7 @@ import axios from 'axios';
 const REST_API_BASE_URL = API_BASE_URL + 'users';
 
 export const getAllUsers = () => axios.get(REST_API_BASE_URL);
+export const getUserByEmail = (email) => axios.get(REST_API_BASE_URL + '?email=' + email);
 
 export const createUser = (user) => axios.post(REST_API_BASE_URL, user);
 

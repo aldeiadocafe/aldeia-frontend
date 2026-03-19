@@ -1,34 +1,55 @@
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Card, Form, Input, Space, Spin, message } from 'antd'
 import { useEffect, useState } from 'react';
-import { useAuth } from '../Login/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { updateUser } from '../../services/UserService';
+import { useAuth } from './AuthContext';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const ProfilesComponent = () => {
+import { updateUser } from '../../services/UserService';
+import { getPasswordById } from '../../services/PasswordService'
+
+const PasswordsComponent = () => {
 
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
+    const {id: idPassword} = useParams();
     const { user, atualizarUser } = useAuth();
 
     const navigate = useNavigate();
     const [loading, setLoading]    = useState(false);
+
+    const carregarDados = async () => {
+
+      setLoading(true)
+
+      await getPasswordById(idPassword).then((response) => {
+
+        form.setFieldsValue({
+          _id:    response.data.user._id,
+          email:  response.data.user.email.toUpperCase(),
+          nome:   response.data.user.nome.toUpperCase()
+        })
+
+      }).catch((err)=> {
+        message.error(`Erro: ${err.response.data.message}!`);
+      })
+
+      setLoading(false)
+
+    }
 
     //Gravar
     const handleFinish = async(values) => {
 
       const userData = {
         _id: values._id, 
-        nome: values.nome.toUpperCase()};
-
-      if (user.senha !== values.senha) {
-        userData.senha = values.senha;
+        nome: values.nome.toUpperCase(),
+        senha: values.senha
       }        
 
       setLoading(true);    
 
-      updateUser(values._id, userData).then((response) => {
+      updateUser (values._id, userData).then((response) => {
 
           atualizarUser(response.data);
           message.success('Registro atualizado com sucesso!')
@@ -48,21 +69,15 @@ const ProfilesComponent = () => {
 
     }
 
-    const handleCancel = () => {
-        form.resetFields();
-    }
-
     useEffect(() => {
 
-      if (user) {
+      if (idPassword) {
 
-        setLoading(true);
+        carregarDados()
 
-        form.setFieldsValue(user);
-
-        setLoading(false);
       }
-    }, []);
+
+    }, [])
 
   return (
     <>
@@ -75,7 +90,7 @@ const ProfilesComponent = () => {
         style={{ maxWidth: 400, 
                  margin: '50px auto',
                  color: 'var(--primary-color)'}}
-        title="Perfil do Usuário">
+        title="Alterar Senha">
         <Form
           form={form}
           layout="vertical"
@@ -108,6 +123,7 @@ const ProfilesComponent = () => {
                         message: 'Informar seu nome' }]}
               >
               <Input 
+                  disabled
                   style={{ textTransform: 'uppercase' }}
                   placeholder="Seu Nome"
 //                  prefix={<UserOutlined />} 
@@ -116,7 +132,7 @@ const ProfilesComponent = () => {
           <Item
               name="senha"
               key={"senha"}
-              label="Senha"
+              label="Nova Senha"
               rules={[{ required: true, 
                         message: 'Informar sua senha' }]}
               >
@@ -131,7 +147,6 @@ const ProfilesComponent = () => {
                 <Space>
                   <Button 
                       htmlType="button"
-                      onClick={handleCancel}
                   >
                     Cancelar
                   </Button>
@@ -150,4 +165,4 @@ const ProfilesComponent = () => {
 
 }
 
-export default ProfilesComponent
+export default PasswordsComponent

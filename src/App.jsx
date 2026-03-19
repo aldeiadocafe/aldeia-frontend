@@ -13,7 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/reset.css'; // Para Ant Design v5
 
 import { AuthProvider } from './components/Login/AuthContext';
-import Login from './components/Login/Login';
+import LoginComponent from './components/Login/LoginComponent';
 import { PrivateRoute } from './components/Login/PrivateRoute';
 import MainLayout from './components/Main/MainLayout';
 import DashComponent from './components/Main/DashComponent';
@@ -32,6 +32,8 @@ import ImportInvoicesComponent from './components/Receipts/ImportInvoicesCompone
 import ListUnitsComponent from './components/Stock/ListUnitComponent';
 import Email from './components/Email';
 import ProfilesComponent from './components/Profile/ProfilesComponent';
+import RecoverComponent from './components/Login/RecoverComponent';
+import PasswordsComponent from './components/Login/PasswordsComponent';
 
 
 // 3. Definir o locale do dayjs globalmente
@@ -55,7 +57,17 @@ function App() {
             <Routes>
 
               {/* Rotas Protegidas com Sidebar */}
-              <Route path="/login" element={<Login/>} />
+              <Route path="/login" element={<LoginComponent/>} />
+
+              {/* Rotas Protegidas com Sidebar */}
+              <Route path="/recover" element={<RecoverComponent/>} />
+
+              {/* http://localhost:5173/password */}
+              <Route path="/password/:id" element={<PasswordsComponent/>} />
+
+              {/* http://localhost:5173/companys */}
+              <Route path='/email'
+                element={<Email/>}/>
 
               <Route
                 path="/"
@@ -65,10 +77,6 @@ function App() {
                   </PrivateRoute>
                 }
               >
-
-                {/* http://localhost:5173/companys */}
-                <Route path='/email'
-                  element={<Email/>}/>
 
                 <Route index 
                   element={

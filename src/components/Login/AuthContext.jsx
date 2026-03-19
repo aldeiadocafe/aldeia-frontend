@@ -44,9 +44,19 @@ export const AuthProvider = ({ children }) => {
 //    navigate('/login');
   };
 
+  const atualizarUser = async (dados) => {
+
+    sessionStorage.setItem('auth-user', JSON.stringify(dados));
+    setUser(dados);
+
+    if (localStorage.getItem('auth-user')) {
+      localStorage.setItem('auth-user', JSON.stringify(dados));
+    }
+
+  }
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ token, user, login, logout, atualizarUser }}>  {/* São os campos "globais" do contexto e as funções */}
       {children}
     </AuthContext.Provider>
   );
