@@ -28,7 +28,6 @@ const ListStockBalanceComponent = () => {
     const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
     const [datesItem, setDatesItem]     = useState([])
-    const [filterDesc,  setFilterDesc]  = useState([])
 
     const [loading, setLoading] = useState(false);
 
@@ -42,12 +41,14 @@ const ListStockBalanceComponent = () => {
     const exportToExcel = () => {
 
         const dadosExcel = dados.map(item => ({
-            Item:       item.itCodigo,
-            Descrição:  item.descricao,
-            Unid:       item.unidade,
-            Quantidade: formatter.format(item.qtde),
-            GCom:       formatter.format(item.gcomEstoque),
-            "GCOM - Qtde":  formatter.format(item.diferenca),
+            Item:               item.itCodigo,
+            Descrição:          item.descricao,
+            Unid:               item.unidade,
+            Quantidade:         formatter.format(item.qtde),
+            GCom:               formatter.format(item.gcomEstoque),
+            "GCOM - Qtde":      formatter.format(item.diferenca),
+            "Data Inventário":  item.dataInventario,
+            "Data GCom":        item.dataGCom
         }))
 
         // Cria worksheet / Converte os dados (JSON) em worksheet
@@ -85,6 +86,8 @@ const ListStockBalanceComponent = () => {
         if (ws['D1']) ws['D1'].s = headerStyle;
         if (ws['E1']) ws['E1'].s = headerStyle;
         if (ws['F1']) ws['F1'].s = headerStyle;
+        if (ws['G1']) ws['G1'].s = headerStyle;
+        if (ws['H1']) ws['H1'].s = headerStyle;
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
@@ -94,7 +97,8 @@ const ListStockBalanceComponent = () => {
             { wch: 15 }, // Largura da Coluna D
             { wch: 15 }, // Largura da Coluna E
             { wch: 15 }, // Largura da Coluna F
-
+            { wch: 15 }, // Largura da Coluna F
+            { wch: 15 }, // Largura da Coluna F
         ]
 
         // Obtém o total de linhas (exclui o cabeçalho se json_to_sheet for usado sem customização)
@@ -109,6 +113,13 @@ const ListStockBalanceComponent = () => {
             ws['D' + i].s = rightAlignStyle; // Aplica o estilo
             ws['E' + i].s = rightAlignStyle; // Aplica o estilo
             ws['F' + i].s = rightAlignStyle; // Aplica o estilo
+
+            //Formatar em data
+            ws['G' + i].z = 'dd/mm/yyyy'
+            ws['G' + i].t = 'd' // Define o tipo como Data
+
+            ws['H' + i].z = 'dd/mm/yyyy'
+            ws['H' + i].t = 'd' // Define o tipo como Data
         }
 
         // Cria um novo workbook
@@ -186,19 +197,16 @@ const ListStockBalanceComponent = () => {
         sorter: (a, b) => a.itcodigo.localeCompare(b.itcodigo),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('itCodigo'),
-        onFilter: (value, record) => record.itcodigo.indexOf(value) === 0,      
         ellipsis: true,
     },
     {
         title: 'Descrição', 
         dataIndex: 'descricao', 
         key: 'descricao',
-        filters:filterDesc,
-        filterMode: 'tree',
-        filterSearch: true,
         sorter: (a, b) => a.descricao.localeCompare(b.descricao),
         defaultSortOrder: 'ascend', 
-        onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ...getColumnSearchProps('descricao'),
         ellipsis: true,
     },
     {
@@ -208,7 +216,6 @@ const ListStockBalanceComponent = () => {
         sorter: (a, b) => a.unidade.localeCompare(b.unidade),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('unidade'),
-        onFilter: (value, record) => record.unidade.indexOf(value) === 0,      
         ellipsis: true,
     },
     {
@@ -240,8 +247,17 @@ const ListStockBalanceComponent = () => {
     },
     {
         dataIndex:  "dataInventario",
-        title:      "Data Inventário",
+        title:      "Dt Inventário",
         sorter: (a, b) => new Date(a.dataInventario).getTime() - new Date(b.dataInventario).getTime(),
+        // Optional: set a default sort order
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ellipsis: true,
+        render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
+    },
+    {
+        dataIndex:  "dataGCom",
+        title:      "Dt GCom",
+        sorter: (a, b) => new Date(a.dataGCom).getTime() - new Date(b.dataGCom).getTime(),
         // Optional: set a default sort order
         showSorterTooltip: { target: 'sorter-icon' }, 
         ellipsis: true,
@@ -313,18 +329,11 @@ const ListStockBalanceComponent = () => {
                 unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
                 gcomEstoque:    item.gcomEstoque,
                 diferenca:      item.gcomEstoque - item.quantidade,
-                dataInventario: item.dataInventario
+                dataInventario: item.dataInventario,
+                dataGCom:       item.dataGCom,
             }))
 
             setDados(dadosAux);
-
-            //Montar filtro
-            const filtro = dadosAux.map((filtro) => ({
-                text:   filtro.descricao,
-                value:  filtro.descricao
-            }))
-            setFilterDesc(filtro)
-
 
         }).catch((error)=> {
             console.error(error);
@@ -340,26 +349,27 @@ const ListStockBalanceComponent = () => {
         const filterItem = expandedDateItem.filter((item) => item.idItem === record.idItem)
 
         return (
-            <Table 
-                columns={expandedColunas} 
-                dataSource={filterItem} 
-                title={() => (
-                    <Title level={4}
-                        style={{ 
-                            color: 'var(--primary-color)',
-                            padding: '0px',
-                            margin: '0px',
-                        }}
-                    >
-                        Data de Validade
-                    </Title>
-                )} // <--- Título aqui
-                size={'small'}
-                showSorterTooltip={true}
-                tableLayout='auto'
-                pagination={false}
-            />
-
+            <div style={{ width: '45%',  }}> {/* margin: '0 auto' Container reduzido */}
+                <Table 
+                    columns={expandedColunas} 
+                    dataSource={filterItem} 
+                    title={() => (
+                        <Title level={4}
+                            style={{ 
+                                color: 'var(--primary-color)',
+                                padding: '0px',
+                                margin: '0px',
+                            }}
+                        >
+                            Data de Validade
+                        </Title>
+                    )} // <--- Título aqui
+                    size={'small'}
+                    showSorterTooltip={true}
+                    tableLayout='auto'
+                    pagination={false}
+                />
+            </div>
         )
 
     }
@@ -462,21 +472,7 @@ const ListStockBalanceComponent = () => {
                 ),
             }}
 */
-            pagination={{
-                tabela,
-                // The available options for items per page
-                pageSizeOptions: ['5', '10', '20', '30'], 
-                // Display the size changer
-                showSizeChanger: true, 
-                // Set the default page size
-        //        defaultPageSize: 5,
-                // Optional: show total items count
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                // Optional: update tabela page state on change
-                onChange: (page) => {
-                setTabela(page);
-                },
-            }}
+            pagination={false}
 
         />
 

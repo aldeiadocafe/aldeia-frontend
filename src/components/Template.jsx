@@ -144,7 +144,7 @@ const ListInventoryComponent = () => {
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricao'),
-            onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
+//            onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -153,7 +153,6 @@ const ListInventoryComponent = () => {
             sorter: (a, b) => a.tipo.localeCompare(b.tipo),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('tipo'),
-            onFilter: (value, record) => record.local.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -162,7 +161,6 @@ const ListInventoryComponent = () => {
             sorter: (a, b) => a.situacao.localeCompare(b.situacao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('situacao'),
-            onFilter: (value, record) => record.situacao.indexOf(value) === 0,      
             ellipsis: true,
         },
         {

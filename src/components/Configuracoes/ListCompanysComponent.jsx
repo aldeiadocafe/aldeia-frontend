@@ -175,7 +175,7 @@ const ListCompanysComponent = () => {
             sorter: (a, b) => a.cnpj.localeCompare(b.cnpj),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('cnpj'),
-            onFilter: (value, record) => record.cnpj.indexOf(value) === 0,      
+//            onFilter: (value, record) => record.cnpj.indexOf(value) === 0,      
             ellipsis: true,
             render: (text) => formatarCNPJ(text)
         },
@@ -186,7 +186,6 @@ const ListCompanysComponent = () => {
             sorter: (a, b) => a.nome.localeCompare(b.nome),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('nome'),
-            onFilter: (value, record) => record.nome.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -196,7 +195,6 @@ const ListCompanysComponent = () => {
             sorter: (a, b) => a.razaoSocial.localeCompare(b.razaoSocial),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('razaoSocial'),
-            onFilter: (value, record) => record.razaoSocial.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -206,7 +204,6 @@ const ListCompanysComponent = () => {
             sorter: (a, b) => a.inscricaoEstadual.localeCompare(b.inscricaoEstadual),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('inscricaoEstadual'),
-            onFilter: (value, record) => record.inscricaoEstadual.indexOf(value) === 0,      
             ellipsis: true,
         },
     ]

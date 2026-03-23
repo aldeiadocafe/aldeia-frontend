@@ -106,7 +106,6 @@ const ConferenceComponent = () => {
             sorter: (a, b) => a.local.localeCompare(b.local),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('local'),
-            onFilter: (value, record) => record.local.indexOf(value) === 0,      
             ellipsis: true,
         },
         {

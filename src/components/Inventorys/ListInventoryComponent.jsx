@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker} from 'antd'
 import Title from 'antd/es/typography/Title';
@@ -38,48 +38,46 @@ const ListInventoryComponent = () => {
     }
 
     const getColumnSearchProps = (dataIndex) => ({
+
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
-            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onChange={(e) => setSelectedKeys(e.target.value.toUpperCase() ? [e.target.value.toUpperCase()] : [])}
+            onPressEnter={() => confirm()}
             style={{ marginBottom: 8, display: 'block' }}
             />
             <Space>
             <Button
                 type="primary"
-                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                onClick={() => confirm()}
                 icon={<SearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
             >
-                Search
+                Procurar
             </Button>
             <Button
                 onClick={() => handleReset(clearFilters, confirm)}
                 size="small"
                 style={{ width: 90 }}
             >
-                Reset
+                Limpar
             </Button>
             </Space>
         </div>
         ),
         filterIcon: (filtered) => (
-        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+            <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
-        onFilter: (value, record) => 
-        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
-    });
+        // Lógica principal: pesquisa insensível a maiúsculas/minúsculas e parcial
+        onFilter: (value, record) =>
+            record[dataIndex]
+            ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+            : '',
 
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
-        // but you can manage a state here if needed for other components.
-    };
+    });
 
     const colunas = 
     [
@@ -136,16 +134,14 @@ const ListInventoryComponent = () => {
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricao'),
-            onFilter: (value, record) => record.local.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
             dataIndex:  "tipoInventario",
             title:      "Tipo",
-            sorter: (a, b) => a.tipo.localeCompare(b.tipo),
+            sorter: (a, b) => a.tipoInventario.localeCompare(b.tipoInventario),
             showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('tipo'),
-            onFilter: (value, record) => record.local.indexOf(value) === 0,      
+            ...getColumnSearchProps('tipoInventario'),
             ellipsis: true,
         },
         {
@@ -154,7 +150,6 @@ const ListInventoryComponent = () => {
             sorter: (a, b) => a.situacao.localeCompare(b.situacao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('situacao'),
-            onFilter: (value, record) => record.situacao.indexOf(value) === 0,      
             ellipsis: true,
         },
         {

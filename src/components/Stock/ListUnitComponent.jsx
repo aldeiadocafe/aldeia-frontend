@@ -128,7 +128,6 @@ const ListUnitComponent = () => {
             sorter: (a, b) => a.unidade.localeCompare(b.unidade),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('unidade'),
-            onFilter: (value, record) => record.unidade.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -137,7 +136,6 @@ const ListUnitComponent = () => {
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricao'),
-            onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
             ellipsis: true,
         },
     ]

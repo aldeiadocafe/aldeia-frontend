@@ -136,7 +136,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('itCodigo'),
-            onFilter: (value, record) => record.itCodigo.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -146,7 +145,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricao'),
-            onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -156,7 +154,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.unidade.localeCompare(b.unidade),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('unidade'),
-            onFilter: (value, record) => record.unidade.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -166,7 +163,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.codigo.localeCompare(b.codigo),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('codigo'),
-            onFilter: (value, record) => record.codigo.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -176,7 +172,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.descricaoConv.localeCompare(b.descricaoConv),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricaoConv'),
-            onFilter: (value, record) => record.descricaoConv.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -186,7 +181,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.unidadeConv.localeCompare(b.unidadeConv),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('unidadeConv'),
-            onFilter: (value, record) => record.unidadeConv.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -196,7 +190,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.ean.localeCompare(b.ean),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('ean'),
-            onFilter: (value, record) => record.ean.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -214,7 +207,6 @@ const ListConversationsComponent = () => {
             sorter: (a, b) => a.situacao.localeCompare(b.situacao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('situacao'),
-            onFilter: (value, record) => record.situacao.indexOf(value) === 0,      
             ellipsis: true,
         },
 

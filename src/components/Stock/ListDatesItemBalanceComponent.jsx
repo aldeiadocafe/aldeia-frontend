@@ -20,7 +20,6 @@ const ListDatesItemBalanceComponent = () => {
 
     const [tabela,      setTabela]      = useState(1);
     const [dados,       setDados]       = useState([])
-    const [filterDesc,  setFilterDesc]  = useState([])
 
     const [loading, setLoading] = useState(false);
 
@@ -97,18 +96,15 @@ const ListDatesItemBalanceComponent = () => {
             sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('itCodigo'),
-            onFilter: (value, record) => record.itCodigo.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
             dataIndex:  'descricao',
             title: 'Descrição',
-            filters:filterDesc,
-            filterMode: 'tree',
-            filterSearch: true,
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            ...getColumnSearchProps('descricao'),
             defaultSortOrder: 'ascend', 
-            onFilter: (value, record) => record.descricao.startsWith(value),
             ellipsis: true,
         },
         {
@@ -117,7 +113,6 @@ const ListDatesItemBalanceComponent = () => {
             sorter: (a, b) => a.unidade.localeCompare(b.unidade),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('unidade'),
-            onFilter: (value, record) => record.unidade.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -203,14 +198,6 @@ const ListDatesItemBalanceComponent = () => {
             }))
 
             setDados(dadosAux);
-
-            //Montar filtro
-            const filtro = dadosAux.map((filtro) => ({
-                text:   filtro.descricao,
-                value:  filtro.descricao
-            }))
-            setFilterDesc(filtro)
-
 
         }).catch((error)=> {
             console.error(error);

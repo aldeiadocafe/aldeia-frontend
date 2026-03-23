@@ -23,7 +23,6 @@ const ImportGComEstoqueComponent = () => {
 
   const [dados,       setDados]           = useState([])
   const [datesItem, setDatesItem]         = useState([])
-  const [filterDesc,  setFilterDesc]      = useState([])
   const [tabela,      setTabela]          = useState(1);
   const [searchText,      setSearchText]  = useState('');
 
@@ -84,19 +83,16 @@ const ImportGComEstoqueComponent = () => {
         sorter: (a, b) => a.itcodigo.localeCompare(b.itcodigo),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('itCodigo'),
-        onFilter: (value, record) => record.itcodigo.indexOf(value) === 0,      
         ellipsis: true,
     },
     {
         title: 'Descrição', 
         dataIndex: 'descricao', 
         key: 'descricao',
-        filters:filterDesc,
-        filterMode: 'tree',
-        filterSearch: true,
-        sorter: (a, b) => a.descricao.localeCompare(b.descricao),
         defaultSortOrder: 'ascend', 
-        onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
+        sorter: (a, b) => a.descricao.localeCompare(b.descricao),
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ...getColumnSearchProps('descricao'),
         ellipsis: true,
     },
     {
@@ -293,13 +289,6 @@ const ImportGComEstoqueComponent = () => {
         descricao:  item.item.descricao,
       }))
       setDadosStock(dados)
-
-      //Montar filtro
-      const filtro = dados.map((filtro) => ({
-          text:   filtro.descricao,
-          value:  filtro.descricao
-      }))
-      setFilterDesc(filtro)
 
     })
       

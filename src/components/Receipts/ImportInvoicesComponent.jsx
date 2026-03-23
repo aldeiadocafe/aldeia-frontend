@@ -28,7 +28,6 @@ const ImportInvoicesComponent = () => {
 
   const [botao,   setBotao]           = useState(false)
   const [loading, setLoading]         = useState(false);
-  const [filterDesc,  setFilterDesc]  = useState([])
   const [searchText,  setSearchText]  = useState('');
 
   const [exibirTabela,  setExibirTabela]  = useState(false)
@@ -202,10 +201,9 @@ const ImportInvoicesComponent = () => {
           title: 'Descrição', 
           dataIndex: 'descricao', 
           key: 'descricao',
-          filters:filterDesc,
-          filterMode: 'tree',
-          filterSearch: true,
           sorter: (a, b) => a.descricao.localeCompare(b.descricao),
+          showSorterTooltip: { target: 'sorter-icon' }, 
+          ...getColumnSearchProps('descricao'),
           onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
           ellipsis: true,
       },

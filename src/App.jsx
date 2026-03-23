@@ -34,6 +34,7 @@ import Email from './components/Email';
 import ProfilesComponent from './components/Profile/ProfilesComponent';
 import RecoverComponent from './components/Login/RecoverComponent';
 import PasswordsComponent from './components/Login/PasswordsComponent';
+import Teste from './components/Teste';
 
 
 // 3. Definir o locale do dayjs globalmente
@@ -68,6 +69,10 @@ function App() {
               {/* http://localhost:5173/companys */}
               <Route path='/email'
                 element={<Email/>}/>
+
+              {/* http://localhost:5173/companys */}
+              <Route path='/teste'
+                element={<Teste/>}/>
 
               <Route
                 path="/"

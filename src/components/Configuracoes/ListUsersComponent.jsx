@@ -138,7 +138,6 @@ const ListUsersComponent = () => {
             sorter: (a, b) => a.email.localeCompare(b.email),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('email'),
-            onFilter: (value, record) => record.email.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -148,7 +147,6 @@ const ListUsersComponent = () => {
             sorter: (a, b) => a.nome.localeCompare(b.nome),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('nome'),
-            onFilter: (value, record) => record.nome.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -158,7 +156,6 @@ const ListUsersComponent = () => {
             sorter: (a, b) => a.telefone.localeCompare(b.telefone),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('telefone'),
-            onFilter: (value, record) => record.telefone.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -168,7 +165,6 @@ const ListUsersComponent = () => {
             sorter: (a, b) => a.situacao.localeCompare(b.situacao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('situacao'),
-            onFilter: (value, record) => record.situacao.indexOf(value) === 0,      
             ellipsis: true,
         },
     ]

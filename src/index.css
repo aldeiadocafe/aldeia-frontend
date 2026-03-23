@@ -66,3 +66,14 @@
   margin-bottom: 10px;
   border-radius: 8px;  
 }
+
+/* Retirar underline do menu */
+.ant-menu-item a,
+.ant-menu-submenu-title a {
+  text-decoration: none !important;
+}
+
+.ant-menu-item::after,
+.ant-menu-submenu::after {
+  border-bottom: transparent !important;
+}

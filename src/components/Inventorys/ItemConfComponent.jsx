@@ -29,7 +29,6 @@ const ItemConfComponent = () => {
 
     const [itemId, setItemId] = useState('');
     
-    const [tabela,          setTabela]          = useState(1);
     const [dados,           setDados]           = useState([]);
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
@@ -40,7 +39,6 @@ const ItemConfComponent = () => {
     const [items,  setItems]    = useState([]);
 
     const [dadosDescricao,  setDadosDescricao]  = useState([]);
-    const [valueDescricao,  setValueDescricao]  = useState('')
     const [optDescricao,    setOptDescricao]    = useState([]);    
 
     const [codBarra, setCodBarra ]  = useState('')
@@ -57,6 +55,8 @@ const ItemConfComponent = () => {
 
     const [isModalVisible, setIsModalVisible]   = useState(false);
 
+    const [zerar, setZerar] = useState(false)
+
     const customHeight = screens.xs ? '355px' : '230px'
 
     const formatter = new Intl.NumberFormat('pt-BR', {
@@ -64,6 +64,12 @@ const ItemConfComponent = () => {
         minimumFractionDigits: 3,
     });
 
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters();
+        setSearchText({});
+        confirm();
+    };
+    
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
@@ -154,7 +160,6 @@ const ItemConfComponent = () => {
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricao'),
-            onFilter: (value, record) => record.local.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -250,7 +255,8 @@ const ItemConfComponent = () => {
             placesInventory:    placesId,   
             item:               values._idItem,
             dataValidade:       dayjs.utc(values.dataValidade),
-            quantidade:         values.quantidade
+            quantidade:         values.quantidade,
+            zerar:              values.chZerar ? true : false
         };
 
         await createCountPlaces(countPlaces).then((response) => {
@@ -267,7 +273,7 @@ const ItemConfComponent = () => {
                 formCountPlaces.resetFields(['dataValidade'])
             }
 
-            formCountPlaces.resetFields(['quantidade'])
+            formCountPlaces.resetFields(['quantidade', 'chZerar'])
 
         }).catch((error)=> {
             if (error.response.data.message) {
@@ -409,6 +415,16 @@ const ItemConfComponent = () => {
 
     }
 
+    const handleChZerar = (value) => {
+
+        setZerar(value.target.checked)
+
+        if (value) {
+            formCountPlaces.setFieldsValue({quantidade: null })
+        }
+
+    }
+    
     useEffect(() => {
 
         if(placesId){
@@ -650,27 +666,40 @@ const ItemConfComponent = () => {
                         </Item>
                     </Space>
                 </Row>
-                <Item
-                    name={"quantidade"}
-                    label="Quantidade"
-                    required
-                    rules={[
-                        {required: true},
-                        {
-                            validator: (_, value) => 
-                                value > 0 
-                                ? Promise.resolve()
-                                : Promise.reject(new Error('A quantidade deve ser maior que zero')),                                    
-                        }
-                        ]}                >
-                    <InputNumber
-                        style={{ width: 140 }}
-                        step={1}
-                        decimalSeparator=','
-                    >
-                    </InputNumber>
 
-                </Item>
+                <Space size={"small"}>
+                    <Item
+                        name={"quantidade"}
+                        label="Quantidade"
+                        required = {!zerar}
+                        rules={[
+                            {required: !zerar},
+                            {
+                                validator: (_, value) => 
+                                    zerar ? Promise.resolve() 
+                                        : value > 0
+                                            ? Promise.resolve()
+                                            : Promise.reject(new Error('A quantidade deve ser maior que zero')),                                    
+                            }
+                            ]}                >
+                        <InputNumber
+                            disabled = {zerar}
+                            style={{ width: 140 }}
+                            step={1}
+                            decimalSeparator=','
+                        >
+                        </InputNumber>
+
+                    </Item>
+                    <Item
+                        label="Zerar Item?"
+                        name="chZerar"
+                        valuePropName="checked"
+                    >
+                        <Checkbox onChange={handleChZerar}/>                        
+                    </Item>
+
+                </Space>
 
                 <Item>
                     <Space>
@@ -701,7 +730,7 @@ const ItemConfComponent = () => {
                     borderColor: '#c36434',
                     boxShadow: '0 2px 8px #d4b8ab',
                     borderRadius: 8,                    
-                    height: 'calc(100% - 315px)' 
+                    height: 'calc(100% - 345px)' 
                 }}
             >
 
@@ -710,7 +739,7 @@ const ItemConfComponent = () => {
                     dataSource={dados}      
                     showSorterTooltip={true}
                     size={'small'}
-                    scroll={{ y: 'calc(80vh - 370px)' }}                
+                    scroll={{ y: 'calc(80vh - 380px)' }}                
                     rowKey={(record) => record._id}
                     pagination={false}
                 />

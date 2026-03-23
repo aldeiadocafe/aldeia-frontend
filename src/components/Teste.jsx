@@ -1,70 +1,81 @@
-import React from 'react';
-import { Form, Input, Button, Checkbox, Card, Typography, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'antd/dist/reset.css'; // Antd v5
+import { SearchOutlined } from '@ant-design/icons';
+import { Button, Input, Space, Table } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { getAllInventorys } from '../services/InventoryService';
 
-const { Title } = Typography;
+// Exemplo simplificado de implementação para busca parcial (baseado na estrutura do Ant Design)
+const getColumnSearchProps = (dataIndex, searchInput) => ({
+  filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+    <div style={{ padding: 8 }}>
+      <Input
+        ref={searchInput}
+        placeholder={`Buscar...`}
+        value={selectedKeys[0]}
+        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+        onPressEnter={() => confirm()}
+        style={{ marginBottom: 8, display: 'block' }}
+      />
+      <Space>
+        <Button
+          type="primary"
+          onClick={() => confirm()}
+          icon={<SearchOutlined />}
+          size="small"
+          style={{ width: 90 }}
+        >
+          Buscar
+        </Button>
+        <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+          Reset
+        </Button>
+      </Space>
+    </div>
+  ),
+  filterIcon: (filtered) => (
+    <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+  ),
+  // Lógica principal: pesquisa insensível a maiúsculas/minúsculas e parcial
+  onFilter: (value, record) =>
+    record[dataIndex]
+      ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+      : '',
+});
 
 const Teste = () => {
     
-  const onFinish = (values) => {
-    console.log('Dados do formulário:', values);
-    // Exemplo de feedback do Ant Design
-    message.success(`Bem-vindo, ${values.username}!`);
-  };
+  const searchInput = useRef(null);
+  const columns = [
+    {
+      title: 'Nome',
+      dataIndex: 'descricao',
+      ...getColumnSearchProps('descricao', searchInput),
+    },
+  ];
 
-  return (
-    <div className="container d-flex justify-content-center align-items-center min-vh-100">
-      <Card className="shadow-lg" style={{ width: 400 }}>
-        <div className="text-center mb-4">
-          <Title level={2}>Login</Title>
-        </div>
-        
-        <Form
-          name="normal_login"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          layout="vertical"
-        >
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Por favor, insira seu usuário!' }]}
-          >
-            <Input prefix={<UserOutlined />} placeholder="Usuário" size="large" />
-          </Form.Item>
-          
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Por favor, insira sua senha!' }]}
-          >
-            <Input.Password
-              prefix={<LockOutlined />}
-              type="password"
-              placeholder="Senha"
-              size="large"
-            />
-          </Form.Item>
+//  const data = [{ key: '1', name: 'João Silva' }, { key: '2', name: 'Maria Souza' }];
+  const [data, setData] = useState([])
 
-          <Form.Item>
-            <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>Lembrar-me</Checkbox>
-            </Form.Item>
-            <a className="float-end" href="/">Esqueci minha senha</a>
-          </Form.Item>
+  useEffect(() => {
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="w-100" size="large">
-              Entrar
-            </Button>
-            <div className="text-center mt-3">
-                Ou <a href="/">registre-se agora!</a>
-            </div>
-          </Form.Item>
-        </Form>
-      </Card>
-    </div>
-  );
+    if (data.length === 0) {
+
+      getAllInventorys().then((response) => {
+
+          const dadosAux = response.data.map((item) => ({
+            key: item._id,
+            descricao: item.descricao 
+          }))
+          setData(dadosAux);
+      }).catch((error)=> {
+          console.error(error);
+      });
+
+    }
+
+  }, [])
+
+  return <Table columns={columns} dataSource={data} />;
+
 };
 
 export default Teste;

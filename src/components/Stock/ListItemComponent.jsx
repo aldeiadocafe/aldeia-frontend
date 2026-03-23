@@ -14,8 +14,6 @@ const ListItemComponent = () => {
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
 
-    const [filterDesc,  setFilterDesc]  = useState([])
-
     const [deleteModal,     setDeleteModal]     = useState(false);
     const [formModal,       setFormModal]       = useState(false);
     const [confirmLoading,  setConfirmLoading]  = useState(false);
@@ -132,19 +130,16 @@ const ListItemComponent = () => {
             sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('itCodigo'),
-            onFilter: (value, record) => record.local.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
             dataIndex:  "descricao",
             title:      "Descrição",
             key:        'descricao',
-            filters:filterDesc,
-            filterMode: 'tree',
-            filterSearch: true,
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             defaultSortOrder: 'ascend', 
-            onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            ...getColumnSearchProps('descricao'),
             ellipsis: true,
         },
         {
@@ -153,7 +148,6 @@ const ListItemComponent = () => {
             sorter: (a, b) => a.unitDescricao.localeCompare(b.unitDescricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('unitDescricao'),
-            onFilter: (value, record) => record.unitDescricao.indexOf(value) === 0,      
             ellipsis: true,
         },
         {
@@ -162,7 +156,6 @@ const ListItemComponent = () => {
             sorter: (a, b) => a.situacao.localeCompare(b.situacao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('situacao'),
-            onFilter: (value, record) => record.situacao.indexOf(value) === 0,      
             ellipsis: true,
         },
     ]
@@ -265,14 +258,6 @@ const ListItemComponent = () => {
             }))
 
             setDados(dadosAux);
-
-            //Montar filtro
-            const filtro = dadosAux.map((filtro) => ({
-                text:   filtro.descricao,
-                value:  filtro.descricao
-            }))
-            setFilterDesc(filtro)
-
 
         }).catch((error)=> {
             console.error(error);

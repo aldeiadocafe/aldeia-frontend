@@ -3,7 +3,7 @@ import { AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined
 
 import { Menu, ConfigProvider } from 'antd';
 import { Link } from 'react-router-dom';
-import { BiBadgeCheck, BiBox, BiBuilding, BiUnite } from 'react-icons/bi';
+import { BiBox, BiBuilding, BiUnite } from 'react-icons/bi';
 import { BsArrowLeftRight, BsBoxSeam, BsCashStack, BsCurrencyDollar, BsReceiptCutoff } from 'react-icons/bs';
 
 const MenuList = () => {

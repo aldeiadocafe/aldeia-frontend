@@ -23,7 +23,6 @@ const DashComponent = () => {
   const [tabela,        setTabela]      = useState(1);
 
   const [dadosGCom, setDadosGCom]       = useState([])
-  const [filterDesc,  setFilterDesc]    = useState([])
   const [searchText,      setSearchText]      = useState('');
 
 
@@ -45,11 +44,6 @@ const DashComponent = () => {
     // Define a altura baseada se é xs ou menor
   const cardBarra = screens.xs ? '135px' : '180px';
 
-  const handleReset = (clearFilters, confirm) => {
-      clearFilters();
-      setSearchText({});
-      confirm();
-  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
       confirm();
@@ -164,11 +158,10 @@ const DashComponent = () => {
         title: 'Descrição', 
         dataIndex: 'descricao', 
         key: 'descricao',
-        filters:filterDesc,
-        filterMode: 'tree',
-        filterSearch: true,
         sorter: (a, b) => a.descricao.localeCompare(b.descricao),
         defaultSortOrder: 'ascend', 
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ...getColumnSearchProps('descricao'),
         onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
         ellipsis: true,
     },
@@ -239,13 +232,6 @@ const DashComponent = () => {
         }))
 
         setDadosGCom(dados)
-
-        //Montar filtro
-        const filtro = dados.map((filtro) => ({
-            text:   filtro.descricao,
-            value:  filtro.descricao
-        }))
-        setFilterDesc(filtro)
 
       })
 
