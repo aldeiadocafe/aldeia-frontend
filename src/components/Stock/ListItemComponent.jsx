@@ -5,10 +5,12 @@ import Title from 'antd/es/typography/Title';
 
 import { createItem, deleteItem, getAllItems, updateItem } from '../../services/ItemService';
 import { getAllUnits } from '../../services/UnitService';
+import { useAuth } from '../Login/AuthContext';
 
 const ListItemComponent = () => {
-    
-    const [tabela,          setTabela]          = useState(1);
+
+    const { user } = useAuth();
+
     const [dados,           setDados]           = useState([]);
     const [selectUnits,     setSelectUnits]     = useState([]);
     const [searchText,      setSearchText]      = useState('');
@@ -40,7 +42,7 @@ const ListItemComponent = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
             onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -163,12 +165,13 @@ const ListItemComponent = () => {
     const gravarDados = (values) => {
 
         const item = {
-            _id:            values._id,
-            itCodigo:       values.itCodigo.toUpperCase(),
-            descricao:      values.descricao.toUpperCase(),
-            unit:           values.unit,
-            situacao:       values.situacao.toUpperCase(),
-
+            _id:                values._id,
+            itCodigo:           values.itCodigo.toUpperCase(),
+            descricao:          values.descricao.toUpperCase(),
+            unit:               values.unit,
+            situacao:           values.situacao.toUpperCase(),
+            usuarioCriacao:     user ? user._id : null,
+            usuarioAlteracao:   user ? user._id : null,
         };
 
         setLoading(true);    

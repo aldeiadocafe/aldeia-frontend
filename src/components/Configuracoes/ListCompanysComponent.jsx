@@ -9,12 +9,14 @@ import Title from 'antd/es/typography/Title';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { createCompany, deleteCompany, getAllCompanys, updateCompany } from '../../services/CompanyService';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
 const ListCompanysComponent = () => {
     
-    const [tabela,          setTabela]          = useState(1);
+    const { user } = useAuth();
+
     const [dados,           setDados]           = useState([]);
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
@@ -85,7 +87,7 @@ const ListCompanysComponent = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
             onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -224,7 +226,9 @@ const ListCompanysComponent = () => {
             estado:            values.estado ? values.estado.toUpperCase() : '',
             cep:               values.cep ? values.cep.replace(/\D/g, '') : "",
             email:             values.email ? values.email.toUpperCase() : '',
-            telefone:          values.telefone ? values.telefone.replace(/\D/g, '') : ""
+            telefone:          values.telefone ? values.telefone.replace(/\D/g, '') : "",
+            usuarioCriacao:     user ? user._id : null,
+            usuarioAlteracao:   user ? user._id : null,
         };
 
         setLoading(true);    

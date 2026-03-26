@@ -4,10 +4,12 @@ import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm,
 import Title from 'antd/es/typography/Title';
 
 import { createUnit, deleteUnit, getAllUnits, getUnitById, updateUnit } from '../../services/UnitService';
+import { useAuth } from '../Login/AuthContext';
 
 const ListUnitComponent = () => {
     
-    const [tabela,          setTabela]          = useState(1);
+    const { user } = useAuth();
+
     const [dados,           setDados]           = useState([]);
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
@@ -36,7 +38,7 @@ const ListUnitComponent = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
             onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -143,9 +145,11 @@ const ListUnitComponent = () => {
     const gravarDados = (values) => {
 
         const unit = {
-            _id:        values._id,
-            unidade:    values.unidade.toUpperCase(),
-            descricao:  values.descricao.toUpperCase(),
+            _id:                values._id,
+            unidade:            values.unidade.toUpperCase(),
+            descricao:          values.descricao.toUpperCase(),
+            usuarioCriacao:     user ? user._id : null,
+            usuarioAlteracao:   user ? user._id : null,
 //            descricao:form.getFieldValue('descricao') // Conteudo da tela
         };
 
@@ -196,20 +200,38 @@ const ListUnitComponent = () => {
         carregarDados();
     };
 
-    const carregarDados = () => {
+    const carregarDados = async () => {
         
-        setLoading(true);
-        setDados([])
-        getAllUnits().then((response) => {
-            setDados(response.data);
-        }).catch((error)=> {
-            console.error(error);
-        });
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+        try {
+
+            setLoading(true);
+
+            setDados([])
+            await fetch(getAllUnits().then((response) => {
+
+                const dadosAux = response.data.map(unit => ({  
+                    _id:                unit._id,
+                    unidade:            unit.unidade,
+                    descricao:          unit.descricao,
+                    dataCriacao:        unit.dataCriacao,
+                }))
+
+                setDados(dadosAux);
+            })).catch((error)=> {
+                console.error(error);
+            });
+
+            setTimeout(() => {
+            setSelectedRowKeys([]);
+            setLoading(false);
+            }, 1000);    
+
+        } catch (error) {
+            console.error("Erro ao carregar dados:", error)            
+        } finally {
+            setLoading(false)
+        }
 
     }
 

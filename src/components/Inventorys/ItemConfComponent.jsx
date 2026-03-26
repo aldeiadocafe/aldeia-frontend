@@ -13,6 +13,7 @@ import { getPlacesInventoryById } from '../../services/PlacesInventoryService';
 import { getAllItems } from '../../services/ItemService';
 import { createCountPlaces, deleteCountPlaces, getAllByPlaces } from '../../services/CountPlacesService';
 import { normalizarTexto } from '../../Funcoes/Utils';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
@@ -20,6 +21,8 @@ const { useBreakpoint } = Grid
 const { Item } = Form;
 
 const ItemConfComponent = () => {
+
+    const { user } = useAuth(); 
 
     const screens = useBreakpoint()
 
@@ -74,7 +77,7 @@ const ItemConfComponent = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
             onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -256,7 +259,10 @@ const ItemConfComponent = () => {
             item:               values._idItem,
             dataValidade:       dayjs.utc(values.dataValidade),
             quantidade:         values.quantidade,
-            zerar:              values.chZerar ? true : false
+            zerar:              values.chZerar ? true : false,
+            usuarioCriacao:     user ? user._id : null,
+            usuarioAlteracao:   user ? user._id : null,
+
         };
 
         await createCountPlaces(countPlaces).then((response) => {
@@ -273,6 +279,7 @@ const ItemConfComponent = () => {
                 formCountPlaces.resetFields(['dataValidade'])
             }
 
+            setZerar(false)
             formCountPlaces.resetFields(['quantidade', 'chZerar'])
 
         }).catch((error)=> {

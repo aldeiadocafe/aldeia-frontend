@@ -9,12 +9,14 @@ import Title from 'antd/es/typography/Title';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { getAllInventorys } from '../../services/InventoryService';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
 const ListPlacesInventoryComponent = () => {
-    
-    const [tabela,          setTabela]          = useState(1);
+
+    const { user } = useAuth();
+
     const [dados,           setDados]           = useState([]);
     const [selectInventory, setSelectInventory] = useState([]);
     const [searchText,      setSearchText]      = useState('');
@@ -45,7 +47,7 @@ const ListPlacesInventoryComponent = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
-            placeholder={`Search ${dataIndex}`}
+            placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
             onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
             onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
@@ -173,7 +175,9 @@ const ListPlacesInventoryComponent = () => {
             inventory:          values.inventory,         
             local:              values.local.toUpperCase(),
             situacao:           values._id ? values.situacao.toUpperCase() : 'CRIADO',
-            placesinventory:    values.placesinventory
+            placesinventory:    values.placesinventory,
+            usuarioCriacao:     user ? user._id : null,
+            usuarioAlteracao:   user ? user._id : null,
         };
 
         setLoading(true);    

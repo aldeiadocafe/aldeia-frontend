@@ -52,33 +52,39 @@ const DashComponent = () => {
       // but you can manage a state here if needed for other components.
   };
 
+  const handleReset = (clearFilters, confirm) => {
+      clearFilters();
+      setSearchText({});
+      confirm();
+  };
+
   const getColumnSearchProps = (dataIndex) => ({
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
       <div style={{ padding: 8 }}>
           <Input
-          placeholder={`Search ${dataIndex}`}
+          placeholder={`Procurar ${dataIndex}`}
           value={selectedKeys[0]}
           onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
           onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
           style={{ marginBottom: 8, display: 'block' }}
           />
           <Space>
-            <Button
-                type="primary"
-                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                icon={<SearchOutlined />}
-                size="small"
-                style={{ width: 90 }}
-            >
-                Search
-            </Button>
-            <Button
-                onClick={() => handleReset(clearFilters, confirm)}
-                size="small"
-                style={{ width: 90 }}
-            >
-                Reset
-            </Button>
+          <Button
+              type="primary"
+              onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+          >
+              Procurar
+          </Button>
+          <Button
+              onClick={() => handleReset(clearFilters, confirm)}
+              size="small"
+              style={{ width: 90 }}
+          >
+              Limpar
+          </Button>
           </Space>
       </div>
       ),
@@ -97,7 +103,6 @@ const DashComponent = () => {
           sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
           showSorterTooltip: { target: 'sorter-icon' }, 
           ...getColumnSearchProps('itCodigo'),
-          onFilter: (value, record) => record.itCodigo.indexOf(value) === 0,      
           ellipsis: true,
       },
       {
@@ -107,7 +112,6 @@ const DashComponent = () => {
           sorter: (a, b) => a.descricao.localeCompare(b.descricao),
           showSorterTooltip: { target: 'sorter-icon' }, 
           ...getColumnSearchProps('descricao'),
-          onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
           ellipsis: true,
       },
       {
@@ -117,7 +121,6 @@ const DashComponent = () => {
           sorter: (a, b) => a.unidade.localeCompare(b.unidade),
           showSorterTooltip: { target: 'sorter-icon' }, 
           ...getColumnSearchProps('unidade'),
-          onFilter: (value, record) => record.unidade.indexOf(value) === 0,      
           ellipsis: true,
       },
       {
@@ -128,7 +131,6 @@ const DashComponent = () => {
           sorter: (a, b) => new Date(a.dataValidade).getTime() - new Date(b.dataValidade).getTime(),
           showSorterTooltip: { target: 'sorter-icon' }, 
           ...getColumnSearchProps('dataValidade'),
-          onFilter: (value, record) => record.dataValidade.indexOf(value) === 0,      
           render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
       },
       {
@@ -150,7 +152,6 @@ const DashComponent = () => {
         key: 'itCodigo',
         sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
         showSorterTooltip: { target: 'sorter-icon' }, 
-        ...getColumnSearchProps('itCodigo'),
         onFilter: (value, record) => record.itCodigo.indexOf(value) === 0,      
         ellipsis: true,
     },
@@ -162,7 +163,6 @@ const DashComponent = () => {
         defaultSortOrder: 'ascend', 
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('descricao'),
-        onFilter: (value, record) => record.descricao.indexOf(value) === 0,      
         ellipsis: true,
     },
     {
@@ -172,7 +172,6 @@ const DashComponent = () => {
         sorter: (a, b) => a.unidade.localeCompare(b.unidade),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('unidade'),
-        onFilter: (value, record) => record.unidade.indexOf(value) === 0,      
         ellipsis: true,
     },
     {

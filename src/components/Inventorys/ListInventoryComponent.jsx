@@ -6,12 +6,14 @@ import Title from 'antd/es/typography/Title';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { createInventory, deleteInventory, endInventory, getAllInventorys, updateInventory } from '../../services/InventoryService';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
 const ListInventoryComponent = () => {
     
-    const [tabela,          setTabela]          = useState(1);
+    const { user } = useAuth();
+
     const [dados,           setDados]           = useState([]);
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
@@ -188,7 +190,8 @@ const ListInventoryComponent = () => {
             descricao:      values.descricao.toUpperCase(),
             tipoInventario: values.tipoInventario.toUpperCase(),
             situacao:       values._id ? values.situacao.toUpperCase() : 'CRIADO',
-
+            usuarioCriacao:     user ? user._id : null,
+            usuarioAlteracao:   user ? user._id : null,
         };
 
         setLoading(true);    
