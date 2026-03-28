@@ -1,80 +1,40 @@
-import { SearchOutlined } from '@ant-design/icons';
-import { Button, Input, Space, Table } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
-import { getAllInventorys } from '../services/InventoryService';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-// Exemplo simplificado de implementação para busca parcial (baseado na estrutura do Ant Design)
-const getColumnSearchProps = (dataIndex, searchInput) => ({
-  filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-    <div style={{ padding: 8 }}>
-      <Input
-        ref={searchInput}
-        placeholder={`Buscar...`}
-        value={selectedKeys[0]}
-        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-        onPressEnter={() => confirm()}
-        style={{ marginBottom: 8, display: 'block' }}
-      />
-      <Space>
-        <Button
-          type="primary"
-          onClick={() => confirm()}
-          icon={<SearchOutlined />}
-          size="small"
-          style={{ width: 90 }}
-        >
-          Buscar
-        </Button>
-        <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-          Reset
-        </Button>
-      </Space>
-    </div>
-  ),
-  filterIcon: (filtered) => (
-    <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-  ),
-  // Lógica principal: pesquisa insensível a maiúsculas/minúsculas e parcial
-  onFilter: (value, record) =>
-    record[dataIndex]
-      ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-      : '',
-});
+import { getAllCompanys } from '../services/CompanyService'
 
 const Teste = () => {
     
-  const searchInput = useRef(null);
-  const columns = [
-    {
-      title: 'Nome',
-      dataIndex: 'descricao',
-      ...getColumnSearchProps('descricao', searchInput),
-    },
-  ];
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-//  const data = [{ key: '1', name: 'João Silva' }, { key: '2', name: 'Maria Souza' }];
-  const [data, setData] = useState([])
+    // 1. Define uma função assíncrona
+    const fetchDataSequentially = async () => {
+      try {
+        setLoading(true);
+        // 2. Primeira requisição
+//        const firstResponse = await axios.get('http://localhost:5000/api/v1/units');
+        const firstResponse = await getAllCompanys()
+        const userId = firstResponse.data;
 
+        // 3. Segunda requisição dependente da primeira
+        const secondResponse = await axios.get(`http://localhost:5000/api/v1/inventorys`);
+        
+        setData(secondResponse.data);
+console.log(firstResponse.data, secondResponse.data)        
+      } catch (error) {
+        console.error('Erro na requisição:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
   useEffect(() => {
 
-    if (data.length === 0) {
+    fetchDataSequentially();
+  }, []); // [] garante que a requisição ocorra apenas na montagem
 
-      getAllInventorys().then((response) => {
-
-          const dadosAux = response.data.map((item) => ({
-            key: item._id,
-            descricao: item.descricao 
-          }))
-          setData(dadosAux);
-      }).catch((error)=> {
-          console.error(error);
-      });
-
-    }
-
-  }, [])
-
-  return <Table columns={columns} dataSource={data} />;
+  if (loading) return <div>Carregando...</div>;
+  return <div>{JSON.stringify(data)}</div>;
 
 };
 

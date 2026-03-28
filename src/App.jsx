@@ -18,14 +18,14 @@ import { PrivateRoute } from './components/Login/PrivateRoute';
 import MainLayout from './components/Main/MainLayout';
 import DashComponent from './components/Main/DashComponent';
 import ListCompanysComponent from './components/Configuracoes/ListCompanysComponent';
-import ListUsersComponent from './components/Configuracoes/ListUsersComponent';
+import UsersComponent from './components/Configuracoes/UsersComponent';
 import ListConversationsComponent from './components/Stock/ListConversationsComponent';
-import ListItemComponent from './components/Stock/ListItemComponent';
+import ItemComponent from './components/Stock/ItemComponent';
 import ImportEstoqueGComComponent from './components/GComs/ImportGComComponent';
 import ListStockBalanceComponent from './components/Stock/ListStockBalanceComponent';
 import ListDatesItemBalanceComponent from './components/Stock/ListDatesItemBalanceComponent';
-import ListInventoryComponent from './components/Inventorys/ListInventoryComponent';
-import ListPlacesInventoryComponent from './components/Inventorys/ListPlacesInventoryComponent';
+import InventoryComponent from './components/Inventorys/InventoryComponent';
+import PlacesInventoryComponent from './components/Inventorys/PlacesInventoryComponent';
 import ConferenceComponent from './components/Inventorys/ConferenceComponent';
 import ItemConfComponent from './components/Inventorys/ItemConfComponent';
 import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
@@ -111,7 +111,7 @@ function App() {
                   <Route path='/users'    
                     element={
                       <PrivateRoute>
-                        <ListUsersComponent/>
+                        <UsersComponent/>
                       </PrivateRoute>
                     }/>
 
@@ -127,7 +127,7 @@ function App() {
                   <Route path='/items'    
                     element={
                       <PrivateRoute>
-                        <ListItemComponent/>
+                        <ItemComponent/>
                       </PrivateRoute>
                     }/>
 
@@ -167,7 +167,7 @@ function App() {
                   <Route path='/inventorys'    
                     element={
                       <PrivateRoute>
-                        <ListInventoryComponent/>
+                        <InventoryComponent/>
                       </PrivateRoute>
                     }/>
 
@@ -175,7 +175,7 @@ function App() {
                   <Route path='/placesinventory'    
                     element={
                       <PrivateRoute>
-                        <ListPlacesInventoryComponent/>
+                        <PlacesInventoryComponent/>
                       </PrivateRoute>
                     }/>
 

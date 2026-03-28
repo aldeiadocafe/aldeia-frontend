@@ -1,20 +1,25 @@
-import { useEffect, useRef, useState } from 'react'
-import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react'
+import { AppstoreAddOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker} from 'antd'
+
+import { createPlacesInventory, deletePlacesInventory, endPlaces, getAllPlacesInventory, updatePlacesInventory } from '../../services/PlacesInventoryService';
+
 import Title from 'antd/es/typography/Title';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
-import { createInventory, deleteInventory, endInventory, getAllInventorys, updateInventory } from '../../services/InventoryService';
+import { getAllInventorys } from '../../services/InventoryService';
 import { useAuth } from '../Login/AuthContext';
+import { getAllCompanys, getCompanyById } from '../../services/CompanyService';
 
 dayjs.extend(utc)
 
-const ListInventoryComponent = () => {
-    
+const PlacesInventoryComponent = () => {
+
     const { user } = useAuth();
 
     const [dados,           setDados]           = useState([]);
+    const [selectInventory, setSelectInventory] = useState([]);
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
 
@@ -27,7 +32,7 @@ const ListInventoryComponent = () => {
     const { Item }  = Form;
 
     const [isEditing, setIsEditing]                 = useState(true);
-    const [idInventory, setIdInventory]             = useState();
+    const [idPlacesInventory, setIdPlacesInventory] = useState();
     
     const { Option, OptGroup } = Select;
 
@@ -40,20 +45,19 @@ const ListInventoryComponent = () => {
     }
 
     const getColumnSearchProps = (dataIndex) => ({
-
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
             placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value.toUpperCase() ? [e.target.value.toUpperCase()] : [])}
-            onPressEnter={() => confirm()}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
+            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
             style={{ marginBottom: 8, display: 'block' }}
             />
             <Space>
             <Button
                 type="primary"
-                onClick={() => confirm()}
+                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
                 icon={<SearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
@@ -71,15 +75,18 @@ const ListInventoryComponent = () => {
         </div>
         ),
         filterIcon: (filtered) => (
-            <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
-        // Lógica principal: pesquisa insensível a maiúsculas/minúsculas e parcial
-        onFilter: (value, record) =>
-            record[dataIndex]
-            ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-            : '',
-
+        onFilter: (value, record) => 
+        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
     });
+
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
+        // but you can manage a state here if needed for other components.
+    };
 
     const colunas = 
     [
@@ -91,19 +98,6 @@ const ListInventoryComponent = () => {
             render: (text, record) => (
                 <Space size="small">
 
-                    <Tooltip title="Editar">
-                        <Button
-                            type="primary"
-                            shape='circle'
-                            className={'rotate-icon'}
-                            icon={<EditOutlined rotate={0} />}
-                            disabled={record.situacao === 'FINALIZADO'}
-                            onClick={() => btnEditar(record)}
-                        />
-                    </Tooltip>
-    {/*                <a>{record.unidade}</a>
-                    <a>Delete</a>
-    */}         
                     <Tooltip title="Eliminar">                        
                         <Button
                             type="primary"
@@ -111,7 +105,6 @@ const ListInventoryComponent = () => {
                             shape='circle'
                             className={'rotate-icon'}
                             icon={<DeleteOutlined rotate={0} />}
-                            disabled={record.situacao === 'FINALIZADO'}
                             onClick={() => btnEliminar(record)}
                         />
                     </Tooltip>       
@@ -119,6 +112,15 @@ const ListInventoryComponent = () => {
                 </Space>
             ),
         },        
+        {
+            dataIndex:  "nomeEmpresa",
+            key:        "nomeEmpresa",
+            title:      "Empresa",
+            sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            ...getColumnSearchProps('nomeEmpresa'),
+            ellipsis: true,
+        },
         {
             dataIndex:  "dataInventario",
             title:      "Data Inventário",
@@ -131,19 +133,11 @@ const ListInventoryComponent = () => {
 
         },
         {
-            dataIndex:  "descricao",
-            title:      "Descrição",
-            sorter: (a, b) => a.descricao.localeCompare(b.descricao),
+            dataIndex:  "local",
+            title:      "Localização",
+            sorter: (a, b) => a.local.localeCompare(b.local),
             showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('descricao'),
-            ellipsis: true,
-        },
-        {
-            dataIndex:  "tipoInventario",
-            title:      "Tipo",
-            sorter: (a, b) => a.tipoInventario.localeCompare(b.tipoInventario),
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('tipoInventario'),
+            ...getColumnSearchProps('local'),
             ellipsis: true,
         },
         {
@@ -163,33 +157,35 @@ const ListInventoryComponent = () => {
                 <Space size="small">
 
                     <Popconfirm
-                        title="Deseja realmente Finalizar o Inventário?"
-                        description="Ao confirmar o inventário será considerado como FINALIZADO, não sendo possível reabrir."
-                        onConfirm={() =>  handlePopupConfirmFinaliz(record)}
+                        title="Deseja realmente Finalizar Localização?"
+                        description="Ao confirmar a localização será considerado como FINALIZADO, não sendo possível reabrir."
+                        onConfirm={() =>  btnFinalizar(record)}
                         okText="Sim"
                         cancelText="Não"            
                     >
+
                         <Button
                             type="primary"
                             shape='circle'
                             className={'rotate-icon'}
                             icon={<CheckSquareOutlined rotate={0} />}
-                            disabled = {record.situacao === 'FINALIZADO'}
+                            disabled = {record.tipoInventario === 'FINALIZADO'}
                         />
-                    </Popconfirm>                    
+                    </Popconfirm>       
+                    
                 </Space>
             ),
         },        
     ]
 
-    const gravarDados = async (values) => {
+    const gravarDados = (values) => {
 
-        const inventory = {
-            _id:            values._id,
-            dataInventario: dayjs.utc(values.dataInventario),
-            descricao:      values.descricao.toUpperCase(),
-            tipoInventario: values.tipoInventario.toUpperCase(),
-            situacao:       values._id ? values.situacao.toUpperCase() : 'CRIADO',
+        const placesinventory = {
+            _id:                values._id,  
+            inventory:          values.inventory,         
+            local:              values.local.toUpperCase(),
+            situacao:           values._id ? values.situacao.toUpperCase() : 'CRIADO',
+            placesinventory:    values.placesinventory,
             usuarioCriacao:     user ? user._id : null,
             usuarioAlteracao:   user ? user._id : null,
         };
@@ -198,12 +194,10 @@ const ListInventoryComponent = () => {
 
         if (!values._id) {
 
-            createInventory(inventory).then((response) => {
+            createPlacesInventory(placesinventory).then((response) => {
                 message.success('Registro criado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
-                //setFormModal(false)
-
 
             }).catch((error)=> {
                 if (error.response) {
@@ -214,7 +208,7 @@ const ListInventoryComponent = () => {
             });
         } else {
 
-            updateInventory(values._id, inventory).then((response) => {
+            updatePlacesInventory(values._id, placesinventory).then((response) => {
 
                 message.success('Registro atualizado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
@@ -232,7 +226,7 @@ const ListInventoryComponent = () => {
             
         }        
         setLoading(false);    
-         
+ 
     };
 
     const handleCancel = () => {        
@@ -251,7 +245,7 @@ const ListInventoryComponent = () => {
                 const values = await form.validateFields();
 
                 //Prossiga com a acao
-                await gravarDados(values);
+                gravarDados(values);
 
             } catch (errorInfo) {
 
@@ -263,26 +257,80 @@ const ListInventoryComponent = () => {
         }
     }
 
-    const carregarDados = () => {
+    const carregarDados = async () => {
 
-        setLoading(true);
+        setLoading(true);      
 
-        setDados([])
-        getAllInventorys().then((response) => {
-            setDados(response.data);
-        }).catch((error)=> {
-            console.error(error);
-        });
+        setDados([]);
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+        try {
 
+            const empresas = await getAllCompanys()
+
+            const places = await getAllPlacesInventory()
+
+            if (places) {
+
+                const ids = user.empresas.map(usuario => usuario._id)
+
+                const dadosAux = places.data
+                            .filter(places => places.situacao != 'FINALIZADO')
+                            .filter(item => ids.includes(item.inventory.empresa))
+                            .map(places => {
+                                return {
+                                    _id:            places._id,
+                                    local:          places.local,
+                                    inventory:      places.inventory,
+                                    dataInventario: places.inventory.dataInventario,
+                                    situacao:       places.situacao,
+                                    nomeEmpresa:    (empresas ? empresas.data.find(empresa => empresa._id === places.inventory.empresa).nome : '')
+                                }
+                            })
+
+                setDados(dadosAux);
+            }
+
+
+        } catch (error) {
+            setDados([])
+            message.error(error);
+        } finally {
+            setLoading(false);
+        }
+
+    }
+
+    const carregarSelectInventario = async () => {
+
+        const ids = user.empresas.map(usuario => usuario._id)
+
+        setLoading(true)
+        await getAllInventorys().then((response) => {
+
+            // EXIBIR OS LOCAIS COM SITUACAO DIFERENTES DE FINALIZADO
+            const dados = response.data
+                .filter(inventory => inventory.situacao != 'FINALIZADO')
+                .filter(item => ids.includes(item.empresa._id))
+
+            // Formatar os dados
+            const formatarDados = dados.map((inventario) => ({
+                value: inventario._id,
+                label: inventario.empresa.nome + ' - ' + dayjs.utc(inventario.dataInventario).format('DD/MM/YYYY') + ' - ' + inventario.descricao
+            }))
+
+            setSelectInventory(formatarDados)
+
+        }).catch((error) => {
+            console.error(error)
+        })
+
+        setLoading(false)
+        
     }
 
     useEffect(() => {
         carregarDados();
+        carregarSelectInventario()
     },[]);
 
 
@@ -295,7 +343,7 @@ const ListInventoryComponent = () => {
     const showFormModal = () => {
 
         setIsEditing(true);
-        setIdInventory();
+        setIdPlacesInventory();
         if(form) {
             form.resetFields(); //Limpa os campos ao fechar
         }
@@ -303,23 +351,31 @@ const ListInventoryComponent = () => {
         setFormModal(true);
     };
 
-    const btnEditar = (value) => {
+    const btnFinalizar = async (value) => {
 
-        setIsEditing(true);
-        setFormModal(true);
+        setLoading(true);    
 
-        if(value) {
+        const finalizar = {
+            _id:                value._id,  
+            usuarioAlteracao:   user ? user._id : null,
+        };
 
-            setIdInventory(value._id)
-            form.setFieldsValue({
-                _id:            value._id,
-                dataInventario: dayjs.utc(value.dataInventario),
-                descricao:      value.descricao,
-                tipoInventario: value.tipoInventario,
-                situacao:       value.situacao
-            })
-
-        }
+        await endPlaces(finalizar).then((response) => {
+            message.success('Localização Finalizada')
+            carregarDados();            
+        }).catch((error)=> {    
+            if (error.response.data.message) {
+                message.error(error.response.data.message)
+            } else {
+                if (error.response) {
+                    message.error(error.response.data || 'Erro no servidor');
+                } else {
+                    message.error('Erro ao finalizar!');
+                }                
+            }
+        });
+        
+        setLoading(false);    
 
     }
 
@@ -332,9 +388,8 @@ const ListInventoryComponent = () => {
 
             form.setFieldsValue({
                 _id:            value._id,
-                dataInventario: dayjs.utc(value.dataInventario),
-                descricao:      value.descricao,
-                tipoInventario: value.tipoInventario,
+                inventory:      value.inventory._id,
+                local:          value.local,
                 situacao:       value.situacao
             })
         }
@@ -342,14 +397,13 @@ const ListInventoryComponent = () => {
 
     // Chamado se o usuário confirmar na Popconfirm
     const handlePopupConfirm = () => {
-        
-        if(form.getFieldValue('_id')){
 
-            deleteInventory(form.getFieldValue('_id')).then((response) => {
-                message.success('Registro eliminado com sucesso!')
+        if(form.getFieldValue('_id')){
+            deletePlacesInventory(form.getFieldValue('_id')).then((response) => {
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
                 setDeleteModal(false); // Fecha o Modal principal
+                message.success('Registro eliminado com sucesso!')
 
             }).catch((error)=> {
                 if (error.response) {
@@ -361,44 +415,13 @@ const ListInventoryComponent = () => {
         }
     };
 
-    // Chamado se o usuário confirmar na Popconfirm
-    const handlePopupConfirmFinaliz = (value) => {
-
-        setLoading(true);    
-
-        if(value){
-
-            endInventory(value._id).then((response) => {
-
-                message.success('Registro finalizado com sucesso!')
-                form.resetFields(); //Limpa os campos ao fechar
-                carregarDados();
-
-            }).catch((error)=> {
-                if (error.response.data.message) {
-                    message.error(error.response.data.message)
-                } else {
-                    if (error.response) {
-                        message.error(error.response.data || 'Erro no servidor');
-                    } else {
-                        message.error('Erro ao finalizar!');
-                    }                
-                }
-            });
-            
-        }
-
-        setLoading(false);
-        
-    };
-
   return (
     <div>
 
         <div style={{ textAlign: 'center' }}>
             <Title level={2}
                 style={{ color: 'var(--primary-color)'}}
-            >Inventário</Title>
+            >Local de Inventário</Title>
         </div>
 
         <Spin
@@ -406,7 +429,6 @@ const ListInventoryComponent = () => {
             spinning={loading}
             fullscreen
         />
-
 
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button 
@@ -419,7 +441,7 @@ const ListInventoryComponent = () => {
             <br></br>
             <br></br>
         </div>
-            
+        
         <Table
             columns={colunas}
             dataSource={dados}      
@@ -432,7 +454,7 @@ const ListInventoryComponent = () => {
 
       {/* Modal de Form */}
       <Modal
-        title={ "Manutenção Cadastro Inventário"}
+        title={ "Manutenção Localização de Inventário"}
         open={formModal}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}        
@@ -450,59 +472,46 @@ const ListInventoryComponent = () => {
                 <Input />
             </Item>
             <Item
-                name={"situacao"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name="dataInventario"
+                name="inventory"
                 label="Data Inventário"
                 rules={[{required: true, 
                          message: 'Informar Data de Inventário'}]}
                 >
-                    <DatePicker
-                        format={"DD/MM/YYYY"}
-                        placeholder='Dt Inventário'
-                        style={{ width: 140 }}
-                        disabled={!isEditing || idInventory}
-                    />
+                <Select
+                    disabled={!isEditing || idPlacesInventory}
+                    placeholder="Selecionar Data de Inventário"
+                    allowClear  //Permite limpar seleção
+                    loading={loading}   // Mostrar ícone de carregamento
+                    options={selectInventory}
+                >
+                </Select>
             </Item>
             <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
+                name={"local"}
+                label="Localização"
+                rules={[{required: true, message: 'Informar Localização'}]}
                 >
                 <Input 
-                    disabled={!isEditing}
+                    disabled={!isEditing || idPlacesInventory}
                     style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Inventário Loja'/>
+                    placeholder='Ex: Estoque, Loja'/>
             </Item>
             <Item
-                name={"tipoInventario"}
-                label="Tipo de Inventário"
-                rules={[{required: true, message: 'Selecionar Tipo'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar um Tipo"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="TOTAL">TOTAL</Option>
-                    <Option value="PARCIAL">PARCIAL</Option>
-                </Select>
+                name={"situacao"}
+                style={{ display: 'none'}}
+            >
+                <Input />
             </Item>
         </Form>
 
       </Modal>
 
       <Modal
-        title={ "Eliminar Unidade de Medida"}
+        title={ "Eliminar Localização"}
         open={deleteModal}
         confirmLoading={confirmLoading}
         onCancel={handleCancel}        
 //        onOk={() => setIsPopupOpen(true)}
-
         footer = {[
             <Button key="cancela" onClick={handleCancel}>
                 Cancelar
@@ -521,7 +530,6 @@ const ListInventoryComponent = () => {
                 </Button>
             </Popconfirm>,
         ]}
-
       >
         
         <Form
@@ -535,29 +543,24 @@ const ListInventoryComponent = () => {
                 <Input />
             </Item>
             <Item
-                name={"situacao"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"dataInventario"}
+                name="inventory"
                 label="Data Inventário"
+                rules={[{required: true, 
+                         message: 'Informar Data de Inventário'}]}
                 >
-                    <DatePicker 
-                        placeholder='Dt Inventário'
-                        style={{ width: 140 }}
-                        disabled={!isEditing}
-                        format={{
-                            format: "DD/MM/YYYY",
-                            type: 'mask',
-                        }}
-                    />
+                <Select
+                    disabled={!isEditing}
+                    placeholder="Selecionar Data de Inventário"
+                    allowClear  //Permite limpar seleção
+                    loading={loading}   // Mostrar ícone de carregamento
+                    options={selectInventory}
+                >
+                </Select>
             </Item>
             <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
+                name={"local"}
+                label="Localização"
+                rules={[{required: true, message: 'Informar Localização'}]}
                 >
                 <Input 
                     disabled={!isEditing}
@@ -565,21 +568,13 @@ const ListInventoryComponent = () => {
                     placeholder='Ex: Estoque, Loja'/>
             </Item>
             <Item
-                name={"tipoInventario"}
-                label="Tipo"
-                rules={[{required: true, message: 'Selecionar Tipo'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar um Tipo"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="TOTAL">TOTAL</Option>
-                    <Option value="PARCIAL">PARCIAL</Option>
-                </Select>
+                name={"situacao"}
+                style={{ display: 'none'}}
+            >
+                <Input />
             </Item>
         </Form>
-
+        
       </Modal>
 
     </div>
@@ -587,4 +582,4 @@ const ListInventoryComponent = () => {
   )
 }
 
-export default ListInventoryComponent
+export default PlacesInventoryComponent

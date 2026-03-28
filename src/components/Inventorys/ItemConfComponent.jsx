@@ -9,6 +9,7 @@ import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 
+import { getAllCompanys } from '../../services/CompanyService';
 import { getPlacesInventoryById } from '../../services/PlacesInventoryService';
 import { getAllItems } from '../../services/ItemService';
 import { createCountPlaces, deleteCountPlaces, getAllByPlaces } from '../../services/CountPlacesService';
@@ -335,6 +336,7 @@ const ItemConfComponent = () => {
 
         setLoading(true);        
         setDados([])
+        
         getAllByPlaces(placesId).then((response) => {
 
             const dados = response.data.map((count) => ({
@@ -432,17 +434,27 @@ const ItemConfComponent = () => {
 
     }
     
-    useEffect(() => {
+    const carregarDados = async () => {
 
-        if(placesId){
+        try {
 
             setLoading(true);
+            const empresas = await getAllCompanys()
+            const place = await getPlacesInventoryById(placesId)
 
-            getPlacesInventoryById(placesId).then((response) => {
+            if (place) {
 
-                const dados = response.data
-
+                const dados = {
+                        _id:            place.data._id,
+                        local:          place.data.local,
+                        inventory:      place.data.inventory,
+                        dataInventario: place.data.inventory.dataInventario,
+                        situacao:       place.data.situacao,
+                        nomeEmpresa:    (empresas ? empresas.data.find(empresa => empresa._id === place.data.inventory.empresa).nome : '')
+                    }
+                
                 formPlaces.setFieldsValue({
+                    nomeEmpresa:    dados.nomeEmpresa,
                     dataInventario: dayjs.utc(dados.inventory.dataInventario).format('DD/MM/YYYY') + ' - ' + dados.inventory.descricao,
                     local:          dados.local
                 })                                   
@@ -471,14 +483,24 @@ const ItemConfComponent = () => {
                 }).catch((error)=> {
                     console.error(error);
                 });
-                             
+                                
                 carregarCount()
 
-                setLoading(false);
+            }
+            
+        } catch (error) {
+            message.error(error);
+        } finally {
+            setLoading(false);
+        }
 
-            }).catch((error)=> {
-                console.error(error);
-            });
+    }
+
+    useEffect(() => {
+
+        if(placesId){
+
+            carregarDados()
 
         }
 
@@ -518,6 +540,16 @@ const ItemConfComponent = () => {
                 >
 
                 <Row>
+                    <Item
+                        name={"nomeEmpresa"}
+                        label="Empresa"                    
+                        style={{ marginRight: '60px'}}
+                    >
+                        <Input 
+                            readOnly={true}
+                            size='small'
+                            />
+                    </Item>
                     <Item
                         name={"dataInventario"}
                         label="Inventário"                    

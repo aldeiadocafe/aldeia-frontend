@@ -15,4 +15,4 @@ export const updatePlacesInventory = (placesInventoryId, placesInventory) => axi
 
 export const deletePlacesInventory = (placesInventoryId) => axios.delete(REST_API_BASE_URL + '/' + placesInventoryId);
 
-export const endPlaces = (placesInventoryId) => axios.post(REST_API_BASE_URL + '/finalizar/' + placesInventoryId);
+export const endPlaces = (endPlaces) => axios.post(REST_API_BASE_URL + '/finalizar', endPlaces);

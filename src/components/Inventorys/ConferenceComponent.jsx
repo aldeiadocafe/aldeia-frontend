@@ -9,10 +9,14 @@ import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { getPlacesInventory } from '../../services/PlacesInventoryService';
+import { getAllCompanys } from '../../services/CompanyService';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
 const ConferenceComponent = () => {    
+
+    const { user } = useAuth();
 
     const [dados,           setDados]           = useState([]);
     const [searchText,      setSearchText]      = useState('');
@@ -41,14 +45,14 @@ const ConferenceComponent = () => {
                 size="small"
                 style={{ width: 90 }}
             >
-                Search
+                Procurar
             </Button>
             <Button
                 onClick={() => handleReset(clearFilters, confirm)}
                 size="small"
                 style={{ width: 90 }}
             >
-                Reset
+                Limpar
             </Button>
         </div>
         ),
@@ -58,6 +62,12 @@ const ConferenceComponent = () => {
         onFilter: (value, record) => 
         record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
     });
+
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters();
+        setSearchText({});
+        confirm();
+    };
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -90,6 +100,14 @@ const ConferenceComponent = () => {
             ),
         },        
         {
+            dataIndex:  "nomeEmpresa",
+            title:      "Empresa",
+            sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            ...getColumnSearchProps('nomeEmpresa'),
+            ellipsis: true,
+        },
+        {
             dataIndex:  "dataInventario",
             title:      "Data Inventário",
             sorter: (a, b) => new Date(a.dataInventario).getTime() - new Date(b.dataInventario).getTime(),
@@ -118,7 +136,7 @@ const ConferenceComponent = () => {
     ]
 
 
-    const btnPesquisar = () => {
+    const btnPesquisar = async () => {
 
         const local          = form.getFieldValue('local');
 
@@ -141,39 +159,42 @@ const ConferenceComponent = () => {
 
         setLoading(true);
 
-        getPlacesInventory(processo).then((response) => {
+        try {
 
-            //Retirar Inventario Finalizado
-            const dados = response.data.filter(place => place.situacao != 'FINALIZADO')
+            const empresas = await getAllCompanys()
 
-            // Ler Array
-            const dadosAux = dados.map(places => ({
-                _id:            places._id,
-                local:          places.local,
-                inventory:      places.inventory,
-                dataInventario: places.inventory.dataInventario,
-                situacao:       places.situacao,
-            }))
+            const places = await getPlacesInventory(processo)
 
-            setDados(dadosAux);
+            if (places) {
+                
+                const ids = user.empresas.map(usuario => usuario._id)
 
-        }).catch((error)=> {
-            setDados([])            
-            if (error.response.data.message) {
-                message.error(error.response.data.message)
-            } else {
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
-                } else {
-                    message.error('Erro ao finalizar!');
-                }                
+                const dadosAux = places.data
+                            .filter(places => places.situacao != 'FINALIZADO')
+                            .filter(item => ids.includes(item.inventory.empresa))
+                            .map(places => {
+                                return {
+                                    _id:            places._id,
+                                    local:          places.local,
+                                    inventory:      places.inventory,
+                                    dataInventario: places.inventory.dataInventario,
+                                    situacao:       places.situacao,
+                                    nomeEmpresa:    (empresas ? empresas.data.find(empresa => empresa._id === places.inventory.empresa).nome : '')
+                                }                                
+                            })
+                setDados(dadosAux);
+
             }
-        });
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+        }  catch (error) {
+            setDados([])            
+            message.error(error);
+        } finally {
+            setTimeout(() => {
+            setSelectedRowKeys([]);
+            setLoading(false);
+            }, 1000);    
+        }
 
     }
 

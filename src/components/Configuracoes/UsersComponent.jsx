@@ -10,17 +10,19 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { createUser, deleteUser, getAllUsers, updateUser } from '../../services/UserService';
 import { getAllCompanys } from '../../services/CompanyService';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
-const ListUsersComponent = () => {
+const UsersComponent = () => {
+
+    const { user } = useAuth();
     
-    const [tabela,          setTabela]          = useState(1);
     const [dados,           setDados]           = useState([]);
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
 
-    const [selectCompanys,  setSelectCompanys]  = useState([])
+    const [selectEmpresas,  setSelectEmpresas]  = useState([])
 
     const [deleteModal,     setDeleteModal]     = useState(false);
     const [formModal,       setFormModal]       = useState(false);
@@ -171,20 +173,22 @@ const ListUsersComponent = () => {
 
     const gravarDados = (values) => {
 
-        const user = {
+        const usuario = {
             _id:        values._id,
             email:      values.email.toUpperCase(),
             nome:       values.nome.toUpperCase(),
             senha:      values.senha,
             telefone:   values.telefone ? values.telefone.replace(/\D/g, '') : "",
-            companys:   values.companys
+            empresas:   values.empresas,
+            usuarioCriacao:     user ? user._id : null,
+            usuarioAlteracao:   user ? user._id : null,
         };
 
         setLoading(true);    
 
         if (!values._id) {
 
-            createUser(user).then((response) => {
+            createUser(usuario).then((response) => {
                 message.success('Registro criado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
@@ -200,7 +204,7 @@ const ListUsersComponent = () => {
             });
         } else {
 
-            updateUser(values._id, user).then((response) => {
+            updateUser(values._id, usuario).then((response) => {
 
                 message.success('Registro atualizado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
@@ -250,11 +254,11 @@ const ListUsersComponent = () => {
         }
     }
 
-    const carregarSelectCompany = async () => {
+    const carregarSelectEmpresa = async () => {
 
         setLoading(true)
 
-        setSelectCompanys([])
+        setSelectEmpresas([])
 
         await getAllCompanys().then((response) => {
 
@@ -264,7 +268,7 @@ const ListUsersComponent = () => {
                 label: company.nome
             }))
 
-            setSelectCompanys(formatarDados);
+            setSelectEmpresas(formatarDados);
 
         }).catch((error)=> {
             console.error(error);
@@ -288,9 +292,10 @@ const ListUsersComponent = () => {
                 senha:      user.senha,
                 telefone:   user.telefone,
                 situacao:   user.situacao,
-                companys:   user.companys,
+                empresas:   user.empresas,
             }))
             setDados(response.data);
+
         }).catch((error)=> {
             console.error(error);
         });
@@ -303,7 +308,7 @@ const ListUsersComponent = () => {
     }
 
     useEffect(() => {
-        carregarSelectCompany()
+        carregarSelectEmpresa()
         carregarDados();
     },[]);
 
@@ -338,8 +343,8 @@ const ListUsersComponent = () => {
                 senha:          value.senha,
                 telefone:       value.telefone,
                 situacao:       value.situacao,
-                companys:       value.companys
-                                    ? value.companys.map(company => company._id)
+                empresas:       value.empresas
+                                    ? value.empresas.map(empresa => empresa._id)
                                     : null
             })
 
@@ -364,8 +369,8 @@ const ListUsersComponent = () => {
                 senha:          value.senha,
                 telefone:       value.telefone,
                 situacao:       value.situacao,
-                companys:       value.companys
-                                    ? value.companys.map(company => company._id)
+                empresas:       value.empresas
+                                    ? value.empresas.map(empresa => empresa._id)
                                     : null
             })
 
@@ -387,8 +392,8 @@ const ListUsersComponent = () => {
                 senha:          value.senha,
                 telefone:       value.telefone,
                 situacao:       value.situacao,
-                companys:       value.companys
-                                    ? value.companys.map(company => company._id)
+                empresas:       value.empresas
+                                    ? value.empresas.map(empresa => empresa._id)
                                     : null
             })
         }
@@ -553,7 +558,7 @@ const ListUsersComponent = () => {
             <Row gutter={[16, 16]}>
                 <Col span={18}>
                     <Item
-                        name="companys"
+                        name="empresas"
                         rules={[{required: true, 
                                 message: 'Informar Empresa'}]}
                         >
@@ -565,7 +570,7 @@ const ListUsersComponent = () => {
                             mode="multiple"
                             allowClear  //Permite limpar seleção
                             loading={loading}   // Mostrar ícone de carregamento
-                            options={selectCompanys}
+                            options={selectEmpresas}
                         >
                         </Select>
                     </Item>
@@ -694,7 +699,7 @@ const ListUsersComponent = () => {
             <Row gutter={[16, 16]}>
                 <Col span={18}>
                     <Item
-                        name="companys"
+                        name="empresas"
                         rules={[{required: true, 
                                 message: 'Informar Empresa'}]}
                         >
@@ -706,7 +711,7 @@ const ListUsersComponent = () => {
                             mode="multiple"
                             allowClear  //Permite limpar seleção
                             loading={loading}   // Mostrar ícone de carregamento
-                            options={selectCompanys}
+                            options={selectEmpresas}
                         >
                         </Select>
                     </Item>
@@ -720,4 +725,4 @@ const ListUsersComponent = () => {
   )
 }
 
-export default ListUsersComponent
+export default UsersComponent

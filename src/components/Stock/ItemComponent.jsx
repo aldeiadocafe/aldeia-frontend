@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, InputNumber, Row, Col} from 'antd'
 import Title from 'antd/es/typography/Title';
 
 import { createItem, deleteItem, getAllItems, updateItem } from '../../services/ItemService';
 import { getAllUnits } from '../../services/UnitService';
 import { useAuth } from '../Login/AuthContext';
 
-const ListItemComponent = () => {
+const ItemComponent = () => {
 
     const { user } = useAuth();
 
@@ -28,6 +28,11 @@ const ListItemComponent = () => {
     const [idItem,      setIdItem]      = useState();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     
+    const formatter = new Intl.NumberFormat('pt-BR', {
+        style: 'decimal',
+        minimumFractionDigits: 3,
+    });
+
     const { Option, OptGroup } = Select;
 
     //Aplique estilos CSS para centralizar a div container na tela
@@ -153,6 +158,12 @@ const ListItemComponent = () => {
             ellipsis: true,
         },
         {
+            dataIndex:  "quantidadeMinima",
+            title:      "Qtde Mínima",
+            align: 'right',
+            render: (value) => formatter.format(value)
+        },
+        {
             dataIndex:  "situacao",
             title:      "Situação",
             sorter: (a, b) => a.situacao.localeCompare(b.situacao),
@@ -170,6 +181,7 @@ const ListItemComponent = () => {
             descricao:          values.descricao.toUpperCase(),
             unit:               values.unit,
             situacao:           values.situacao.toUpperCase(),
+            quantidadeMinima:   values.quantidadeMinima,
             usuarioCriacao:     user ? user._id : null,
             usuarioAlteracao:   user ? user._id : null,
         };
@@ -252,12 +264,13 @@ const ListItemComponent = () => {
 
             // Ler Array
             const dadosAux = response.data.map(item => ({
-                _id:            item._id,
-                itCodigo:       item.itCodigo,
-                descricao:      item.descricao,
-                unit:           item.unit,
-                unitDescricao:  item.unit?.descricao,
-                situacao:       item.situacao
+                _id:                item._id,
+                itCodigo:           item.itCodigo,
+                descricao:          item.descricao,
+                unit:               item.unit,
+                unitDescricao:      item.unit?.descricao,
+                situacao:           item.situacao,
+                quantidadeMinima:   item.quantidadeMinima
             }))
 
             setDados(dadosAux);
@@ -325,11 +338,12 @@ const ListItemComponent = () => {
 
             setIdItem(value._id)
             form.setFieldsValue({
-                _id:            value._id,
-                itCodigo:       value.itCodigo,
-                descricao:      value.descricao,
-                unit:           value.unit._id,
-                situacao:       value.situacao
+                _id:                value._id,
+                itCodigo:           value.itCodigo,
+                descricao:          value.descricao,
+                unit:               value.unit._id,
+                situacao:           value.situacao,
+                quantidadeMinima:   value.quantidadeMinima
             })
 
             setFormModal(true);
@@ -347,11 +361,12 @@ const ListItemComponent = () => {
 
             setIdItem(value._id)
             form.setFieldsValue({
-                _id:            value._id,
-                itCodigo:       value.itCodigo,
-                descricao:      value.descricao,
-                unit:           value.unit._id,
-                situacao:       value.situacao
+                _id:                value._id,
+                itCodigo:           value.itCodigo,
+                descricao:          value.descricao,
+                unit:               value.unit._id,
+                situacao:           value.situacao,
+                quantidadeMinima:   value.quantidadeMinima
             })
 
         }
@@ -366,11 +381,12 @@ const ListItemComponent = () => {
         if(value) {
 
             form.setFieldsValue({
-                _id:            value._id,
-                itCodigo:       value.itCodigo,
-                descricao:      value.descricao,
-                unit:           value.unit._id,
-                situacao:       value.situacao
+                _id:                value._id,
+                itCodigo:           value.itCodigo,
+                descricao:          value.descricao,
+                unit:               value.unit._id,
+                situacao:           value.situacao,
+                quantidadeMinima:   value.quantidadeMinima
             })
         }
     }
@@ -477,21 +493,38 @@ const ListItemComponent = () => {
                     style={{ textTransform: 'uppercase' }}
                     placeholder='Ex: Coca Cola'/>
             </Item>
-            <Item
-                name="unit"
-                label="Unidade Medida"
-                rules={[{required: true, 
-                         message: 'Informar Unidade de Medida'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar Unid Medida"
-                    allowClear  //Permite limpar seleção
-                    loading={loading}   // Mostrar ícone de carregamento
-                    options={selectUnits}
-                >
-                </Select>
-            </Item>
+            <Row gutter={[16, 16]}>
+                <Col span={12}>
+                    <Item
+                        name="unit"
+                        label="Unidade Medida"
+                        rules={[{required: true, 
+                                message: 'Informar Unidade de Medida'}]}
+                        >
+                        <Select
+                            disabled={!isEditing}
+                            placeholder="Selecionar Unid Medida"
+                            allowClear  //Permite limpar seleção
+                            loading={loading}   // Mostrar ícone de carregamento
+                            options={selectUnits}
+                        >
+                        </Select>
+                    </Item>
+                </Col>
+                <Col span={12}>
+                    <Item
+                        name={"quantidadeMinima"}
+                        key={"quantidadeMinima"}
+                        label="Qtde Mínima"
+                        >
+                        <InputNumber 
+                            disabled={!isEditing}
+                            placeholder='Quantidade mínima de estoque'
+                            decimalSeparator=','
+                            />
+                    </Item>
+                </Col>
+            </Row>
             <Item
                 name={"situacao"}
                 label="Situação"
@@ -551,7 +584,7 @@ const ListItemComponent = () => {
                 name="unit"
                 label="Unidade Medida"
                 rules={[{required: true, 
-                         message: 'Informar Unidade de Medida'}]}
+                        message: 'Informar Unidade de Medida'}]}
                 >
                 <Select
                     disabled={!isEditing}
@@ -561,9 +594,23 @@ const ListItemComponent = () => {
                     options={selectUnits}
                 >
                 </Select>
-            </Item>            
+            </Item>
+            <Col>
+                <Item
+                    name={"quantidadeMinima"}
+                    key={"quantidadeMinima"}
+                    label="Qtde Mínima"
+                    >
+                    <InputNumber 
+                        disabled={!isEditing}
+                        placeholder='Quantidade mínima de estoque'
+                        decimalSeparator=','
+                        />
+                </Item>
+            </Col>
             <Item
                 name={"situacao"}
+                key={"situacao"}
                 label="Situação"
                 rules={[{required: true, message: 'Selecionar Situação'}]}
                 >
@@ -603,4 +650,4 @@ const ListItemComponent = () => {
   )
 }
 
-export default ListItemComponent
+export default ItemComponent
