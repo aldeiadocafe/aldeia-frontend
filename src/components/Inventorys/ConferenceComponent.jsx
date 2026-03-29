@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useState } from 'react'
 
 import { Table, Input, Space, Button, Form, DatePicker, message, Row, Col, Card, Spin, Tooltip } from 'antd'
 
-import { IssuesCloseOutlined, SearchOutlined } from '@ant-design/icons';
+import { FileSearchOutlined, IssuesCloseOutlined, SearchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +11,7 @@ import utc from 'dayjs/plugin/utc'
 import { getPlacesInventory } from '../../services/PlacesInventoryService';
 import { getAllCompanys } from '../../services/CompanyService';
 import { useAuth } from '../Login/AuthContext';
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 dayjs.extend(utc)
 
@@ -28,6 +29,19 @@ const ConferenceComponent = () => {
 
     const navigator = useNavigate()
 
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
+        // but you can manage a state here if needed for other components.
+    };
+
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters();
+        setSearchText({});
+        confirm();
+    };
+
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
@@ -38,10 +52,11 @@ const ConferenceComponent = () => {
             onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
             style={{ marginBottom: 8, display: 'block' }}
             />
+            <Space>
             <Button
                 type="primary"
                 onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                icon={<SearchOutlined />}
+                icon={<FileSearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
             >
@@ -54,27 +69,15 @@ const ConferenceComponent = () => {
             >
                 Limpar
             </Button>
+            </Space>
         </div>
         ),
         filterIcon: (filtered) => (
         <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         onFilter: (value, record) => 
-        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
+        normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
-
-    const handleReset = (clearFilters, confirm) => {
-        clearFilters();
-        setSearchText({});
-        confirm();
-    };
-
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
-        // but you can manage a state here if needed for other components.
-    };
     
     const colunas = 
     [

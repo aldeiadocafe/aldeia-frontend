@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { AppstoreAddOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { AppstoreAddOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, InputNumber, Row, Col} from 'antd'
 import Title from 'antd/es/typography/Title';
 
 import { createItem, deleteItem, getAllItems, updateItem } from '../../services/ItemService';
 import { getAllUnits } from '../../services/UnitService';
 import { useAuth } from '../Login/AuthContext';
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 const ItemComponent = () => {
 
@@ -43,6 +44,19 @@ const ItemComponent = () => {
         height: '100vh', // Ocupa 100% da altura da viewport para centralizar verticalmente
     }
 
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
+        // but you can manage a state here if needed for other components.
+    };
+
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters();
+        setSearchText({});
+        confirm();
+    };
+
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
@@ -57,18 +71,18 @@ const ItemComponent = () => {
             <Button
                 type="primary"
                 onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                icon={<SearchOutlined />}
+                icon={<FileSearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
             >
-                Search
+                Procurar
             </Button>
             <Button
                 onClick={() => handleReset(clearFilters, confirm)}
                 size="small"
                 style={{ width: 90 }}
             >
-                Reset
+                Limpar
             </Button>
             </Space>
         </div>
@@ -77,15 +91,8 @@ const ItemComponent = () => {
         <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         onFilter: (value, record) => 
-        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
+        normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
-
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
-        // but you can manage a state here if needed for other components.
-    };
 
     const colunas = 
     [
@@ -312,13 +319,6 @@ const ItemComponent = () => {
         carregarSelectUnit()
         carregarDados();
     },[]);
-
-
-    const handleReset = (clearFilters, confirm) => {
-        clearFilters();
-        setSearchText({});
-        confirm();
-    };
 
     const showFormModal = () => {
 

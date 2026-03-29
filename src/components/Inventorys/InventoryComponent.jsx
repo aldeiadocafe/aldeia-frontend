@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AppstoreAddOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { AppstoreAddOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Col, Row} from 'antd'
 import Title from 'antd/es/typography/Title';
 
@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { createInventory, deleteInventory, endInventory, getAllInventorys, updateInventory } from '../../services/InventoryService';
 import { useAuth } from '../Login/AuthContext';
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 dayjs.extend(utc)
 
@@ -33,30 +34,34 @@ const InventoryComponent = () => {
     
     const { Option, OptGroup } = Select;
 
-    //Aplique estilos CSS para centralizar a div container na tela
-    const containerPopconfirm = {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh', // Ocupa 100% da altura da viewport para centralizar verticalmente
-    }
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
+        // but you can manage a state here if needed for other components.
+    };
+
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters();
+        setSearchText({});
+        confirm();
+    };
 
     const getColumnSearchProps = (dataIndex) => ({
-
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
             placeholder={`Procurar ${dataIndex}`}
             value={selectedKeys[0]}
-            onChange={(e) => setSelectedKeys(e.target.value.toUpperCase() ? [e.target.value.toUpperCase()] : [])}
-            onPressEnter={() => confirm()}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
+            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
             style={{ marginBottom: 8, display: 'block' }}
             />
             <Space>
             <Button
                 type="primary"
-                onClick={() => confirm()}
-                icon={<SearchOutlined />}
+                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                icon={<FileSearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
             >
@@ -73,14 +78,10 @@ const InventoryComponent = () => {
         </div>
         ),
         filterIcon: (filtered) => (
-            <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+        <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
-        // Lógica principal: pesquisa insensível a maiúsculas/minúsculas e parcial
-        onFilter: (value, record) =>
-            record[dataIndex]
-            ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-            : '',
-
+        onFilter: (value, record) => 
+        normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
 
     const colunas = 
@@ -324,12 +325,6 @@ const InventoryComponent = () => {
         carregarDados();
     },[]);
 
-
-    const handleReset = (clearFilters, confirm) => {
-        clearFilters();
-        setSearchText({});
-        confirm();
-    };
 
     const showFormModal = () => {
 

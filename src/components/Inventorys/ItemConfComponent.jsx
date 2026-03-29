@@ -2,9 +2,8 @@ import Title from 'antd/es/typography/Title'
 import { useEffect, useRef, useState }  from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AutoComplete, Button, Grid, Card, Checkbox,Popconfirm, DatePicker, Form, Input, InputNumber, message, Row, Space, Spin, Table, Modal } from 'antd';
-import { CameraOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
+import { CameraOutlined, DeleteOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
-
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
@@ -68,12 +67,19 @@ const ItemConfComponent = () => {
         minimumFractionDigits: 3,
     });
 
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
+        // but you can manage a state here if needed for other components.
+    };
+
     const handleReset = (clearFilters, confirm) => {
         clearFilters();
         setSearchText({});
         confirm();
     };
-    
+
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
@@ -88,18 +94,18 @@ const ItemConfComponent = () => {
             <Button
                 type="primary"
                 onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                icon={<SearchOutlined />}
+                icon={<FileSearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
             >
-                Search
+                Procurar
             </Button>
             <Button
                 onClick={() => handleReset(clearFilters, confirm)}
                 size="small"
                 style={{ width: 90 }}
             >
-                Reset
+                Limpar
             </Button>
             </Space>
         </div>
@@ -108,15 +114,8 @@ const ItemConfComponent = () => {
         <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         onFilter: (value, record) => 
-        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
+        normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
-
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
-        // but you can manage a state here if needed for other components.
-    };
 
     const colunas = 
     [

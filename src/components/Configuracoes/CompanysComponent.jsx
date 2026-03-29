@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
+import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Row, Col} from 'antd'
 import { PatternFormat } from 'react-number-format'; // Recomendado: PatternFormat para máscaras fixas
 import { cpf, cnpj } from 'cpf-cnpj-validator';
@@ -10,10 +10,11 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { createCompany, deleteCompany, getAllCompanys, updateCompany } from '../../services/CompanyService';
 import { useAuth } from '../Login/AuthContext';
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 dayjs.extend(utc)
 
-const ListCompanysComponent = () => {
+const CompanysComponent = () => {
     
     const { user } = useAuth();
 
@@ -83,6 +84,19 @@ const ListCompanysComponent = () => {
         height: '100vh', // Ocupa 100% da altura da viewport para centralizar verticalmente
     }
 
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
+        // but you can manage a state here if needed for other components.
+    };
+
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters();
+        setSearchText({});
+        confirm();
+    };
+
     const getColumnSearchProps = (dataIndex) => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
@@ -97,18 +111,18 @@ const ListCompanysComponent = () => {
             <Button
                 type="primary"
                 onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                icon={<SearchOutlined />}
+                icon={<FileSearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
             >
-                Search
+                Procurar
             </Button>
             <Button
                 onClick={() => handleReset(clearFilters, confirm)}
                 size="small"
                 style={{ width: 90 }}
             >
-                Reset
+                Limpar
             </Button>
             </Space>
         </div>
@@ -117,15 +131,8 @@ const ListCompanysComponent = () => {
         <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         onFilter: (value, record) => 
-        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
+        normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
-
-    const handleSearch = (selectedKeys, confirm, dataIndex) => {
-        confirm();
-        setSearchText(selectedKeys[0]);
-        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
-        // but you can manage a state here if needed for other components.
-    };
 
     const colunas = 
     [
@@ -321,13 +328,6 @@ const ListCompanysComponent = () => {
     useEffect(() => {
         carregarDados();
     },[]);
-
-
-    const handleReset = (clearFilters, confirm) => {
-        clearFilters();
-        setSearchText({});
-        confirm();
-    };
 
     const showFormModal = () => {
 
@@ -960,4 +960,4 @@ const ListCompanysComponent = () => {
   )
 }
 
-export default ListCompanysComponent
+export default CompanysComponent

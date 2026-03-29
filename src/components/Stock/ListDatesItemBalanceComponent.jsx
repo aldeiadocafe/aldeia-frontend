@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Input, Space, Spin, Table, DatePicker } from 'antd'
-import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 
 import Title from 'antd/es/typography/Title';
 
@@ -11,6 +11,7 @@ import * as XLSX from 'xlsx-js-style'
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 dayjs.extend(utc)
 
@@ -21,24 +22,26 @@ const ListDatesItemBalanceComponent = () => {
     const [tabela,      setTabela]      = useState(1);
     const [dados,       setDados]       = useState([])
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading]         = useState(false);
+
+    const [searchText, setSearchText]   = useState([])
 
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
         minimumFractionDigits: 3,
     });
 
-    const handleReset = (clearFilters, confirm) => {
-        clearFilters();
-        setSearchText({});
-        confirm();
-    };
-
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         setSearchText(selectedKeys[0]);
         // Note: The actual data filtering happens internally via the 'onFilter' prop, 
         // but you can manage a state here if needed for other components.
+    };
+
+    const handleReset = (clearFilters, confirm) => {
+        clearFilters();
+        setSearchText({});
+        confirm();
     };
 
     const getColumnSearchProps = (dataIndex) => ({
@@ -55,18 +58,18 @@ const ListDatesItemBalanceComponent = () => {
             <Button
                 type="primary"
                 onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                icon={<SearchOutlined />}
+                icon={<FileSearchOutlined />}
                 size="small"
                 style={{ width: 90 }}
             >
-                Search
+                Procurar
             </Button>
             <Button
                 onClick={() => handleReset(clearFilters, confirm)}
                 size="small"
                 style={{ width: 90 }}
             >
-                Reset
+                Limpar
             </Button>
             </Space>
         </div>
@@ -75,7 +78,7 @@ const ListDatesItemBalanceComponent = () => {
         <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         onFilter: (value, record) => 
-        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
+        normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
 
     const colunas = [

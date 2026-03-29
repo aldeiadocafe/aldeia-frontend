@@ -17,7 +17,7 @@ import LoginComponent from './components/Login/LoginComponent';
 import { PrivateRoute } from './components/Login/PrivateRoute';
 import MainLayout from './components/Main/MainLayout';
 import DashComponent from './components/Main/DashComponent';
-import ListCompanysComponent from './components/Configuracoes/ListCompanysComponent';
+import CompanysComponent from './components/Configuracoes/CompanysComponent';
 import UsersComponent from './components/Configuracoes/UsersComponent';
 import ListConversationsComponent from './components/Stock/ListConversationsComponent';
 import ItemComponent from './components/Stock/ItemComponent';
@@ -29,7 +29,7 @@ import PlacesInventoryComponent from './components/Inventorys/PlacesInventoryCom
 import ConferenceComponent from './components/Inventorys/ConferenceComponent';
 import ItemConfComponent from './components/Inventorys/ItemConfComponent';
 import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
-import ListUnitsComponent from './components/Stock/ListUnitComponent';
+import UnitsComponent from './components/Stock/UnitComponent';
 import Email from './components/Email';
 import ProfilesComponent from './components/Profile/ProfilesComponent';
 import RecoverComponent from './components/Login/RecoverComponent';
@@ -103,7 +103,7 @@ function App() {
                   <Route path='/companys'    
                     element={
                       <PrivateRoute>
-                        <ListCompanysComponent/>
+                        <CompanysComponent/>
                       </PrivateRoute>
                     }/>
 
@@ -119,7 +119,7 @@ function App() {
                   <Route path='/units'    
                     element={
                       <PrivateRoute>
-                        <ListUnitsComponent/>
+                        <UnitsComponent/>
                       </PrivateRoute>
                     }/>
 

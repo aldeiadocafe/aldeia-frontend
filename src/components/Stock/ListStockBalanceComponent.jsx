@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Table, Badge, Spin, Input, Space, Button } from 'antd';
-import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
 
 
@@ -14,6 +14,7 @@ import { saveAs } from 'file-saver';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 dayjs.extend(utc)
 
@@ -22,6 +23,8 @@ const ListStockBalanceComponent = () => {
     const [dados,       setDados]                   = useState([])
     const [expandedDateItem, setExpandedDateItem ]  = useState([])
 
+    const [searchText,      setSearchText]      = useState([])
+    
     const [dadosGCom, setDadosGCom]       = useState([])
 
     // 1. Estado para armazenar as chaves (keys) das linhas expandidas
@@ -155,29 +158,29 @@ const ListStockBalanceComponent = () => {
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters}) => (
         <div style={{ padding: 8 }}>
             <Input
-                placeholder={`Procurar ${dataIndex}`}
-                value={selectedKeys[0]}
-                onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
-                onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                style={{ marginBottom: 8, display: 'block' }}
-                />
+            placeholder={`Procurar ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value.toUpperCase()] : [])}
+            onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            style={{ marginBottom: 8, display: 'block' }}
+            />
             <Space>
-                <Button
-                    type="primary"
-                    onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-                    icon={<SearchOutlined />}
-                    size="small"
-                    style={{ width: 90 }}
-                >
-                    Search
-                </Button>
-                <Button
-                    onClick={() => handleReset(clearFilters, confirm)}
-                    size="small"
-                    style={{ width: 90 }}
-                >
-                    Reset
-                </Button>
+            <Button
+                type="primary"
+                onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+                icon={<FileSearchOutlined />}
+                size="small"
+                style={{ width: 90 }}
+            >
+                Procurar
+            </Button>
+            <Button
+                onClick={() => handleReset(clearFilters, confirm)}
+                size="small"
+                style={{ width: 90 }}
+            >
+                Limpar
+            </Button>
             </Space>
         </div>
         ),
@@ -185,7 +188,7 @@ const ListStockBalanceComponent = () => {
         <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
         ),
         onFilter: (value, record) => 
-        record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
+        normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
 
   // Colunas principais

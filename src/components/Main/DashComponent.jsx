@@ -8,11 +8,12 @@ import { getAllUnits } from '../../services/UnitService'
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
-import { SearchOutlined } from '@ant-design/icons'
+import { FileSearchOutlined, SearchOutlined } from '@ant-design/icons'
 import { getAllStockBalances } from '../../services/StockBalanceService'
 import Title from 'antd/es/typography/Title';
 
 import { useAuth } from '../Login/AuthContext';
+import { normalizarTexto } from '../../Funcoes/Utils';
 
 
 dayjs.extend(utc)
@@ -83,7 +84,7 @@ const DashComponent = () => {
           <Button
               type="primary"
               onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-              icon={<SearchOutlined />}
+              icon={<FileSearchOutlined />}
               size="small"
               style={{ width: 90 }}
           >
@@ -103,7 +104,7 @@ const DashComponent = () => {
       <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
       ),
       onFilter: (value, record) => 
-      record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
+      normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
   });
 
   const colunas = [
