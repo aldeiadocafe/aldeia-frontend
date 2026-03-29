@@ -23,14 +23,16 @@ const DashComponent = () => {
 
   const { user } = useAuth();
 
-  const [ datesItem,    setDatesItem]   = useState([])
-  const [ loading,      setLoading]     = useState(false)
+  const [ datesCompleto,  setDatesCompleto] = useState([])
+  const [ datesItem,      setDatesItem]     = useState([])
+  const [ loading,        setLoading]       = useState(false)
 
-  const [dadosGCom, setDadosGCom]       = useState([])
+  const [GComCompleto,    setGComCompleto]    = useState([])
+  const [dadosGCom,       setDadosGCom]       = useState([])
   const [searchText,      setSearchText]      = useState('');
 
   const [selectEmpresas,  setSelectEmpresas]  = useState([]);
-  const [empresa,         setEmpresa]         = useState(null)
+  const [empresa,         setEmpresa]         = useState([])
 
   const [ form ]  = Form.useForm();
   const { Item }  = Form;
@@ -106,6 +108,15 @@ const DashComponent = () => {
 
   const colunas = [
       {
+          dataIndex:  'nomeEmpresa',
+          key:  'nomeEmpresa',
+          title: 'Empresa',
+          sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
+          showSorterTooltip: { target: 'sorter-icon' }, 
+          ...getColumnSearchProps('nomeEmpresa'),
+          ellipsis: true,
+      },
+      {
           dataIndex:  'itCodigo',
           key:  'itCodigo',
           title: 'Item',
@@ -156,9 +167,18 @@ const DashComponent = () => {
   // Colunas principais
   const colunasGCom = [
     {
+        dataIndex:  'nomeEmpresa',
+        key:  'nomeEmpresaGCom',
+        title: 'Empresa',
+        sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ...getColumnSearchProps('nomeEmpresa'),
+        ellipsis: true,
+    },
+    {
         title: 'Item', 
         dataIndex: 'itCodigo', 
-        key: 'itCodigo',
+        key: 'itCodigoGCom',
         sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
         showSorterTooltip: { target: 'sorter-icon' }, 
         onFilter: (value, record) => record.itCodigo.indexOf(value) === 0,      
@@ -167,7 +187,7 @@ const DashComponent = () => {
     {
         title: 'Descrição', 
         dataIndex: 'descricao', 
-        key: 'descricao',
+        key: 'descricaoGCom',
         sorter: (a, b) => a.descricao.localeCompare(b.descricao),
         defaultSortOrder: 'ascend', 
         showSorterTooltip: { target: 'sorter-icon' }, 
@@ -177,7 +197,7 @@ const DashComponent = () => {
     {
         title:      "Unid",
         dataIndex:  "unidade",
-        key:  "unidade",
+        key:  "unidadeGCom",
         sorter: (a, b) => a.unidade.localeCompare(b.unidade),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('unidade'),
@@ -186,7 +206,7 @@ const DashComponent = () => {
     {
         title: 'Qtde', 
         dataIndex: 'quantidade', 
-        key: 'quantidade',
+        key: 'quantidadeGCom',
         align: 'right',
         sorter: (a, b) => a.quantidade - b.quantidade,
         showSorterTooltip: { target: 'sorter-icon' }, 
@@ -204,13 +224,84 @@ const DashComponent = () => {
     {
         title: 'GCom - Estoq', 
         dataIndex: 'diferenca', 
-        key: 'diferenca',
+        key: 'diferencaGCom',
         align: 'right',
         sorter: (a, b) => a.diferenca - b.diferenca,
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
     },
   ];
+
+  const atualizarBarra = async (dados) => {
+
+    const hoje = dayjs(new Date().toISOString().split('T')[0])
+
+    const dataAux = [
+      { dias: 'Venc',  total: 0 },
+      { dias: '5 dias',    total: 0 },
+      { dias: '10 dias',   total: 0 },
+      { dias: '15 dias',   total: 0 },
+      { dias: '20 dias',   total: 0 },
+      { dias: '25 dias',   total: 0 },
+      { dias: '30 dias',   total: 0 },
+    ];
+    
+    // Vencidos
+    dataAux[0].total = dados
+                  .filter(item => (
+                    dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day')) <= 0 
+                  )
+                  .reduce((sum, item) => sum + item.quantidade, 0)
+
+    // 5 dias
+    dataAux[1].total = dados
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 0)
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 4)
+                  .reduce((sum, item) => sum + item.quantidade, 0)
+
+    // 10 dias
+    dataAux[2].total = dados
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 4)
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 9)
+                  .reduce((sum, item) => sum + item.quantidade, 0)
+
+    // 15 dias
+    dataAux[3].total = dados
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 9)
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 14)
+                  .reduce((sum, item) => sum + item.quantidade, 0)
+
+    // 20 dias
+    dataAux[4].total = dados
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 14)
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 19)
+                  .reduce((sum, item) => sum + item.quantidade, 0)
+
+    // 25 dias
+    dataAux[5].total = dados
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 19)
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 24)
+                  .reduce((sum, item) => sum + item.quantidade, 0)
+
+    // 30 dias
+    dataAux[6].total = dados
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 24)
+                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 29)
+                  .reduce((sum, item) => sum + item.quantidade, 0)
+
+  /*
+    dataAux[0].total = 10
+    dataAux[1].total = 30
+    dataAux[2].total = 25
+    dataAux[3].total = 60
+    dataAux[4].total = 33
+  */
+
+    setData(dataAux)
+
+
+
+  }
 
   const carregarDados = async () => {
 
@@ -232,8 +323,9 @@ const DashComponent = () => {
           setLoading(false)
           form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
 
-          setEmpresa(empresas => user.empresas.map(empresa => empresa._id))
-console.log(user.empresas.map(empresa => empresa._id))          
+//          setEmpresa(empresas => user.empresas.map(empresa => empresa._id))
+          setEmpresa(user.empresas)
+
       }
 
       let unit
@@ -243,24 +335,30 @@ console.log(user.empresas.map(empresa => empresa._id))
           console.error(error);
       });
 
+      setGComCompleto([])
       setDadosGCom([])
 
       await getAllStockBalances().then(response => {
 
-        const dados = response.data.map(item => ({
-          _id:          item._id,
-          itCodigo:     item.item.itCodigo,
-          descricao:    item.item.descricao,
-          unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
-          quantidade:   item.quantidade,
-          gcomEstoque:  item.gcomEstoque,
-          diferenca:    item.gcomEstoque - item.quantidade
-        }))
-
+        const dados = response.data
+          .map(item => ({
+            _id:          item._id,
+            itCodigo:     item.item.itCodigo,
+            descricao:    item.item.descricao,
+            unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
+            quantidade:   item.quantidade,
+            gcomEstoque:  item.gcomEstoque,
+            diferenca:    item.gcomEstoque - item.quantidade,
+            empresa:      item.empresa,
+            nomeEmpresa:  item.empresa.nome
+          }))
+        setGComCompleto(dados)
         setDadosGCom(dados)
 
       })
 
+      setDatesCompleto([])
+      setDatesItem([])
       await getAllDatesItem().then((response) => {
 
         const dados = response.data.map(item => ({
@@ -270,77 +368,17 @@ console.log(user.empresas.map(empresa => empresa._id))
           unit:         item.item.unit,
           unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
           dataValidade: item.dataValidade,
-          quantidade:   item.quantidade
+          quantidade:   item.quantidade,
+          empresa:      item.empresa,
+          nomeEmpresa:  item.empresa.nome
         }))
 
+        setDatesCompleto(dados)
         setDatesItem(dados)
 
         if (dados.length > 0) {
 
-          const hoje = dayjs(new Date().toISOString().split('T')[0])
-
-          const dataAux = [
-            { dias: 'Venc',  total: 0 },
-            { dias: '5 dias',    total: 0 },
-            { dias: '10 dias',   total: 0 },
-            { dias: '15 dias',   total: 0 },
-            { dias: '20 dias',   total: 0 },
-            { dias: '25 dias',   total: 0 },
-            { dias: '30 dias',   total: 0 },
-          ];
-          
-          // Vencidos
-          dataAux[0].total = dados
-                        .filter(item => (
-                          dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day')) <= 0 
-                        )
-                        .reduce((sum, item) => sum + item.quantidade, 0)
-
-          // 5 dias
-          dataAux[1].total = dados
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 0)
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 4)
-                        .reduce((sum, item) => sum + item.quantidade, 0)
-
-          // 10 dias
-          dataAux[2].total = dados
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 4)
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 9)
-                        .reduce((sum, item) => sum + item.quantidade, 0)
-
-          // 15 dias
-          dataAux[3].total = dados
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 9)
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 14)
-                        .reduce((sum, item) => sum + item.quantidade, 0)
-
-          // 20 dias
-          dataAux[4].total = dados
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 14)
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 19)
-                        .reduce((sum, item) => sum + item.quantidade, 0)
-
-          // 25 dias
-          dataAux[5].total = dados
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 19)
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 24)
-                        .reduce((sum, item) => sum + item.quantidade, 0)
-
-          // 30 dias
-          dataAux[6].total = dados
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 24)
-                        .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 29)
-                        .reduce((sum, item) => sum + item.quantidade, 0)
-
-/*
-          dataAux[0].total = 10
-          dataAux[1].total = 30
-          dataAux[2].total = 25
-          dataAux[3].total = 60
-          dataAux[4].total = 33
-*/
-
-          setData(dataAux)
+          atualizarBarra(dados)
 
         }
 
@@ -375,6 +413,23 @@ console.log(user.empresas.map(empresa => empresa._id))
     },  
   };
 
+  const handleOnChageEmpresa = async (value) => {
+
+    try {
+      
+      const GComAux = GComCompleto.filter(dados => value.includes(dados.empresa._id))
+      setDadosGCom(GComAux)
+
+      const datesAux = datesCompleto.filter(dados => value.includes(dados.empresa._id))
+      setDatesItem(datesAux)
+      
+      atualizarBarra(datesAux)
+
+    } catch {
+      console.log("Erro")
+    }
+  }
+
   useEffect(() => {
 
     carregarDados()
@@ -387,7 +442,7 @@ console.log(user.empresas.map(empresa => empresa._id))
 
         <Card 
           size='small'
-          style={{ height: 'calc(8vh)'}}
+          style={{ height: 'calc(11vh)'}}
           >
           <Row gutter={[16, 16]}>
             <Col>
@@ -408,12 +463,13 @@ console.log(user.empresas.map(empresa => empresa._id))
                                 message: 'Informar Empresa'}]}
                         >
                         <Select
-                            disabled={empresa}
+                            disabled={empresa.length === 1}
                             placeholder="Selecionar Empresa"
                             allowClear  //Permite limpar seleção
                             mode="multiple"
                             loading={loading}   // Mostrar ícone de carregamento
                             options={selectEmpresas}
+                            onChange={handleOnChageEmpresa}
                         >
                         </Select>
                     </Item>
@@ -437,10 +493,12 @@ console.log(user.empresas.map(empresa => empresa._id))
           
             <Card
               title="Total de Produtos à Vencer"
-              bodyStyle={{ 
-                  height: cardBarra,
-                  overflow: 'hidden' 
-                }}
+              styles={{
+                body:{ 
+                    height: cardBarra,
+                    overflow: 'hidden' 
+                  },
+              }}
             >            
               <Column {...config} />
             </Card>

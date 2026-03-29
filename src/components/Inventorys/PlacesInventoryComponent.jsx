@@ -363,7 +363,7 @@ const PlacesInventoryComponent = () => {
         await endPlaces(finalizar).then((response) => {
             message.success('Localização Finalizada')
             carregarDados();            
-        }).catch((error)=> {     
+        }).catch((error)=> {                 
             if (error.response.data.message) {                
                 message.error(error.response.data.message)
             } else {
