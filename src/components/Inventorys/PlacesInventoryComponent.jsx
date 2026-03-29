@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Alert} from 'antd'
 
 import { createPlacesInventory, deletePlacesInventory, endPlaces, getAllPlacesInventory, updatePlacesInventory } from '../../services/PlacesInventoryService';
 
@@ -363,8 +363,8 @@ const PlacesInventoryComponent = () => {
         await endPlaces(finalizar).then((response) => {
             message.success('Localização Finalizada')
             carregarDados();            
-        }).catch((error)=> {    
-            if (error.response.data.message) {
+        }).catch((error)=> {     
+            if (error.response.data.message) {                
                 message.error(error.response.data.message)
             } else {
                 if (error.response) {
@@ -373,9 +373,10 @@ const PlacesInventoryComponent = () => {
                     message.error('Erro ao finalizar!');
                 }                
             }
+        }).finally (() => {
+            setLoading(false)   
         });
         
-        setLoading(false);    
 
     }
 

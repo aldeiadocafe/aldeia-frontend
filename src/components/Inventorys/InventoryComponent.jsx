@@ -412,13 +412,24 @@ const InventoryComponent = () => {
     };
 
     // Chamado se o usuário confirmar na Popconfirm
-    const handlePopupConfirmFinaliz = (value) => {
+    const handlePopupConfirmFinaliz = async (value) => {
 
         setLoading(true);    
 
         if(value){
+            
+            const inventory = {
+                _id:                value._id,
+                empresa:            value.empresa,
+                empresaNome:        value.empresaNome,
+                dataInventario:     value.dataInventario,
+                descricao:          value.descricao,
+                tipoInventario:     value.tipoInventario,
+                situacao:           value.situacao,
+                usuarioAlteracao:   user
+            }
 
-            endInventory(value._id).then((response) => {
+            await endInventory(inventory).then((response) => {
 
                 message.success('Registro finalizado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar

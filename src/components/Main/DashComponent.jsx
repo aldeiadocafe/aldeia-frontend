@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Column } from '@ant-design/plots'
-import { Button, Card, Col, Input, Layout, Row, Space, Table, Grid } from 'antd'
+import { Button, Card, Col, Input, Layout, Row, Space, Table, Grid, Form, Select } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 
 import { getAllDatesItem } from '../../services/DatesItemBalanceService'
@@ -10,6 +10,10 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { SearchOutlined } from '@ant-design/icons'
 import { getAllStockBalances } from '../../services/StockBalanceService'
+import Title from 'antd/es/typography/Title';
+
+import { useAuth } from '../Login/AuthContext';
+
 
 dayjs.extend(utc)
 
@@ -17,14 +21,19 @@ const { useBreakpoint } = Grid;
 
 const DashComponent = () => {
 
+  const { user } = useAuth();
+
   const [ datesItem,    setDatesItem]   = useState([])
   const [ loading,      setLoading]     = useState(false)
-
-  const [tabela,        setTabela]      = useState(1);
 
   const [dadosGCom, setDadosGCom]       = useState([])
   const [searchText,      setSearchText]      = useState('');
 
+  const [selectEmpresas,  setSelectEmpresas]  = useState([]);
+  const [empresa,         setEmpresa]         = useState(null)
+
+  const [ form ]  = Form.useForm();
+  const { Item }  = Form;
 
   // 1. Nome do array precisa ser data
   const [data, setData] = useState([])
@@ -209,6 +218,24 @@ const DashComponent = () => {
 
     try {
 
+      setEmpresa(null)
+
+      if (user.empresas) {
+
+          // Empresa
+          const formatarDados = user.empresas.map((company) => ({
+              value: company._id,
+              label: company.nome
+          }))
+          setSelectEmpresas(formatarDados)
+
+          setLoading(false)
+          form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+
+          setEmpresa(empresas => user.empresas.map(empresa => empresa._id))
+console.log(user.empresas.map(empresa => empresa._id))          
+      }
+
       let unit
       await getAllUnits().then((response) => {
         unit = response.data
@@ -356,8 +383,49 @@ const DashComponent = () => {
 
   return (
     <Layout >      
-      <Content style={{ margin: '10px'}}>
-        <Row gutter={[16, 16]}>
+      <Content>
+
+        <Card 
+          size='small'
+          style={{ height: 'calc(8vh)'}}
+          >
+          <Row gutter={[16, 16]}>
+            <Col>
+
+              <Title level={4}
+                  style={{ color: 'var(--primary-color)'}}
+              >Escolher Empresa</Title>
+            </Col>
+
+            <Col span={12}>
+              <Form
+                  form={form}
+                  >
+                    <Item
+                        name={"empresas"}
+                        key={"empresas"}
+                        rules={[{required: true, 
+                                message: 'Informar Empresa'}]}
+                        >
+                        <Select
+                            disabled={empresa}
+                            placeholder="Selecionar Empresa"
+                            allowClear  //Permite limpar seleção
+                            mode="multiple"
+                            loading={loading}   // Mostrar ícone de carregamento
+                            options={selectEmpresas}
+                        >
+                        </Select>
+                    </Item>
+                </Form>
+            </Col>
+          </Row>  
+
+        </Card>
+
+        <Row 
+          style={{ marginTop: '5px' }}
+          gutter={[16, 16]}>
 
           {/* xs={24} para celular (1 card por linha) */}
           {/* md={12} para desktop (2 cards por linha) */}
@@ -423,7 +491,7 @@ const DashComponent = () => {
 
         <Card 
           title="Produtos por Data de Validade" 
-          style={{ marginTop: '16px' }}>
+          style={{ marginTop: '5px' }}>
           <Table
               columns={colunas} 
               dataSource={datesItem} 

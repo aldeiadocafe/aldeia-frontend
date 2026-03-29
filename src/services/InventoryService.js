@@ -13,4 +13,4 @@ export const updateInventory = (inventoryId, inventory) => axios.put(REST_API_BA
 
 export const deleteInventory = (inventoryId) => axios.delete(REST_API_BASE_URL + '/' + inventoryId);
 
-export const endInventory = (inventoryId) => axios.post(REST_API_BASE_URL + '/finalizar/' + inventoryId);
+export const endInventory = (inventory) => axios.post(REST_API_BASE_URL + '/finalizar', inventory);
