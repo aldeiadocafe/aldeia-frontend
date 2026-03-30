@@ -8,7 +8,7 @@ const Email = () => {
   const [form] = Form.useForm();
 
   const sendEmail = (values) => {
-
+/*
     // 1. Defina os parâmetros com as variáveis do template
     const templateParams = {
       email: values.user_email, // O nome capturado no formulário
@@ -18,7 +18,7 @@ const Email = () => {
     };
 
     // values object contains {user_name, user_email, message}
-/*    
+    
     emailjs    
       .sendForm(
         'service_umls6wu',      //YOUR_SERVICE_ID
@@ -29,8 +29,8 @@ const Email = () => {
 */
     emailjs.send("service_umls6wu","template_s7r5d5d",{
         user_name: "Edgar",
-        link: "https://sakamoto.aldeiadocafe.com.br/item-conference/69bc317b9c8715ba3d0ba9a4",
-        email: "edgar.bispo@aldeiadocafe.com.br"},
+        link: "https://APP.aldeiadocafe.com.br/item-conference/69bc317b9c8715ba3d0ba9a4",
+        email: values.user_email},
       'fhQYQ-Ntr84l_55IR')        
       .then(
         (result) => {
