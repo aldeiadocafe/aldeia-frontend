@@ -135,7 +135,7 @@ function App() {
                   <Route path='/conversationsitem'    
                     element={
                       <PrivateRoute>
-                        <ListConversationsComponent/>
+                        {/*<ListConversationsComponent/> */}
                       </PrivateRoute>
                     }/>
 
@@ -199,7 +199,7 @@ function App() {
                   <Route path='/importarnfe'    
                     element={
                       <PrivateRoute>
-                        <ImportInvoicesComponent/>
+                        {/*<ImportInvoicesComponent/> */}
                       </PrivateRoute>
                     }/>
 
