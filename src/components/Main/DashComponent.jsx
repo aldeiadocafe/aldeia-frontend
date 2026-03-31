@@ -223,7 +223,7 @@ const DashComponent = () => {
         render: (value) => formatter.format(value),
     },
     {
-        title: 'GCom - Estoq', 
+        title: 'Estoq - GCom', 
         dataIndex: 'diferenca', 
         key: 'diferencaGCom',
         align: 'right',
@@ -349,7 +349,7 @@ const DashComponent = () => {
             unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
             quantidade:   item.quantidade,
             gcomEstoque:  item.gcomEstoque,
-            diferenca:    item.gcomEstoque - item.quantidade,
+            diferenca:    item.quantidade - item.gcomEstoque,
             empresa:      item.empresa,
             nomeEmpresa:  item.empresa.nome
           }))

@@ -49,7 +49,7 @@ const ListStockBalanceComponent = () => {
             Unid:               item.unidade,
             Quantidade:         formatter.format(item.qtde),
             GCom:               formatter.format(item.gcomEstoque),
-            "GCOM - Qtde":      formatter.format(item.diferenca),
+            "Estoq - GCOM":     formatter.format(item.diferenca),
             "Data Inventário":  item.dataInventario,
             "Data GCom":        item.dataGCom
         }))
@@ -240,7 +240,7 @@ const ListStockBalanceComponent = () => {
         render: (value) => formatter.format(value),
     },
     {
-        title: 'GCom - Estoq', 
+        title: 'Estoq - GCom', 
         dataIndex: 'diferenca', 
         key: 'diferenca',
         align: 'right',
@@ -331,7 +331,7 @@ const ListStockBalanceComponent = () => {
                 unit:           item.item.unit,
                 unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
                 gcomEstoque:    item.gcomEstoque,
-                diferenca:      item.gcomEstoque - item.quantidade,
+                diferenca:      item.quantidade - item.gcomEstoque,
                 dataInventario: item.dataInventario,
                 dataGCom:       item.dataGCom,
             }))
