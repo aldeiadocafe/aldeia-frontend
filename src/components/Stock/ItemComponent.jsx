@@ -167,6 +167,8 @@ const ItemComponent = () => {
         {
             dataIndex:  "quantidadeMinima",
             title:      "Qtde Mínima",
+            sorter: (a, b) => a.quantidadeMinima - b.quantidadeMinima,
+            showSorterTooltip: { target: 'sorter-icon' }, 
             align: 'right',
             render: (value) => formatter.format(value)
         },
