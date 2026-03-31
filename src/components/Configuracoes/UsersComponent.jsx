@@ -426,7 +426,7 @@ const UsersComponent = () => {
         <div style={{ textAlign: 'center' }}>
             <Title level={2}
                 style={{ color: 'var(--primary-color)'}}
-            >Empresa</Title>
+            >Usuário</Title>
         </div>
 
         <Spin
@@ -460,7 +460,7 @@ const UsersComponent = () => {
 
       {/* Modal de Form */}
       <Modal
-        title={ "Manutenção Cadastro Empresa"}
+        title={ "Manutenção Cadastro Usuário"}
         width={"100vw"}
         style={{ top: 20, padding: 0, margin: 15 }}
         open={formModal}
@@ -581,7 +581,7 @@ const UsersComponent = () => {
       </Modal>
 
       <Modal
-        title={ "Eliminar Empresa"}
+        title={ "Eliminar Usuário"}
         width={"100vw"}
         style={{ top: 20, padding: 0, margin: 15 }}
         open={deleteModal}
