@@ -13,7 +13,7 @@ const { Title } = Typography;
 
 const LoginComponent = () => {
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
@@ -26,7 +26,7 @@ const LoginComponent = () => {
       const res = await getLogin(loginAux)
 
       await login(res.data,values.remember ? values.remember : false);
-      message.success(`Bem-vindo, ${values.email}!`);
+      message.success(`Bem-vindo, ${res.data.user.nome}!`);
 //      window.location.href = '/';
       navigate('/')
 
