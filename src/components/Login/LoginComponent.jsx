@@ -20,7 +20,7 @@ const LoginComponent = () => {
 
     try {
       const loginAux = {
-        email:  values.email.toString().toUpperCase(),
+        nome:   values.nome.toString().toUpperCase(),
         senha:  values.senha
       }
       const res = await getLogin(loginAux)
@@ -51,10 +51,11 @@ const LoginComponent = () => {
           layout="vertical"
         >
           <Form.Item
-            name="email"
-            rules={[{ required: true, message: 'Por favor, insira seu e-mail!' }]}
+            name="nome"
+            rules={[{ required: true, message: 'Por favor, insira seu nome!' }]}
           >
-            <Input prefix={<UserOutlined />} placeholder="E-mail" size="large" />
+            <Input prefix={<UserOutlined />} placeholder="Nome" size="large" />
+
           </Form.Item>
           
           <Form.Item

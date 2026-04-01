@@ -89,18 +89,6 @@ const ProfilesComponent = () => {
               <Input/>
           </Item>
           <Item
-              name="email"
-              key={"email"}
-              label="E-mail"
-              >
-
-              <Input 
-                  disabled
-                  prefix={<MailOutlined />} 
-                  />
-
-          </Item>
-          <Item
               name="nome"
               key={"nome"}
               label="Nome"
@@ -108,10 +96,29 @@ const ProfilesComponent = () => {
                         message: 'Informar seu nome' }]}
               >
               <Input 
+                  disabled
                   style={{ textTransform: 'uppercase' }}
                   placeholder="Seu Nome"
-//                  prefix={<UserOutlined />} 
+                  prefix={<UserOutlined />} 
                   />
+          </Item>
+          <Item
+              name="email"
+              key={"email"}
+              label="E-mail"
+              rules={[
+                { type: 'email',
+                  message: 'O e-mail inserido não é válido!'
+                },
+                { required: true, 
+                  message: 'Informar seu e-mail' }]}
+              >
+
+              <Input 
+                  style={{ textTransform: 'uppercase' }}
+//                  prefix={<MailOutlined />} 
+                  />
+
           </Item>
           <Item
               name="senha"

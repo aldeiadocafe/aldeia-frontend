@@ -9,6 +9,8 @@ import { getPasswordById } from '../../services/PasswordService'
 
 const PasswordsComponent = () => {
 
+    const { logout } = useAuth()
+
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
@@ -69,6 +71,13 @@ const PasswordsComponent = () => {
 
     }
 
+    const handleCancel = async () => {
+
+      await logout()
+      navigate('/')
+
+    }
+
     useEffect(() => {
 
       if (idPassword) {
@@ -104,18 +113,6 @@ const PasswordsComponent = () => {
               <Input/>
           </Item>
           <Item
-              name="email"
-              key={"email"}
-              label="E-mail"
-              >
-
-              <Input 
-                  disabled
-                  prefix={<MailOutlined />} 
-                  />
-
-          </Item>
-          <Item
               name="nome"
               key={"nome"}
               label="Nome"
@@ -126,8 +123,20 @@ const PasswordsComponent = () => {
                   disabled
                   style={{ textTransform: 'uppercase' }}
                   placeholder="Seu Nome"
-//                  prefix={<UserOutlined />} 
+                  prefix={<UserOutlined />} 
                   />
+          </Item>
+          <Item
+              name="email"
+              key={"email"}
+              label="E-mail"
+              >
+
+              <Input 
+                  disabled
+                  prefix={<MailOutlined />} 
+                  />
+
           </Item>
           <Item
               name="senha"
@@ -147,6 +156,7 @@ const PasswordsComponent = () => {
                 <Space>
                   <Button 
                       htmlType="button"
+                      onClick={handleCancel}
                   >
                     Cancelar
                   </Button>

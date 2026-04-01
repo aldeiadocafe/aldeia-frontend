@@ -141,21 +141,21 @@ const UsersComponent = () => {
             ),
         },        
         {
-            title:      "E-mail",
-            dataIndex:  "email",
-            key:        "email",
-            sorter: (a, b) => a.email.localeCompare(b.email),
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('email'),
-            ellipsis: true,
-        },
-        {
             title:      "Nome",
             dataIndex:  "nome",
             key:        "nome",
             sorter: (a, b) => a.nome.localeCompare(b.nome),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('nome'),
+            ellipsis: true,
+        },
+        {
+            title:      "E-mail",
+            dataIndex:  "email",
+            key:        "email",
+            sorter: (a, b) => a.email.localeCompare(b.email),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            ...getColumnSearchProps('email'),
             ellipsis: true,
         },
         {
@@ -482,6 +482,18 @@ const UsersComponent = () => {
             <Row gutter={[16, 16]}>
                 <Col span={12}>
                     <Item
+                        name={"nome"}
+                        label="Nome"
+                        rules={[{required: true, message: 'Informar Nome'}]}
+                        >
+                        <Input 
+                            style={{ textTransform: 'uppercase' }}
+                            disabled={!isEditing || idUser}
+                            />
+                    </Item>
+                </Col>
+                <Col span={12}>
+                    <Item
                         name={"email"}
                         label="E-mail"
                         rules={[
@@ -490,20 +502,8 @@ const UsersComponent = () => {
                         ]}
                         >
                         <Input 
-                            disabled={!isEditing || idUser}
                             style={{ textTransform: 'uppercase' }}
                             placeholder="seu.email@exemplo.com"
-                            />
-                    </Item>
-                </Col>
-                <Col span={12}>
-                    <Item
-                        name={"nome"}
-                        label="Nome"
-                        rules={[{required: true, message: 'Informar Nome'}]}
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
                             disabled={!isEditing}
                             />
                     </Item>
