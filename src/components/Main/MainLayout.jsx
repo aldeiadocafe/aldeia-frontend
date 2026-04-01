@@ -14,6 +14,8 @@ import { useAuth } from '../Login/AuthContext';
 
 const MainLayout = () => {
 
+    const { logout } = useAuth()
+
     const navigator = useNavigate()
 
     const [collapsed, setCollapsed] = useState(true);
@@ -58,12 +60,14 @@ const MainLayout = () => {
 
         console.log('Logout realizado!');
 
+        logout()
+/*
         localStorage.removeItem('auth-token');
         sessionStorage.removeItem('auth-token');
 
         localStorage.removeItem('auth-user');
         sessionStorage.removeItem('auth-user');        
-
+*/
         window.location.href = '/login';
 
     };
