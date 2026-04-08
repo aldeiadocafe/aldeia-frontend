@@ -1,20 +1,18 @@
-import React from 'react';
-import { View, Text, useWindowDimensions, StyleSheet } from 'react-native';
+import { Grid } from 'antd';
+const { useBreakpoint } = Grid;
 
 const Teste = () => {
-  // Captura a largura e altura automaticamente
-  const { height, width } = useWindowDimensions();
-
+  const screens = useBreakpoint();
+  
+  // screens contém booleanos para cada breakpoint
+  // Exemplo: screens.md (true se for tablet/desktop)
+  console.log(screens);                
+  
   return (
-    <View style={styles.container}>
-      <Text>Largura do Tablet: {width}px</Text>
-      <Text>Altura do Tablet: {height}px</Text>
-    </View>
+    <div>
+      {screens.md ? 'Tablet/Desktop' : 'Celular'}
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-});
 
 export default Teste;
