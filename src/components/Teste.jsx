@@ -1,33 +1,20 @@
-import { Table } from 'antd';
+import React from 'react';
+import { View, Text, useWindowDimensions, StyleSheet } from 'react-native';
 
-const columns = [
-  {
-    title: 'Company',
-    dataIndex: 'company',
-    // 1. Define Filter Options
-    filters: [
-      { text: 'Company A', value: 'Company A' },
-      { text: 'Company B', value: 'Company B' },
-    ],
-    // 2. Specify Filter Logic
-    onFilter: (value, record) => record.company.indexOf(value) === 0,
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-    filters: [
-      { text: 'Active', value: 'Active' },
-      { text: 'Inactive', value: 'Inactive' },
-    ],
-    onFilter: (value, record) => record.status.indexOf(value) === 0,
-    // filterMultiple: true, // Optional: defaults to true
-  },
-];
+const Teste = () => {
+  // Captura a largura e altura automaticamente
+  const { height, width } = useWindowDimensions();
 
-const data = [
-  { key: '1', company: 'Company A', status: 'Active' },
-  { key: '2', company: 'Company B', status: 'Inactive' },
-];
+  return (
+    <View style={styles.container}>
+      <Text>Largura do Tablet: {width}px</Text>
+      <Text>Altura do Tablet: {height}px</Text>
+    </View>
+  );
+};
 
-const Teste = () => <Table columns={columns} dataSource={data} />;
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+});
+
 export default Teste;
