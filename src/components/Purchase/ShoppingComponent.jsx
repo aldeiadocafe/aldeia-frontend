@@ -258,7 +258,7 @@ const ShoppingComponent = () => {
             dataIndex: 'comprado',           // Pega a propriedade 'name' do dataSource
             key: 'comprado',            // ID único da coluna
             width: '10%',
-            fixed: 'left',  // Fixa a coluna
+//            fixed: 'left',  // Fixa a coluna
             // Converte boolean para Number para possibilitar a comparação aritmética
             sorter: (a, b) => Number(a.comprado) - Number(b.comprado),
             showSorterTooltip: { target: 'sorter-icon' }, 
@@ -274,7 +274,7 @@ const ShoppingComponent = () => {
             dataIndex:  'nomesEmpresa',
             key:  'nomesEmpresa',
             title: 'Empresa',
-            fixed: 'left',  // Fixa a coluna
+//            fixed: 'left',  // Fixa a coluna
             filters: filterEmpresas,
             // Método de filtragem
             onFilter: (value, record) => {
@@ -296,7 +296,7 @@ const ShoppingComponent = () => {
             title: 'Item',
             dataIndex: 'itCodigo',
             key: 'itCodigo',
-            fixed: 'left',  // Fixa a coluna
+//            fixed: 'left',  // Fixa a coluna
             sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('itCodigo'),
