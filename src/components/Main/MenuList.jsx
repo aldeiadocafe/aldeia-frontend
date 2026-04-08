@@ -4,7 +4,7 @@ import { AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined
 import { Menu, ConfigProvider } from 'antd';
 import { Link } from 'react-router-dom';
 import { BiBox, BiBuilding, BiUnite } from 'react-icons/bi';
-import { BsArrowLeftRight, BsBoxSeam, BsCashStack, BsCurrencyDollar, BsReceiptCutoff } from 'react-icons/bs';
+import { BsArrowLeftRight, BsBoxSeam, BsCashStack, BsReceiptCutoff, BsCart2, BsListTask } from 'react-icons/bs';
 
 const MenuList = () => {
 
@@ -38,6 +38,7 @@ const MenuList = () => {
                                     Item
                                 </Link>,
                         },
+/*                        
                         {
                             key: 'fatorConversao',
                             icon: <BsArrowLeftRight />,
@@ -46,6 +47,7 @@ const MenuList = () => {
                                     Fator Conv
                                 </Link>,
                         },
+*/                        
                     ]
                 },
                 {
@@ -97,7 +99,7 @@ const MenuList = () => {
                             Local
                         </Link>,
 
-                },                
+                },                                
                 {
                     key: 'conferencia',
                     icon: <CalculatorOutlined />,
@@ -107,6 +109,22 @@ const MenuList = () => {
                         </Link>,
 
                 },
+            ]
+        },
+        { 
+            key: 'mnuPurchase',
+            icon: <BsCart2 />,
+            label: "Compras",
+            children: [
+                {
+                    key: 'shopping',
+                    icon: <BsListTask />,
+                    label: 
+                        <Link to="/shopping">
+                            Lista de Compras
+                        </Link>,
+
+                },                
             ]
         },
         { 
@@ -125,6 +143,7 @@ const MenuList = () => {
                 },
             ]
         },
+/*        
         { 
             key: 'mnuReceipt',
             icon: <BiBox />,
@@ -140,6 +159,7 @@ const MenuList = () => {
                 },
             ]
         },
+*/        
         { 
             key: 'sistema',
             icon: <SettingOutlined />,
