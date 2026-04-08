@@ -309,7 +309,7 @@ const ShoppingComponent = () => {
             ),
         },
         {
-            title: 'Qtd',
+            title: 'Estoq Atual',
             dataIndex: 'quantidade',
             key: 'quantidade',
             width: '15%',

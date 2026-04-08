@@ -75,7 +75,6 @@ const MainLayout = () => {
     return (
         <Layout className="full-height-layout">
             <Sider 
-//                width={220}
                 collapsedWidth='40px'
                 collapsed={collapsed} 
                 collapsible
