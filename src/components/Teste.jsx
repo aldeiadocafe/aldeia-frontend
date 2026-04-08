@@ -40,7 +40,7 @@ const Teste = () => {
         </div>
 
         {/* Rodapé: Botão Logout */}
-        <div style={{ padding: '16px' }}>
+        <div style={{ padding: '50px' }}>
           <Button
             type="text"
             icon={<LogoutOutlined />}
