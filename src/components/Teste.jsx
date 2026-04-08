@@ -12,7 +12,7 @@ const Teste = () => {
   return (
     <Sider
       breakpoint="lg"
-      collapsedWidth="0"
+//      collapsedWidth="0"
       style={{
         height: '100vh',
         position: 'fixed',
