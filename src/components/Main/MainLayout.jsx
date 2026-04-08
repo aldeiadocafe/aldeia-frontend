@@ -89,7 +89,7 @@ const MainLayout = () => {
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        height: '100%',
+                        height: '100vh',
                     }}
                 >
                     <a href='/'>
