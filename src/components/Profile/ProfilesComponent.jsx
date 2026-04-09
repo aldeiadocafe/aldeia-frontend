@@ -49,7 +49,7 @@ const ProfilesComponent = () => {
     }
 
     const handleCancel = () => {
-        form.resetFields();
+      navigate('/')
     }
 
     useEffect(() => {
