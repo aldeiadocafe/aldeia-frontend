@@ -308,20 +308,26 @@ const CompanysComponent = () => {
         }
     }
 
-    const carregarDados = () => {
-        setLoading(true);
+    const carregarDados = async () => {
 
-        setDados([])
-        getAllCompanys().then((response) => {
-            setDados(response.data);
-        }).catch((error)=> {
+        try {
+
+            setLoading(true);
+
+            setDados([])
+            await getAllCompanys().then((response) => {
+                setDados(response.data);
+
+            })
+
+        } catch (error) {
             console.error(error);
-        });
+        } finally {
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+        setLoading(false); //Libera a tela
+
+        }
+     
 
     }
 
