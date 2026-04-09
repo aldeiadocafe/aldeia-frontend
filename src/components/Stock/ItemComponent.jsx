@@ -293,10 +293,8 @@ const ItemComponent = () => {
             console.error(error);
         } finally {
 
-            setTimeout(() => {
-                setSelectedRowKeys([]);
-                setLoading(false);
-            }, 1000);    
+            setSelectedRowKeys([]);
+            setLoading(false);
     
         }
 
