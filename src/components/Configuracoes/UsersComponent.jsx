@@ -178,24 +178,51 @@ const UsersComponent = () => {
         },
     ]
 
-    const gravarDados = (values) => {
+    const gravarDados = async (values) => {
 
-        const usuario = {
-            _id:        values._id,
-            email:      values.email.toUpperCase(),
-            nome:       values.nome.toUpperCase(),
-            senha:      values.senha,
-            telefone:   values.telefone ? values.telefone.replace(/\D/g, '') : "",
-            empresas:   values.empresas,
-            usuarioCriacao:     user ? user._id : null,
-            usuarioAlteracao:   user ? user._id : null,
-        };
+        const usuarioAnt = dados.find(item => item._id === values._id)
+        let senhaAux
+        let usuario
+
+        if (usuarioAnt) {
+
+            
+            if (usuarioAnt.senha === values.senha) senhaAux = values.senha
+
+        }
+
+        if (senhaAux) {
+
+            usuario = {
+                _id:        values._id,
+                email:      values.email.toUpperCase(),
+                nome:       values.nome.toUpperCase(),
+                telefone:   values.telefone ? values.telefone.replace(/\D/g, '') : "",
+                empresas:   values.empresas,
+                usuarioCriacao:     user ? user._id : null,
+                usuarioAlteracao:   user ? user._id : null,
+            };
+
+        } else {
+
+            usuario = {
+                _id:        values._id,
+                email:      values.email.toUpperCase(),
+                nome:       values.nome.toUpperCase(),
+                senha:      values.senha,
+                telefone:   values.telefone ? values.telefone.replace(/\D/g, '') : "",
+                empresas:   values.empresas,
+                usuarioCriacao:     user ? user._id : null,
+                usuarioAlteracao:   user ? user._id : null,
+            };
+
+        }
 
         setLoading(true);    
 
         if (!values._id) {
 
-            createUser(usuario).then((response) => {
+            await createUser(usuario).then((response) => {
                 message.success('Registro criado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
@@ -211,7 +238,7 @@ const UsersComponent = () => {
             });
         } else {
 
-            updateUser(values._id, usuario).then((response) => {
+            await updateUser(values._id, usuario).then((response) => {
 
                 message.success('Registro atualizado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
@@ -245,14 +272,14 @@ const UsersComponent = () => {
         if (isEditing) {
 
             try {
-
+                
                 const values = await form.validateFields();
 
                 //Prossiga com a acao
                 gravarDados(values);
 
             } catch (errorInfo) {
-
+                console.log(errorInfo)
                 message.info('Verificar campo(s)!');
             }
 
@@ -301,7 +328,7 @@ const UsersComponent = () => {
                 situacao:   user.situacao,
                 empresas:   user.empresas,
             }))
-            setDados(response.data);
+            setDados(dadosAux);
 
         }).catch((error)=> {
             console.error(error);
@@ -480,6 +507,7 @@ const UsersComponent = () => {
                     >
                         <Input />
                     </Item>
+
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
                             <Item
@@ -519,6 +547,7 @@ const UsersComponent = () => {
                                 >
                                 <Input.Password
                                     disabled={!isEditing}
+                                    allowClear
                                     placeholder="Informar Senha"
                                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                                 />            
@@ -621,6 +650,7 @@ const UsersComponent = () => {
                     >
                         <Input />
                     </Item>
+
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
                             <Item

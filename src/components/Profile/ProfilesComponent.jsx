@@ -130,6 +130,7 @@ const ProfilesComponent = () => {
               <Input.Password
                 prefix={<LockOutlined />}
                 type="password"
+                allowClear
                 placeholder="Senha"
               />
 
