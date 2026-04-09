@@ -264,34 +264,41 @@ const ItemComponent = () => {
         }
     }
 
-    const carregarDados = () => {
-        
-        setLoading(true);
+    const carregarDados = async () => {
 
-        setDados([])
-        getAllItems().then((response) => {
+        try {
 
-            // Ler Array
-            const dadosAux = response.data.map(item => ({
-                _id:                item._id,
-                itCodigo:           item.itCodigo,
-                descricao:          item.descricao,
-                unit:               item.unit,
-                unitDescricao:      item.unit?.descricao,
-                situacao:           item.situacao,
-                quantidadeMinima:   item.quantidadeMinima
-            }))
+            setLoading(true);
 
-            setDados(dadosAux);
+            setDados([])
+            await getAllItems().then((response) => {
 
-        }).catch((error)=> {
+                // Ler Array
+                const dadosAux = response.data.map(item => ({
+                    _id:                item._id,
+                    itCodigo:           item.itCodigo,
+                    descricao:          item.descricao,
+                    unit:               item.unit,
+                    unitDescricao:      item.unit?.descricao,
+                    situacao:           item.situacao,
+                    quantidadeMinima:   item.quantidadeMinima
+                }))
+
+                setDados(dadosAux);
+
+            });
+
+
+        } catch (error) {
             console.error(error);
-        });
+        } finally {
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+            setTimeout(() => {
+                setSelectedRowKeys([]);
+                setLoading(false);
+            }, 1000);    
+    
+        }
 
     }
 
