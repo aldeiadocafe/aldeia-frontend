@@ -289,44 +289,47 @@ const ListDatesItemBalanceComponent = () => {
 
         <div>
 
-            <div style={{ textAlign: 'center' }}>
-                <Title level={2}
-                    style={{ color: 'var(--primary-color)'}}
-                >Consultar Item por Data de Validade</Title>
-            </div>
-
-            <Spin
-                spinning={loading}
-                fullscreen
-            />
-
-            <div style={{
-                display: 'flex',
-                justifyContent: 'flex-end'
-                }}
+            <Spin 
+            spinning={loading} 
+            size='large' 
+            tip="Carregando..."
             >
 
-                <Button 
-                    type="primary" 
-                    icon={<DownloadOutlined />} 
-                    onClick={exportToExcel}
+                <div style={{ textAlign: 'center' }}>
+                    <Title level={2}
+                        style={{ color: 'var(--primary-color)'}}
+                    >Consultar Item por Data de Validade</Title>
+                </div>
+
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end'
+                    }}
                 >
-                    Exportar para Excel
-                </Button>                
 
-            </div>
+                    <Button 
+                        type="primary" 
+                        icon={<DownloadOutlined />} 
+                        onClick={exportToExcel}
+                    >
+                        Exportar para Excel
+                    </Button>                
 
-            <Table
-                columns={colunas} 
-                dataSource={dados} 
-                showSorterTooltip={true}
-                size={'small'}
-                tableLayout="auto"
-                onChange={onChange} 
-                scroll={{ y: 'calc(80vh - 50px)' }}                
-                rowKey={(record) => record._id}
-                pagination={false}
-            />
+                </div>
+
+                <Table
+                    columns={colunas} 
+                    dataSource={dados} 
+                    showSorterTooltip={true}
+                    size={'small'}
+                    tableLayout="auto"
+                    onChange={onChange} 
+                    scroll={{ y: 'calc(80vh - 50px)' }}                
+                    rowKey={(record) => record._id}
+                    pagination={false}
+                />
+
+            </Spin>
 
         </div>
     )        

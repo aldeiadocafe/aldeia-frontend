@@ -397,87 +397,90 @@ const ListStockBalanceComponent = () => {
 
     <div>
 
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Consultar Saldo do Item</Title>
-        </div>
-
-        <div style={{
-            display: 'flex',
-            justifyContent: 'flex-end'
-        }}
+        <Spin 
+        spinning={loading} 
+        size='large' 
+        tip="Carregando..."
         >
-            <Space style={{ marginBottom: 16 }}>
-                <Button onClick={expandAll}>Expandir Tudo</Button>
-                <Button onClick={collapseAll}>Recolher Tudo</Button>
-                <Button 
-                    type="primary" 
-                    icon={<DownloadOutlined />} 
-                    onClick={exportToExcel}
-                >
-                    Exportar para Excel
-                </Button>                
-            </Space>
-        </div>
 
-        <Spin
-            spinning={loading}
-            fullscreen
-        />
+            <div style={{ textAlign: 'center' }}>
+                <Title level={2}
+                    style={{ color: 'var(--primary-color)'}}
+                >Consultar Saldo do Item</Title>
+            </div>
 
-        <Table
-            columns={colunas}
-            dataSource={dados}
-            size={'small'}
-            showSorterTooltip={true}
-            tableLayout='auto'
-//            onChange={onChange}
-            scroll={{ y: 'calc(80vh - 50px)' }}
-            expandable={{ 
-                expandedRowRender,
-                // 4. Conectar o estado controlado
-                expandedRowKeys: expandedRowKeys,
-                // 5. Atualizar o estado quando o usuário clicar manualmente
-                onExpand: (expanded, record) => {
-                    const keys = expanded
-                    ? [...expandedRowKeys, record.key] // Adiciona se expandir
-                    : expandedRowKeys.filter((key) => key !== record.key); // Remove se fechar
-                    setExpandedRowKeys(keys);
-                },                
+            <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end'
             }}
-/*            
-            expandable={{            
-                expandedRowRender: (record) => (
-                    <Table 
-                        columns={expandedColunas} 
-                        dataSource={expandedDateItem} 
-                        title={() => 'Data de Validade'} // <--- Título aqui
-                        size={'small'}
-                        showSorterTooltip={true}
-                        tableLayout='auto'
-                        pagination={{
-                            tabela,
-                            // The available options for items per page
-                            pageSizeOptions: ['5', '10', '20', '30'], 
-                            // Display the size changer
-                            showSizeChanger: true, 
-                            // Set the default page size
-                    //        defaultPageSize: 5,
-                            // Optional: show total items count
-                            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                            // Optional: update tabela page state on change
-                            onChange: (page) => {
-                            setTabela(page);
-                            },
-                        }}
-                    />
-                ),
-            }}
-*/
-            pagination={false}
+            >
+                <Space style={{ marginBottom: 16 }}>
+                    <Button onClick={expandAll}>Expandir Tudo</Button>
+                    <Button onClick={collapseAll}>Recolher Tudo</Button>
+                    <Button 
+                        type="primary" 
+                        icon={<DownloadOutlined />} 
+                        onClick={exportToExcel}
+                    >
+                        Exportar para Excel
+                    </Button>                
+                </Space>
+            </div>
 
-        />
+            <Table
+                columns={colunas}
+                dataSource={dados}
+                size={'small'}
+                showSorterTooltip={true}
+                tableLayout='auto'
+    //            onChange={onChange}
+                scroll={{ y: 'calc(80vh - 50px)' }}
+                expandable={{ 
+                    expandedRowRender,
+                    // 4. Conectar o estado controlado
+                    expandedRowKeys: expandedRowKeys,
+                    // 5. Atualizar o estado quando o usuário clicar manualmente
+                    onExpand: (expanded, record) => {
+                        const keys = expanded
+                        ? [...expandedRowKeys, record.key] // Adiciona se expandir
+                        : expandedRowKeys.filter((key) => key !== record.key); // Remove se fechar
+                        setExpandedRowKeys(keys);
+                    },                
+                }}
+    /*            
+                expandable={{            
+                    expandedRowRender: (record) => (
+                        <Table 
+                            columns={expandedColunas} 
+                            dataSource={expandedDateItem} 
+                            title={() => 'Data de Validade'} // <--- Título aqui
+                            size={'small'}
+                            showSorterTooltip={true}
+                            tableLayout='auto'
+                            pagination={{
+                                tabela,
+                                // The available options for items per page
+                                pageSizeOptions: ['5', '10', '20', '30'], 
+                                // Display the size changer
+                                showSizeChanger: true, 
+                                // Set the default page size
+                        //        defaultPageSize: 5,
+                                // Optional: show total items count
+                                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                                // Optional: update tabela page state on change
+                                onChange: (page) => {
+                                setTabela(page);
+                                },
+                            }}
+                        />
+                    ),
+                }}
+    */
+                pagination={false}
+
+            />
+
+        </Spin>
 
     </div>
 

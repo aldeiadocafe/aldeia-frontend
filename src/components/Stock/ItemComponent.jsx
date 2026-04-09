@@ -422,81 +422,166 @@ const ItemComponent = () => {
   return (
     <div>
 
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Item</Title>
-        </div>
+        <Spin 
+        spinning={loading} 
+        size='large' 
+        tip="Carregando..."
+        >
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
+            <div style={{ textAlign: 'center' }}>
+                <Title level={2}
+                    style={{ color: 'var(--primary-color)'}}
+                >Item</Title>
+            </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button 
-                type='primary'
-                icon={<AppstoreAddOutlined />}
-                onClick={showFormModal}
-                >
-                    Cadastrar
-            </Button>
-            <br></br>
-            <br></br>
-        </div>
-        
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            tableLayout='auto'
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}                
-            rowKey={(record) => record._id}
-            pagination={false}
-        />
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                    type='primary'
+                    icon={<AppstoreAddOutlined />}
+                    onClick={showFormModal}
+                    >
+                        Cadastrar
+                </Button>
+                <br></br>
+                <br></br>
+            </div>
+            
+            <Table
+                columns={colunas}
+                dataSource={dados}      
+                showSorterTooltip={true}
+                tableLayout='auto'
+                size={'small'}
+                scroll={{ y: 'calc(80vh - 90px)' }}                
+                rowKey={(record) => record._id}
+                pagination={false}
+            />
 
-      {/* Modal de Form */}
-      <Modal
-        title={ "Cadastro de Item"}
-        open={formModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-        onOk={handleOk}
-      >        
-        <Form
-            form={form}
-            layout='vertical'
+            {/* Modal de Form */}
+            <Modal
+                title={ "Cadastro de Item"}
+                open={formModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+                onOk={handleOk}
+            >        
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name={"itCodigo"}
+                        label="Item"
+                        rules={[{required: true, message: 'Informar o Código do Item'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing || idItem}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Código 60000639'/>
+                    </Item>
+                    <Item
+                        name={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Coca Cola'/>
+                    </Item>
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Item
+                                name="unit"
+                                label="Unidade Medida"
+                                rules={[{required: true, 
+                                        message: 'Informar Unidade de Medida'}]}
+                                >
+                                <Select
+                                    disabled={!isEditing}
+                                    placeholder="Selecionar Unid Medida"
+                                    allowClear  //Permite limpar seleção
+                                    loading={loading}   // Mostrar ícone de carregamento
+                                    options={selectUnits}
+                                >
+                                </Select>
+                            </Item>
+                        </Col>
+                        <Col span={12}>
+                            <Item
+                                name={"quantidadeMinima"}
+                                key={"quantidadeMinima"}
+                                label="Qtde Mínima"
+                                >
+                                <InputNumber 
+                                    disabled={!isEditing}
+                                    placeholder='Quantidade mínima de estoque'
+                                    decimalSeparator=','
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Item
+                        name={"situacao"}
+                        label="Situação"
+                        rules={[{required: true, message: 'Selecionar Situação'}]}
+                        >
+                        <Select
+                            disabled={!isEditing}
+                            placeholder="Selecionar uma situação"
+                            allowClear  //Permite limpar seleção
+                        >
+                            <Option value="ATIVO">ATIVO</Option>
+                            <Option value="OBSOLETO">OBSOLETO</Option>
+                        </Select>
+                    </Item>
+                </Form>
+
+            </Modal>
+
+            <Modal
+                title={ "Eliminar Item"}
+                open={deleteModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+                onOk={() => setIsPopupOpen(true)}
             >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"itCodigo"}
-                label="Item"
-                rules={[{required: true, message: 'Informar o Código do Item'}]}
-                >
-                <Input 
-                    disabled={!isEditing || idItem}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Código 60000639'/>
-            </Item>
-            <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    disabled={!isEditing}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Coca Cola'/>
-            </Item>
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name={"itCodigo"}
+                        label="Item"
+                        >
+                        <Input 
+                            disabled={!isEditing || idItem}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Código 60000639'/>                    
+                    </Item>
+                    <Item
+                        name={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Coca Cola'/>
+                    </Item>
                     <Item
                         name="unit"
                         label="Unidade Medida"
@@ -512,140 +597,57 @@ const ItemComponent = () => {
                         >
                         </Select>
                     </Item>
-                </Col>
-                <Col span={12}>
+                    <Col>
+                        <Item
+                            name={"quantidadeMinima"}
+                            key={"quantidadeMinima"}
+                            label="Qtde Mínima"
+                            >
+                            <InputNumber 
+                                disabled={!isEditing}
+                                placeholder='Quantidade mínima de estoque'
+                                decimalSeparator=','
+                                />
+                        </Item>
+                    </Col>
                     <Item
-                        name={"quantidadeMinima"}
-                        key={"quantidadeMinima"}
-                        label="Qtde Mínima"
+                        name={"situacao"}
+                        key={"situacao"}
+                        label="Situação"
+                        rules={[{required: true, message: 'Selecionar Situação'}]}
                         >
-                        <InputNumber 
+                        <Select
                             disabled={!isEditing}
-                            placeholder='Quantidade mínima de estoque'
-                            decimalSeparator=','
-                            />
+                            placeholder="Selecionar uma situação"
+                            allowClear  //Permite limpar seleção
+                        >
+                            <Option value="ATIVO">ATIVO</Option>
+                            <Option value="OBSOLETO">OBSOLETO</Option>
+                        </Select>
                     </Item>
-                </Col>
-            </Row>
-            <Item
-                name={"situacao"}
-                label="Situação"
-                rules={[{required: true, message: 'Selecionar Situação'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar uma situação"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="ATIVO">ATIVO</Option>
-                    <Option value="OBSOLETO">OBSOLETO</Option>
-                </Select>
-            </Item>
-        </Form>
+                </Form>
 
-      </Modal>
+                {/* Modal de Eliminar */}
+                <div style={{ 
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center', 
+                    }}>
+                    <Popconfirm
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimando permanentemente."
+                        open={isPopupOpen}
+                        onConfirm={handlePopupConfirm}
+                        onCancel={handlePopupCancel}
+                        okText="Sim"
+                        cancelText="Não"            
+                    />
+                </div>
+                
 
-      <Modal
-        title={ "Eliminar Item"}
-        open={deleteModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-        onOk={() => setIsPopupOpen(true)}
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"itCodigo"}
-                label="Item"
-                >
-                <Input 
-                    disabled={!isEditing || idItem}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Código 60000639'/>                    
-            </Item>
-            <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    disabled={!isEditing}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Coca Cola'/>
-            </Item>
-            <Item
-                name="unit"
-                label="Unidade Medida"
-                rules={[{required: true, 
-                        message: 'Informar Unidade de Medida'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar Unid Medida"
-                    allowClear  //Permite limpar seleção
-                    loading={loading}   // Mostrar ícone de carregamento
-                    options={selectUnits}
-                >
-                </Select>
-            </Item>
-            <Col>
-                <Item
-                    name={"quantidadeMinima"}
-                    key={"quantidadeMinima"}
-                    label="Qtde Mínima"
-                    >
-                    <InputNumber 
-                        disabled={!isEditing}
-                        placeholder='Quantidade mínima de estoque'
-                        decimalSeparator=','
-                        />
-                </Item>
-            </Col>
-            <Item
-                name={"situacao"}
-                key={"situacao"}
-                label="Situação"
-                rules={[{required: true, message: 'Selecionar Situação'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar uma situação"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="ATIVO">ATIVO</Option>
-                    <Option value="OBSOLETO">OBSOLETO</Option>
-                </Select>
-            </Item>
-        </Form>
+            </Modal>
 
-        {/* Modal de Eliminar */}
-        <div style={{ 
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center', 
-            }}>
-            <Popconfirm
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                open={isPopupOpen}
-                onConfirm={handlePopupConfirm}
-                onCancel={handlePopupCancel}
-                okText="Sim"
-                cancelText="Não"            
-            />
-        </div>
-        
-
-      </Modal>
+        </Spin>
 
     </div>
 

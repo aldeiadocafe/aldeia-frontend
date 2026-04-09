@@ -507,320 +507,328 @@ const ItemConfComponent = () => {
 
   return (
     <>        
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Conferência do Item</Title>
-        </div>
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
+        <div>
 
-        {/* Card de Inventário */}
-        <Card
-            size='small'
-            style={{
-                marginBottom: '10px',
-                borderColor: '#c36434',
-                boxShadow: '0 2px 8px #d4b8ab',
-                borderRadius: 8,                    
-            }}
-        >
-
-            <Form 
-                form={formPlaces}
-                layout="inline"
-                size='small'
-                style={{ display: 'flex', 
-                         justifyContent: 'center', alignItems: 'center' }}
-                >
-
-                <Row>
-                    <Item
-                        name={"nomeEmpresa"}
-                        label="Empresa"                    
-                        style={{ marginRight: '60px'}}
-                    >
-                        <Input 
-                            readOnly={true}
-                            size='small'
-                            />
-                    </Item>
-                    <Item
-                        name={"dataInventario"}
-                        label="Inventário"                    
-                        style={{ marginRight: '60px'}}
-                    >
-                        <Input 
-                            readOnly={true}
-                            size='small'
-                            />
-                    </Item>
-                </Row>
-                <Item
-                    name={"local"}
-                    label="Local"                    
-                >
-                    <Input 
-                        readOnly={true}
-                        size='small'
-                        />
-                </Item>
-
-            </Form>
-
-        </Card>
-
-        {/* Card Item Inventário */}
-        <Card
-            size='small'
-            style={{
-                marginBottom: '10px',
-                borderColor: '#c36434',
-                boxShadow: '0 2px 8px #d4b8ab',
-                borderRadius: 8,
-                padding: '0px',
-                height: customHeight,
-//                height: '310px'
-//                height: 'calc(50vh)' 
-                transition: 'customHeight 0.3s ease' // 3. Adicionar transição suave
-
-            }}
-        >
-            <Button
-                onClick={onClickCamera}
-                icon={<CameraOutlined />}
-                size="small"
-                shape="circle"
-            />
-
-            <Form
-                form={formCountPlaces}
-                layout='horizontal'
-                size='small'
-                onFinish={onFinishFormItems}
-//                onFinishFailed={onFinishFailedFormItems}
+            <Spin 
+            spinning={loading} 
+            size='large' 
+            tip="Carregando..."
             >
-                <Item
-                    name={"_id"}
-                    style={{display: 'none'}}
-                >
-                    <Input />
-                </Item>
-                <Item
-                    name={"_idItem"}
-                    style={{display: 'none'}}
-                >
-                    <Input />
-                </Item>
-                <Item
-                    name={"itCodigo"}
-                    style={{display: 'none'}}
-                >
-                    <Input />
-                </Item>
 
-                <Row>
-                    <Space>
-                        <Item
-                            name="chDescricao"
-                            valuePropName="checked"
+
+                <div style={{ textAlign: 'center' }}>
+                    <Title level={2}
+                        style={{ color: 'var(--primary-color)'}}
+                    >Conferência do Item</Title>
+                </div>
+
+                {/* Card de Inventário */}
+                <Card
+                    size='small'
+                    style={{
+                        marginBottom: '10px',
+                        borderColor: '#c36434',
+                        boxShadow: '0 2px 8px #d4b8ab',
+                        borderRadius: 8,                    
+                    }}
+                >
+
+                    <Form 
+                        form={formPlaces}
+                        layout="inline"
+                        size='small'
+                        style={{ display: 'flex', 
+                                justifyContent: 'center', alignItems: 'center' }}
                         >
-                            <Checkbox/>                        
-                        </Item>
-                        <Item
-                            name = "descricao"
-                            label="Descrição"
-                            required
-                            rules={[{required: true, 
-                                    message: 'Informar Descrição do Item'}]}
-                        >
-                            <AutoComplete
-                                allowClear      // Enable the clear button
-//                                value={valueDescricao}    // Controlled component value
-                                options={optDescricao}   // // O array de sugestões {value, label}
-                                onSelect={onSelectDescricao}
-                                onSearch={onSearchDescricao}
-                                onFocus={onFocusDescricao}
-                                ref={refDescricao}
-//                                onChange={onChangeDescricao}
-                                //onBlur={onBlurDescricao}     // Leave do campo
 
-                                // --- Props de Comportamento ---
-                                style={{ minWidth: 260 }}
-                                placeholder="Descrição do Item"
-//                                allowClear // Mostra ícone para limpar o input
-//                                filterOption={false} // Desabilita filtro automático (filtramos no handleSearch)
-
-                                // --- Customização ---
-                                notFoundContent="Nenhum resultado encontrado"
+                        <Row>
+                            <Item
+                                name={"nomeEmpresa"}
+                                label="Empresa"                    
+                                style={{ marginRight: '60px'}}
                             >
-                            </AutoComplete>                        
-
-                        </Item>
-
+                                <Input 
+                                    readOnly={true}
+                                    size='small'
+                                    />
+                            </Item>
+                            <Item
+                                name={"dataInventario"}
+                                label="Inventário"                    
+                                style={{ marginRight: '60px'}}
+                            >
+                                <Input 
+                                    readOnly={true}
+                                    size='small'
+                                    />
+                            </Item>
+                        </Row>
                         <Item
-                            name = "unidade"
-                            label="UN"
+                            name={"local"}
+                            label="Local"                    
                         >
                             <Input 
-//                                readOnly={true}
-                                disabled 
+                                readOnly={true}
                                 size='small'
-                                style={{ width: 40 }}
-                                />
-                            
-                        </Item>
-                    </Space>
-                </Row>
-                <Row>
-                    <Space>
-                        <Item
-                            name="chDataValidade"
-                            valuePropName="checked"
-                        >
-                            <Checkbox/>                        
-                        </Item>
-                        <Item
-                            name={"dataValidade"}
-                            label="Dt Validade"
-                            validateTrigger={['onBluir']}
-                            rules={[{required: true, 
-                                    message: 'Informar Data de Validade'},
-                                    {validator: validateDataValidade}
-                                    ]}
-                            
-                            >                                
-                                <DatePicker 
-                                    placeholder='Dt Validade'
-                                    selected={startDate}
-                                    ref={refDataValidade}
-                                    style={{ width: 140 }}
-                                    format={"DD/MM/YYYY"}
                                 />
                         </Item>
-                    </Space>
-                </Row>
 
-                <Space size={"small"}>
-                    <Item
-                        name={"quantidade"}
-                        label="Quantidade"
-                        required = {!zerar}
-                        rules={[
-                            {required: !zerar},
-                            {
-                                validator: (_, value) => 
-                                    zerar ? Promise.resolve() 
-                                        : value > 0
-                                            ? Promise.resolve()
-                                            : Promise.reject(new Error('A quantidade deve ser maior que zero')),                                    
-                            }
-                            ]}                >
-                        <InputNumber
-                            disabled = {zerar}
-                            style={{ width: 140 }}
-                            step={1}
-                            decimalSeparator=','
-                        >
-                        </InputNumber>
+                    </Form>
 
-                    </Item>
-                    <Item
-                        label="Zerar Item?"
-                        name="chZerar"
-                        valuePropName="checked"
-                    >
-                        <Checkbox onChange={handleChZerar}/>                        
-                    </Item>
+                </Card>
 
-                </Space>
+                {/* Card Item Inventário */}
+                <Card
+                    size='small'
+                    style={{
+                        marginBottom: '10px',
+                        borderColor: '#c36434',
+                        boxShadow: '0 2px 8px #d4b8ab',
+                        borderRadius: 8,
+                        padding: '0px',
+                        height: customHeight,
+        //                height: '310px'
+        //                height: 'calc(50vh)' 
+                        transition: 'customHeight 0.3s ease' // 3. Adicionar transição suave
 
-                <Item>
-                    <Space>
-                        <Button onClick={handleVoltar}>
-                            Cancelar
-                        </Button>
-                        <Button type="primary" htmlType="submit">
-                            Gravar
-                        </Button>
-                        <Checkbox
-                            onChange={()=> {setCardCount(!cardCount)}}
-                        >
-                            Exibir Contagem
-                        </Checkbox>
-                    </Space>
-                </Item>
-                <Item>
-                </Item>
-            </Form>
-
-        </Card>
-
-        {cardCount && (
-            <Card
-                title="Contagem"
-                style={{
-                    marginBottom: '10px',
-                    borderColor: '#c36434',
-                    boxShadow: '0 2px 8px #d4b8ab',
-                    borderRadius: 8,                    
-                    height: 'calc(100% - 345px)' 
-                }}
-            >
-
-                <Table
-                    columns={colunas}
-                    dataSource={dados}      
-                    showSorterTooltip={true}
-                    size={'small'}
-                    scroll={{ y: 'calc(80vh - 380px)' }}                
-                    rowKey={(record) => record._id}
-                    pagination={false}
-                />
-            </Card>
-        )}
-
-        {/* Código de Barra */}
-        <Modal
-            open={isModalVisible}
-            onCancel={handleCancel}
-            afterClose={handleCloseModal}
-            destroyOnHidden={true}
-            footer={null}
-            centered    // Centraliza o modal
-        >
-
-            <div>
-                <Title level={3}
-                    style={{ color: 'var(--primary-color)'}}
-                >Ler Código de Barra / QR Code</Title>
-            </div>
-
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                }}
-            >
-
-                {isModalVisible && (
-                    <BarcodeScannerComponent
-                        alignItems="center"
-                        width={300}
-                        height={300}
-                        stopStream={stopScan}   // Passa o estado para a prop
-                        onUpdate={handleScan}
+                    }}
+                >
+                    <Button
+                        onClick={onClickCamera}
+                        icon={<CameraOutlined />}
+                        size="small"
+                        shape="circle"
                     />
-                )}                    
-            </div>
 
-        </Modal>
+                    <Form
+                        form={formCountPlaces}
+                        layout='horizontal'
+                        size='small'
+                        onFinish={onFinishFormItems}
+        //                onFinishFailed={onFinishFailedFormItems}
+                    >
+                        <Item
+                            name={"_id"}
+                            style={{display: 'none'}}
+                        >
+                            <Input />
+                        </Item>
+                        <Item
+                            name={"_idItem"}
+                            style={{display: 'none'}}
+                        >
+                            <Input />
+                        </Item>
+                        <Item
+                            name={"itCodigo"}
+                            style={{display: 'none'}}
+                        >
+                            <Input />
+                        </Item>
 
+                        <Row>
+                            <Space>
+                                <Item
+                                    name="chDescricao"
+                                    valuePropName="checked"
+                                >
+                                    <Checkbox/>                        
+                                </Item>
+                                <Item
+                                    name = "descricao"
+                                    label="Descrição"
+                                    required
+                                    rules={[{required: true, 
+                                            message: 'Informar Descrição do Item'}]}
+                                >
+                                    <AutoComplete
+                                        allowClear      // Enable the clear button
+        //                                value={valueDescricao}    // Controlled component value
+                                        options={optDescricao}   // // O array de sugestões {value, label}
+                                        onSelect={onSelectDescricao}
+                                        onSearch={onSearchDescricao}
+                                        onFocus={onFocusDescricao}
+                                        ref={refDescricao}
+        //                                onChange={onChangeDescricao}
+                                        //onBlur={onBlurDescricao}     // Leave do campo
+
+                                        // --- Props de Comportamento ---
+                                        style={{ minWidth: 260 }}
+                                        placeholder="Descrição do Item"
+        //                                allowClear // Mostra ícone para limpar o input
+        //                                filterOption={false} // Desabilita filtro automático (filtramos no handleSearch)
+
+                                        // --- Customização ---
+                                        notFoundContent="Nenhum resultado encontrado"
+                                    >
+                                    </AutoComplete>                        
+
+                                </Item>
+
+                                <Item
+                                    name = "unidade"
+                                    label="UN"
+                                >
+                                    <Input 
+        //                                readOnly={true}
+                                        disabled 
+                                        size='small'
+                                        style={{ width: 40 }}
+                                        />
+                                    
+                                </Item>
+                            </Space>
+                        </Row>
+                        <Row>
+                            <Space>
+                                <Item
+                                    name="chDataValidade"
+                                    valuePropName="checked"
+                                >
+                                    <Checkbox/>                        
+                                </Item>
+                                <Item
+                                    name={"dataValidade"}
+                                    label="Dt Validade"
+                                    validateTrigger={['onBluir']}
+                                    rules={[{required: true, 
+                                            message: 'Informar Data de Validade'},
+                                            {validator: validateDataValidade}
+                                            ]}
+                                    
+                                    >                                
+                                        <DatePicker 
+                                            placeholder='Dt Validade'
+                                            selected={startDate}
+                                            ref={refDataValidade}
+                                            style={{ width: 140 }}
+                                            format={"DD/MM/YYYY"}
+                                        />
+                                </Item>
+                            </Space>
+                        </Row>
+
+                        <Space size={"small"}>
+                            <Item
+                                name={"quantidade"}
+                                label="Quantidade"
+                                required = {!zerar}
+                                rules={[
+                                    {required: !zerar},
+                                    {
+                                        validator: (_, value) => 
+                                            zerar ? Promise.resolve() 
+                                                : value > 0
+                                                    ? Promise.resolve()
+                                                    : Promise.reject(new Error('A quantidade deve ser maior que zero')),                                    
+                                    }
+                                    ]}                >
+                                <InputNumber
+                                    disabled = {zerar}
+                                    style={{ width: 140 }}
+                                    step={1}
+                                    decimalSeparator=','
+                                >
+                                </InputNumber>
+
+                            </Item>
+                            <Item
+                                label="Zerar Item?"
+                                name="chZerar"
+                                valuePropName="checked"
+                            >
+                                <Checkbox onChange={handleChZerar}/>                        
+                            </Item>
+
+                        </Space>
+
+                        <Item>
+                            <Space>
+                                <Button onClick={handleVoltar}>
+                                    Cancelar
+                                </Button>
+                                <Button type="primary" htmlType="submit">
+                                    Gravar
+                                </Button>
+                                <Checkbox
+                                    onChange={()=> {setCardCount(!cardCount)}}
+                                >
+                                    Exibir Contagem
+                                </Checkbox>
+                            </Space>
+                        </Item>
+                        <Item>
+                        </Item>
+                    </Form>
+
+                </Card>
+
+                {cardCount && (
+                    <Card
+                        title="Contagem"
+                        style={{
+                            marginBottom: '10px',
+                            borderColor: '#c36434',
+                            boxShadow: '0 2px 8px #d4b8ab',
+                            borderRadius: 8,                    
+                            height: 'calc(100% - 345px)' 
+                        }}
+                    >
+
+                        <Table
+                            columns={colunas}
+                            dataSource={dados}      
+                            showSorterTooltip={true}
+                            size={'small'}
+                            scroll={{ y: 'calc(80vh - 380px)' }}                
+                            rowKey={(record) => record._id}
+                            pagination={false}
+                        />
+                    </Card>
+                )}
+
+                {/* Código de Barra */}
+                <Modal
+                    open={isModalVisible}
+                    onCancel={handleCancel}
+                    afterClose={handleCloseModal}
+                    destroyOnHidden={true}
+                    footer={null}
+                    centered    // Centraliza o modal
+                >
+
+                    <div>
+                        <Title level={3}
+                            style={{ color: 'var(--primary-color)'}}
+                        >Ler Código de Barra / QR Code</Title>
+                    </div>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+
+                        {isModalVisible && (
+                            <BarcodeScannerComponent
+                                alignItems="center"
+                                width={300}
+                                height={300}
+                                stopStream={stopScan}   // Passa o estado para a prop
+                                onUpdate={handleScan}
+                            />
+                        )}                    
+                    </div>
+
+                </Modal>
+
+            </Spin>
+
+        </div>  
+        
     </>
   )
 }

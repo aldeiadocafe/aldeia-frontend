@@ -451,221 +451,222 @@ const InventoryComponent = () => {
   return (
     <div>
 
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Inventário</Title>
-        </div>
+        <Spin 
+          spinning={loading} 
+          size='large' 
+          tip="Carregando..."
+          >
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
+            <div style={{ textAlign: 'center' }}>
+                <Title level={2}
+                    style={{ color: 'var(--primary-color)'}}
+                >Inventário</Title>
+            </div>
 
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                    type='primary'
+                    icon={<AppstoreAddOutlined />}
+                    onClick={showFormModal}
+                    >
+                        Cadastrar
+                </Button>
+                <br></br>
+                <br></br>
+            </div>
+                
+            <Table
+                columns={colunas}
+                dataSource={dados}      
+                showSorterTooltip={true}
+                size={'small'}
+                scroll={{ y: 'calc(80vh - 90px)' }}                
+                rowKey={(record) => record._id}
+                pagination={false}
+            />
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button 
-                type='primary'
-                icon={<AppstoreAddOutlined />}
-                onClick={showFormModal}
-                >
-                    Cadastrar
-            </Button>
-            <br></br>
-            <br></br>
-        </div>
-            
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}                
-            rowKey={(record) => record._id}
-            pagination={false}
-        />
+            {/* Modal de Form */}
+            <Modal
+                title={ "Manutenção Cadastro Inventário"}
+                open={formModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+                onOk={handleOk}
 
-      {/* Modal de Form */}
-      <Modal
-        title={ "Manutenção Cadastro Inventário"}
-        open={formModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-        onOk={handleOk}
-
-      >        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"situacao"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Row gutter={[16, 16]}>
-                <Col span={12} >
+            >        
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
                     <Item
-                        name={"empresas"}
-                        key={"empresas"}
-                        label={`Empresa`}
-                        rules={[{required: true, 
-                                message: 'Informar Empresa'}]}
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name={"situacao"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Row gutter={[16, 16]}>
+                        <Col span={12} >
+                            <Item
+                                name={"empresas"}
+                                key={"empresas"}
+                                label={`Empresa`}
+                                rules={[{required: true, 
+                                        message: 'Informar Empresa'}]}
+                                >
+                                <Select
+                                    disabled={empresa}
+                                    placeholder="Selecionar Empresa"
+                                    allowClear  //Permite limpar seleção
+                                    loading={loading}   // Mostrar ícone de carregamento
+                                    options={selectEmpresas}
+                                >
+                                </Select>
+                            </Item>
+                        </Col>
+
+                            <Item
+                                name="dataInventario"
+                                key={"dataInventario"}
+                                label="Data Inventário"
+                                rules={[{required: true, 
+                                        message: 'Informar Data de Inventário'}]}
+                                >
+                                    <DatePicker
+                                        format={"DD/MM/YYYY"}
+                                        placeholder='Dt Inventário'
+                                        style={{ width: 140 }}
+                                        disabled={!isEditing || idInventory}
+                                    />
+                            </Item>
+                        </Row>
+                    <Item
+                        name={"descricao"}
+                        key={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Inventário Loja'/>
+                    </Item>
+                    <Item 
+                        name={"tipoInventario"}
+                        key={"tipoInventario"}
+                        label="Tipo de Inventário"
+                        rules={[{required: true, message: 'Selecionar Tipo'}]}
                         >
                         <Select
-                            disabled={empresa}
-                            placeholder="Selecionar Empresa"
+                            disabled={!isEditing}
+                            placeholder="Selecionar um Tipo"
                             allowClear  //Permite limpar seleção
-                            loading={loading}   // Mostrar ícone de carregamento
-                            options={selectEmpresas}
                         >
+                            <Option value="TOTAL">TOTAL</Option>
+                            <Option value="PARCIAL">PARCIAL</Option>
                         </Select>
                     </Item>
-                </Col>
+                </Form>
 
+            </Modal>
+
+            <Modal
+                title={ "Eliminar Unidade de Medida"}
+                open={deleteModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+        //        onOk={() => setIsPopupOpen(true)}
+
+                footer = {[
+                    <Button key="cancela" onClick={handleCancel}>
+                        Cancelar
+                    </Button>,
+                    <Popconfirm
+                        key="submit"
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimando permanentemente."
+                        onConfirm={handlePopupConfirm}  
+                        okText="Sim"
+                        cancelText="Não"            
+                        placement='topLeft'
+                        >
+                        <Button type="primary" loading={confirmLoading}>
+                            OK
+                        </Button>
+                    </Popconfirm>,
+                ]}
+
+            >
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item 
+                        name={"_id"}
+                        key={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
                     <Item
-                        name="dataInventario"
+                        name={"situacao"}
+                        key={"situacao"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item 
+                        name={"dataInventario"}
                         key={"dataInventario"}
                         label="Data Inventário"
-                        rules={[{required: true, 
-                                message: 'Informar Data de Inventário'}]}
                         >
-                            <DatePicker
-                                format={"DD/MM/YYYY"}
+                            <DatePicker 
                                 placeholder='Dt Inventário'
                                 style={{ width: 140 }}
-                                disabled={!isEditing || idInventory}
+                                disabled={!isEditing}
+                                format={{
+                                    format: "DD/MM/YYYY",
+                                    type: 'mask',
+                                }}
                             />
                     </Item>
-                </Row>
-            <Item
-                name={"descricao"}
-                key={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    disabled={!isEditing}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Inventário Loja'/>
-            </Item>
-            <Item 
-                name={"tipoInventario"}
-                key={"tipoInventario"}
-                label="Tipo de Inventário"
-                rules={[{required: true, message: 'Selecionar Tipo'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar um Tipo"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="TOTAL">TOTAL</Option>
-                    <Option value="PARCIAL">PARCIAL</Option>
-                </Select>
-            </Item>
-        </Form>
+                    <Item
+                        name={"descricao"}
+                        key={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Estoque, Loja'/>
+                    </Item>
+                    <Item
+                        name={"tipoInventario"}
+                        key={"tipoInventario"}
+                        label="Tipo"
+                        rules={[{required: true, message: 'Selecionar Tipo'}]}
+                        >
+                        <Select
+                            disabled={!isEditing}
+                            placeholder="Selecionar um Tipo"
+                            allowClear  //Permite limpar seleção
+                        >
+                            <Option value="TOTAL">TOTAL</Option>
+                            <Option value="PARCIAL">PARCIAL</Option>
+                        </Select>
+                    </Item>
+                </Form>
 
-      </Modal>
+            </Modal>
 
-      <Modal
-        title={ "Eliminar Unidade de Medida"}
-        open={deleteModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-//        onOk={() => setIsPopupOpen(true)}
-
-        footer = {[
-            <Button key="cancela" onClick={handleCancel}>
-                Cancelar
-            </Button>,
-            <Popconfirm
-                key="submit"
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                onConfirm={handlePopupConfirm}  
-                okText="Sim"
-                cancelText="Não"            
-                placement='topLeft'
-                >
-                <Button type="primary" loading={confirmLoading}>
-                    OK
-                </Button>
-            </Popconfirm>,
-        ]}
-
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item 
-                name={"_id"}
-                key={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"situacao"}
-                key={"situacao"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item 
-                name={"dataInventario"}
-                key={"dataInventario"}
-                label="Data Inventário"
-                >
-                    <DatePicker 
-                        placeholder='Dt Inventário'
-                        style={{ width: 140 }}
-                        disabled={!isEditing}
-                        format={{
-                            format: "DD/MM/YYYY",
-                            type: 'mask',
-                        }}
-                    />
-            </Item>
-            <Item
-                name={"descricao"}
-                key={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    disabled={!isEditing}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Estoque, Loja'/>
-            </Item>
-            <Item
-                name={"tipoInventario"}
-                key={"tipoInventario"}
-                label="Tipo"
-                rules={[{required: true, message: 'Selecionar Tipo'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar um Tipo"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="TOTAL">TOTAL</Option>
-                    <Option value="PARCIAL">PARCIAL</Option>
-                </Select>
-            </Item>
-        </Form>
-
-      </Modal>
+        </Spin>
 
     </div>
 

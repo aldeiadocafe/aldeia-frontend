@@ -419,164 +419,166 @@ const PlacesInventoryComponent = () => {
   return (
     <div>
 
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Local de Inventário</Title>
-        </div>
+      <Spin 
+        spinning={loading} 
+        size='large' 
+        tip="Carregando..."
+        >
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
+            <div style={{ textAlign: 'center' }}>
+                <Title level={2}
+                    style={{ color: 'var(--primary-color)'}}
+                >Local de Inventário</Title>
+            </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button 
-                type='primary'
-                icon={<AppstoreAddOutlined />}
-                onClick={showFormModal}
-                >
-                    Cadastrar
-            </Button>
-            <br></br>
-            <br></br>
-        </div>
-        
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}                
-            rowKey={(record) => record._id}
-            pagination={false}
-        />
-
-      {/* Modal de Form */}
-      <Modal
-        title={ "Manutenção Localização de Inventário"}
-        open={formModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-        onOk={handleOk}
-
-      >        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name="inventory"
-                label="Data Inventário"
-                rules={[{required: true, 
-                         message: 'Informar Data de Inventário'}]}
-                >
-                <Select
-                    disabled={!isEditing || idPlacesInventory}
-                    placeholder="Selecionar Data de Inventário"
-                    allowClear  //Permite limpar seleção
-                    loading={loading}   // Mostrar ícone de carregamento
-                    options={selectInventory}
-                >
-                </Select>
-            </Item>
-            <Item
-                name={"local"}
-                label="Localização"
-                rules={[{required: true, message: 'Informar Localização'}]}
-                >
-                <Input 
-                    disabled={!isEditing || idPlacesInventory}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Estoque, Loja'/>
-            </Item>
-            <Item
-                name={"situacao"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-        </Form>
-
-      </Modal>
-
-      <Modal
-        title={ "Eliminar Localização"}
-        open={deleteModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-//        onOk={() => setIsPopupOpen(true)}
-        footer = {[
-            <Button key="cancela" onClick={handleCancel}>
-                Cancelar
-            </Button>,
-            <Popconfirm
-                key="submit"
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                onConfirm={handlePopupConfirm}  
-                okText="Sim"
-                cancelText="Não"            
-                placement='topLeft'
-                >
-                <Button type="primary" loading={confirmLoading}>
-                    OK
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                    type='primary'
+                    icon={<AppstoreAddOutlined />}
+                    onClick={showFormModal}
+                    >
+                        Cadastrar
                 </Button>
-            </Popconfirm>,
-        ]}
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
+                <br></br>
+                <br></br>
+            </div>
+            
+            <Table
+                columns={colunas}
+                dataSource={dados}      
+                showSorterTooltip={true}
+                size={'small'}
+                scroll={{ y: 'calc(80vh - 90px)' }}                
+                rowKey={(record) => record._id}
+                pagination={false}
+            />
+
+            {/* Modal de Form */}
+            <Modal
+                title={ "Manutenção Localização de Inventário"}
+                open={formModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+                onOk={handleOk}
+
+            >        
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name="inventory"
+                        label="Data Inventário"
+                        rules={[{required: true, 
+                                message: 'Informar Data de Inventário'}]}
+                        >
+                        <Select
+                            disabled={!isEditing || idPlacesInventory}
+                            placeholder="Selecionar Data de Inventário"
+                            allowClear  //Permite limpar seleção
+                            loading={loading}   // Mostrar ícone de carregamento
+                            options={selectInventory}
+                        >
+                        </Select>
+                    </Item>
+                    <Item
+                        name={"local"}
+                        label="Localização"
+                        rules={[{required: true, message: 'Informar Localização'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing || idPlacesInventory}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Estoque, Loja'/>
+                    </Item>
+                    <Item
+                        name={"situacao"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                </Form>
+
+            </Modal>
+
+            <Modal
+                title={ "Eliminar Localização"}
+                open={deleteModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+        //        onOk={() => setIsPopupOpen(true)}
+                footer = {[
+                    <Button key="cancela" onClick={handleCancel}>
+                        Cancelar
+                    </Button>,
+                    <Popconfirm
+                        key="submit"
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimando permanentemente."
+                        onConfirm={handlePopupConfirm}  
+                        okText="Sim"
+                        cancelText="Não"            
+                        placement='topLeft'
+                        >
+                        <Button type="primary" loading={confirmLoading}>
+                            OK
+                        </Button>
+                    </Popconfirm>,
+                ]}
             >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name="inventory"
-                label="Data Inventário"
-                rules={[{required: true, 
-                         message: 'Informar Data de Inventário'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar Data de Inventário"
-                    allowClear  //Permite limpar seleção
-                    loading={loading}   // Mostrar ícone de carregamento
-                    options={selectInventory}
-                >
-                </Select>
-            </Item>
-            <Item
-                name={"local"}
-                label="Localização"
-                rules={[{required: true, message: 'Informar Localização'}]}
-                >
-                <Input 
-                    disabled={!isEditing}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Estoque, Loja'/>
-            </Item>
-            <Item
-                name={"situacao"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-        </Form>
-        
-      </Modal>
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name="inventory"
+                        label="Data Inventário"
+                        rules={[{required: true, 
+                                message: 'Informar Data de Inventário'}]}
+                        >
+                        <Select
+                            disabled={!isEditing}
+                            placeholder="Selecionar Data de Inventário"
+                            allowClear  //Permite limpar seleção
+                            loading={loading}   // Mostrar ícone de carregamento
+                            options={selectInventory}
+                        >
+                        </Select>
+                    </Item>
+                    <Item
+                        name={"local"}
+                        label="Localização"
+                        rules={[{required: true, message: 'Informar Localização'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Estoque, Loja'/>
+                    </Item>
+                    <Item
+                        name={"situacao"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                </Form>
+                
+            </Modal>
+
+        </Spin>
 
     </div>
 

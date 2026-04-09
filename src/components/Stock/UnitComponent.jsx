@@ -321,225 +321,228 @@ const UnitComponent = () => {
 
   return (
     <div>
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Unidade de Medida</Title>
-        </div>
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
+        <Spin 
+        spinning={loading} 
+        size='large' 
+        tip="Carregando..."
+        >
 
-        {/* Modal de Eliminar */}
-        <div style={{ 
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center', 
-            }}>
-            <Popconfirm
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                open={isPopupOpen}
-                onConfirm={handlePopupConfirm}
-                onCancel={handlePopupCancel}
-                okText="Sim"
-                cancelText="Não"            
-            />
-        </div>
+            <div style={{ textAlign: 'center' }}>
+                <Title level={2}
+                    style={{ color: 'var(--primary-color)'}}
+                >Unidade de Medida</Title>
+            </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button 
-                type='primary'
-                icon={<AppstoreAddOutlined />}
-                onClick={showFormModal}
-                >
-                    Cadastrar
-            </Button>
-            <br></br>
-            <br></br>
-        </div>
-        
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}                
-            rowKey={(record) => record._id}
-            pagination={false}
-        />
-
-      {/* Modal de Form */}
-      <Modal
-        title={ isEditing ? "Editar Unidade de Medida" : "Cadastrar Unidade de Medida"}
-        open={formModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-        onOk={() => {
-            form
-                .validateFields() // Validação dos campos
-                .then(values => {
-                    // Success: Reset fields and call the parent's onSave handler
-                    gravarDados(values);
-//                    form.resetFields(); 
-//                    onSave(values);
-                })
-                .catch(info => {
-                    message.info('Verificar campo(s)!');
-                    // Error handling
-//                    console.log('Validation Failed:', info);
-                });
-        }}
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
-//            initialValues={inicialDados} // Atribui os valores iniciais aqui
-            >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"unidade"}
-                label="Unidade"
-                rules={[{required: true, 
-                         message: 'Informar Unidade de Medida'}]}
-                >
-                <Input 
-                    placeholder='Unidade de Medida'
-                    style={{ textTransform: 'uppercase' }}
-                    disabled={isEditing}
+            {/* Modal de Eliminar */}
+            <div style={{ 
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center', 
+                }}>
+                <Popconfirm
+                    title="Confirma a exclusão do registro?"
+                    description="Ao confirmar o registro será elimando permanentemente."
+                    open={isPopupOpen}
+                    onConfirm={handlePopupConfirm}
+                    onCancel={handlePopupCancel}
+                    okText="Sim"
+                    cancelText="Não"            
                 />
-            </Item>
-            <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Litro'/>
-            </Item>
-        </Form>
+            </div>
 
-      </Modal>
-
-      {/* Modal de View */}
-      <Modal
-        title={ "Unidade de Medida"}
-        open={viewModal}
-        confirmLoading={confirmLoading}
-        cancelButtonProps={{ style: { display: 'none'}}}
-        onOk={() => setViewModal(false)}
-        onCancel={handleCancel}        
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"unidade"}
-                label="Unidade"
-                rules={[{required: true, 
-                         message: 'Informar Unidade de Medida'}]}
-                >
-                <Input 
-                    placeholder='Unidade de Medida'
-                    style={{ textTransform: 'uppercase' }}
-                    disabled={true}
-                />
-            </Item>
-            <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Litro'
-                    readOnly={true}
-                    />
-            </Item>
-        </Form>
-
-      </Modal>
-
-      <Modal
-        title={ "Eliminar Unidade de Medida"}
-        open={deleteModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-//        onOk={() => setIsPopupOpen(true)}
-        footer = {[
-            <Button key="cancela" onClick={handleCancel}>
-                Cancelar
-            </Button>,
-            <Popconfirm
-                key="submit"
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                onConfirm={handlePopupConfirm}  
-                okText="Sim"
-                cancelText="Não"            
-                placement='topLeft'
-                >
-                <Button type="primary" loading={confirmLoading}>
-                    OK
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                    type='primary'
+                    icon={<AppstoreAddOutlined />}
+                    onClick={showFormModal}
+                    >
+                        Cadastrar
                 </Button>
-            </Popconfirm>,
-        ]}
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"unidade"}
-                label="Unidade"
-                rules={[{required: true, 
-                         message: 'Informar Unidade de Medida'}]}
-                >
-                <Input 
-                    placeholder='Unidade de Medida'
-                    style={{ textTransform: 'uppercase' }}
-                    disabled={true}
-                />
-            </Item>
-            <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Litro'
-                    readOnly={true}
-                    />
-            </Item>
-        </Form>
+                <br></br>
+                <br></br>
+            </div>
+            
+            <Table
+                columns={colunas}
+                dataSource={dados}      
+                showSorterTooltip={true}
+                size={'small'}
+                scroll={{ y: 'calc(80vh - 90px)' }}                
+                rowKey={(record) => record._id}
+                pagination={false}
+            />
 
-      </Modal>
+            {/* Modal de Form */}
+            <Modal
+                title={ isEditing ? "Editar Unidade de Medida" : "Cadastrar Unidade de Medida"}
+                open={formModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}
+                onOk={() => {
+                    form
+                        .validateFields() // Validação dos campos
+                        .then(values => {
+                            // Success: Reset fields and call the parent's onSave handler
+                            gravarDados(values);
+        //                    form.resetFields(); 
+        //                    onSave(values);
+                        })
+                        .catch(info => {
+                            message.info('Verificar campo(s)!');
+                            // Error handling
+        //                    console.log('Validation Failed:', info);
+                        });
+                }}
+            >
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+        //            initialValues={inicialDados} // Atribui os valores iniciais aqui
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name={"unidade"}
+                        label="Unidade"
+                        rules={[{required: true, 
+                                message: 'Informar Unidade de Medida'}]}
+                        >
+                        <Input 
+                            placeholder='Unidade de Medida'
+                            style={{ textTransform: 'uppercase' }}
+                            disabled={isEditing}
+                        />
+                    </Item>
+                    <Item
+                        name={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Litro'/>
+                    </Item>
+                </Form>
+
+            </Modal>
+
+            {/* Modal de View */}
+            <Modal
+                title={ "Unidade de Medida"}
+                open={viewModal}
+                confirmLoading={confirmLoading}
+                cancelButtonProps={{ style: { display: 'none'}}}
+                onOk={() => setViewModal(false)}
+                onCancel={handleCancel}        
+            >
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name={"unidade"}
+                        label="Unidade"
+                        rules={[{required: true, 
+                                message: 'Informar Unidade de Medida'}]}
+                        >
+                        <Input 
+                            placeholder='Unidade de Medida'
+                            style={{ textTransform: 'uppercase' }}
+                            disabled={true}
+                        />
+                    </Item>
+                    <Item
+                        name={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Litro'
+                            readOnly={true}
+                            />
+                    </Item>
+                </Form>
+
+            </Modal>
+
+            <Modal
+                title={ "Eliminar Unidade de Medida"}
+                open={deleteModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+        //        onOk={() => setIsPopupOpen(true)}
+                footer = {[
+                    <Button key="cancela" onClick={handleCancel}>
+                        Cancelar
+                    </Button>,
+                    <Popconfirm
+                        key="submit"
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimando permanentemente."
+                        onConfirm={handlePopupConfirm}  
+                        okText="Sim"
+                        cancelText="Não"            
+                        placement='topLeft'
+                        >
+                        <Button type="primary" loading={confirmLoading}>
+                            OK
+                        </Button>
+                    </Popconfirm>,
+                ]}
+            >
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name={"unidade"}
+                        label="Unidade"
+                        rules={[{required: true, 
+                                message: 'Informar Unidade de Medida'}]}
+                        >
+                        <Input 
+                            placeholder='Unidade de Medida'
+                            style={{ textTransform: 'uppercase' }}
+                            disabled={true}
+                        />
+                    </Item>
+                    <Item
+                        name={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Litro'
+                            readOnly={true}
+                            />
+                    </Item>
+                </Form>
+
+            </Modal>
+
+        </Spin>
 
     </div>
 

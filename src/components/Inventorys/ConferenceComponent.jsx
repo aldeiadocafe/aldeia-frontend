@@ -216,105 +216,113 @@ const ConferenceComponent = () => {
 
   return (
     <>
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Conferência</Title>
-        </div>
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
-
-        <Card
-            style={{
-                marginBottom: '10px',
-                borderColor: '#c36434',
-                boxShadow: '0 2px 8px #d4b8ab',
-                borderRadius: 8,                    
-            }}
-        >
-
-            <Form
-                name ='frmConferencia'
-                layout='inline'
-                form = {form}
-            >
-                <Row
-                    justify={"space-between"}
-                    align={"middle"}
+        <div>
+            
+            <Spin 
+                spinning={loading} 
+                size='large' 
+                tip="Carregando..."
                 >
 
-                    <Item
-                        name={"_id"}
-                        style={{display: 'none'}}
+
+                <div style={{ textAlign: 'center' }}>
+                    <Title level={2}
+                        style={{ color: 'var(--primary-color)'}}
+                    >Conferência</Title>
+                </div>
+
+                <Card
+                    style={{
+                        marginBottom: '10px',
+                        borderColor: '#c36434',
+                        boxShadow: '0 2px 8px #d4b8ab',
+                        borderRadius: 8,                    
+                    }}
+                >
+
+                    <Form
+                        name ='frmConferencia'
+                        layout='inline'
+                        form = {form}
                     >
-                        <Input />
+                        <Row
+                            justify={"space-between"}
+                            align={"middle"}
+                        >
 
-                    </Item>
-                    <Item
-                        name={"dataInventario"}
-                        label="Data Inventário"
-                        >
-                            <DatePicker 
-                                placeholder='Dt Inventário'
-                                style={{ width: 140 }}
-                                format={{
-                                    format: "DD/MM/YYYY",
-                                    type: 'mask',
-                                }}
-                            />
-                    </Item>
-                    <Item
-                        name={"local"}
-                        label="Localização"
-                        >
-                        <Col
-                            xs={22}
-                            md={24}
+                            <Item
+                                name={"_id"}
+                                style={{display: 'none'}}
                             >
-                            <Input 
-                                placeholder='Por exemplo: Estoque'
-                                style={{ textTransform: 'uppercase' }}
-                            />
-                        </Col>
-                    </Item>
-                    <Item>
-                        <Button type="primary"
-                            onClick={btnPesquisar}>
-                            Pesquisar
-                        </Button>                    
-                    </Item>
+                                <Input />
 
-                </Row>
+                            </Item>
+                            <Item
+                                name={"dataInventario"}
+                                label="Data Inventário"
+                                >
+                                    <DatePicker 
+                                        placeholder='Dt Inventário'
+                                        style={{ width: 140 }}
+                                        format={{
+                                            format: "DD/MM/YYYY",
+                                            type: 'mask',
+                                        }}
+                                    />
+                            </Item>
+                            <Item
+                                name={"local"}
+                                label="Localização"
+                                >
+                                <Col
+                                    xs={22}
+                                    md={24}
+                                    >
+                                    <Input 
+                                        placeholder='Por exemplo: Estoque'
+                                        style={{ textTransform: 'uppercase' }}
+                                    />
+                                </Col>
+                            </Item>
+                            <Item>
+                                <Button type="primary"
+                                    onClick={btnPesquisar}>
+                                    Pesquisar
+                                </Button>                    
+                            </Item>
 
-            </Form>
+                        </Row>
 
-        </Card>
+                    </Form>
 
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}    
-            rowKey={(record) => record._id}
-            pagination={false}
-            onRow={(record, rowIndex) => {
-                return {
-                onClick: (event) => {
-                    btnContagem(record, rowIndex, event);
-                }, // Evento de clique na linha
-                // Outros eventos também podem ser adicionados aqui, como onDoubleClick, onMouseEnter, etc.
-                // onDoubleClick: event => {}, 
-                // onContextMenu: event => {},
-                };
-            }}
-            // Opcional: Adiciona um cursor de mãozinha para indicar que a linha é clicável via CSS
-            rowClassName="clickable-row"             
-        />
+                </Card>
+
+                <Table
+                    columns={colunas}
+                    dataSource={dados}      
+                    showSorterTooltip={true}
+                    size={'small'}
+                    scroll={{ y: 'calc(80vh - 90px)' }}    
+                    rowKey={(record) => record._id}
+                    pagination={false}
+                    onRow={(record, rowIndex) => {
+                        return {
+                        onClick: (event) => {
+                            btnContagem(record, rowIndex, event);
+                        }, // Evento de clique na linha
+                        // Outros eventos também podem ser adicionados aqui, como onDoubleClick, onMouseEnter, etc.
+                        // onDoubleClick: event => {}, 
+                        // onContextMenu: event => {},
+                        };
+                    }}
+                    // Opcional: Adiciona um cursor de mãozinha para indicar que a linha é clicável via CSS
+                    rowClassName="clickable-row"             
+                />
+
+            </Spin>
+
+        </div>
 
     </>
   )

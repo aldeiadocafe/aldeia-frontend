@@ -446,194 +446,195 @@ const ListConversationsComponent = () => {
   return (
     <div>
 
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Inventário</Title>
-        </div>
+        <Spin 
+        spinning={loading} 
+        size='large' 
+        tip="Carregando..."
+        >
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
+            <div style={{ textAlign: 'center' }}>
+                <Title level={2}
+                    style={{ color: 'var(--primary-color)'}}
+                >Inventário</Title>
+            </div>
 
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button 
-                type='primary'
-                icon={<AppstoreAddOutlined />}
-                onClick={showFormModal}
-                >
-                    Cadastrar
-            </Button>
-            <br></br>
-            <br></br>
-        </div>
-            
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}                
-            rowKey={(record) => record._id}
-            pagination={{
-                tabela,
-                // The available options for items per page
-                pageSizeOptions: ['5', '10', '20', '30'], 
-                // Display the size changer
-                showSizeChanger: true, 
-                // Set the default page size
-        //        defaultPageSize: 5,
-                // Optional: show total items count
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                // Optional: update tabela page state on change
-                onChange: (page) => {
-                setTabela(page);
-                },
-            }}        
-        />
-
-      {/* Modal de Form */}
-      <Modal
-        title={ "Manutenção Fator de Conversão"}
-        open={formModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-        onOk={handleOk}
-
-      >        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name="dataInventario"
-                label="Data Inventário"
-                rules={[{required: true, 
-                         message: 'Informar Data de Inventário'}]}
-                >
-                    <DatePicker
-                        format={"DD/MM/YYYY"}
-                        placeholder='Dt Inventário'
-                        style={{ width: 140 }}
-                        disabled={!isEditing || conversationsId}
-                    />
-            </Item>
-            <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    disabled={!isEditing}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Inventário Loja'/>
-            </Item>
-            <Item
-                name={"tipoInventario"}
-                label="Tipo de Inventário"
-                rules={[{required: true, message: 'Selecionar Tipo'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar um Tipo"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="TOTAL">TOTAL</Option>
-                    <Option value="PARCIAL">PARCIAL</Option>
-                </Select>
-            </Item>
-        </Form>
-
-      </Modal>
-
-      <Modal
-        title={ "Eliminar Unidade de Medida"}
-        open={deleteModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-//        onOk={() => setIsPopupOpen(true)}
-
-        footer = {[
-            <Button key="cancela" onClick={handleCancel}>
-                Cancelar
-            </Button>,
-            <Popconfirm
-                key="submit"
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                onConfirm={handlePopupConfirm}  
-                okText="Sim"
-                cancelText="Não"            
-                placement='topLeft'
-                >
-                <Button type="primary" loading={confirmLoading}>
-                    OK
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                    type='primary'
+                    icon={<AppstoreAddOutlined />}
+                    onClick={showFormModal}
+                    >
+                        Cadastrar
                 </Button>
-            </Popconfirm>,
-        ]}
+                <br></br>
+                <br></br>
+            </div>
+                
+            <Table
+                columns={colunas}
+                dataSource={dados}      
+                showSorterTooltip={true}
+                size={'small'}
+                scroll={{ y: 'calc(80vh - 90px)' }}                
+                rowKey={(record) => record._id}
+                pagination={{
+                    tabela,
+                    // The available options for items per page
+                    pageSizeOptions: ['5', '10', '20', '30'], 
+                    // Display the size changer
+                    showSizeChanger: true, 
+                    // Set the default page size
+            //        defaultPageSize: 5,
+                    // Optional: show total items count
+                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                    // Optional: update tabela page state on change
+                    onChange: (page) => {
+                    setTabela(page);
+                    },
+                }}        
+            />
 
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Item
-                name={"dataInventario"}
-                label="Data Inventário"
-                >
-                    <DatePicker 
-                        placeholder='Dt Inventário'
-                        style={{ width: 140 }}
-                        disabled={!isEditing}
-                        format={{
-                            format: "DD/MM/YYYY",
-                            type: 'mask',
-                        }}
-                    />
-            </Item>
-            <Item
-                name={"descricao"}
-                label="Descrição"
-                rules={[{required: true, message: 'Informar Descrição'}]}
-                >
-                <Input 
-                    disabled={!isEditing}
-                    style={{ textTransform: 'uppercase' }}
-                    placeholder='Ex: Estoque, Loja'/>
-            </Item>
-            <Item
-                name={"tipoInventario"}
-                label="Tipo"
-                rules={[{required: true, message: 'Selecionar Tipo'}]}
-                >
-                <Select
-                    disabled={!isEditing}
-                    placeholder="Selecionar um Tipo"
-                    allowClear  //Permite limpar seleção
-                >
-                    <Option value="TOTAL">TOTAL</Option>
-                    <Option value="PARCIAL">PARCIAL</Option>
-                </Select>
-            </Item>
-        </Form>
+            {/* Modal de Form */}
+            <Modal
+                title={ "Manutenção Fator de Conversão"}
+                open={formModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+                onOk={handleOk}
 
-      </Modal>
+            >        
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name="dataInventario"
+                        label="Data Inventário"
+                        rules={[{required: true, 
+                                message: 'Informar Data de Inventário'}]}
+                        >
+                            <DatePicker
+                                format={"DD/MM/YYYY"}
+                                placeholder='Dt Inventário'
+                                style={{ width: 140 }}
+                                disabled={!isEditing || conversationsId}
+                            />
+                    </Item>
+                    <Item
+                        name={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Inventário Loja'/>
+                    </Item>
+                    <Item
+                        name={"tipoInventario"}
+                        label="Tipo de Inventário"
+                        rules={[{required: true, message: 'Selecionar Tipo'}]}
+                        >
+                        <Select
+                            disabled={!isEditing}
+                            placeholder="Selecionar um Tipo"
+                            allowClear  //Permite limpar seleção
+                        >
+                            <Option value="TOTAL">TOTAL</Option>
+                            <Option value="PARCIAL">PARCIAL</Option>
+                        </Select>
+                    </Item>
+                </Form>
+
+            </Modal>
+
+            <Modal
+                title={ "Eliminar Unidade de Medida"}
+                open={deleteModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+        //        onOk={() => setIsPopupOpen(true)}
+
+                footer = {[
+                    <Button key="cancela" onClick={handleCancel}>
+                        Cancelar
+                    </Button>,
+                    <Popconfirm
+                        key="submit"
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimando permanentemente."
+                        onConfirm={handlePopupConfirm}  
+                        okText="Sim"
+                        cancelText="Não"            
+                        placement='topLeft'
+                        >
+                        <Button type="primary" loading={confirmLoading}>
+                            OK
+                        </Button>
+                    </Popconfirm>,
+                ]}
+
+            >
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Item
+                        name={"dataInventario"}
+                        label="Data Inventário"
+                        >
+                            <DatePicker 
+                                placeholder='Dt Inventário'
+                                style={{ width: 140 }}
+                                disabled={!isEditing}
+                                format={{
+                                    format: "DD/MM/YYYY",
+                                    type: 'mask',
+                                }}
+                            />
+                    </Item>
+                    <Item
+                        name={"descricao"}
+                        label="Descrição"
+                        rules={[{required: true, message: 'Informar Descrição'}]}
+                        >
+                        <Input 
+                            disabled={!isEditing}
+                            style={{ textTransform: 'uppercase' }}
+                            placeholder='Ex: Estoque, Loja'/>
+                    </Item>
+                    <Item
+                        name={"tipoInventario"}
+                        label="Tipo"
+                        rules={[{required: true, message: 'Selecionar Tipo'}]}
+                        >
+                        <Select
+                            disabled={!isEditing}
+                            placeholder="Selecionar um Tipo"
+                            allowClear  //Permite limpar seleção
+                        >
+                            <Option value="TOTAL">TOTAL</Option>
+                            <Option value="PARCIAL">PARCIAL</Option>
+                        </Select>
+                    </Item>
+                </Form>
+
+            </Modal>
+
+        </Spin> 
 
     </div>
 

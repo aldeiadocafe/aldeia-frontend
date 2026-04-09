@@ -298,55 +298,18 @@ const ImportGComEstoqueComponent = () => {
 
     <div>
 
+      <Spin 
+        spinning={loading} 
+        size='large' 
+        tip="Carregando..."
+        >
+
         <div style={{ textAlign: 'center' }}>
             <Title level={2}
                 style={{ color: 'var(--primary-color)'}}
             >Atualizar Quantidade de Estoque GCom</Title>
         </div>
       
-      <Spin
-          spinning={loading}
-          fullscreen
-      />
-
-        <Card
-            size='small'
-            style={{
-                marginBottom: '10px',
-                borderColor: '#c36434',
-                boxShadow: '0 2px 8px #d4b8ab',
-                borderRadius: 8,                    
-            }}
-        >
-
-          <Upload {...props} fileList={fileList}>
-            <Button icon={<UploadOutlined />}>Selecionar Excel</Button>
-          </Upload>
-
-          {loading && (
-            <Card style={{ marginTop: 16 }}>
-              <div style={{ textAlign: 'center' }}>
-                <p>Processando: {progress}%</p>
-                <Progress percent={progress} status={progress === 100 ? 'success' : 'active'} />
-              </div>
-            </Card>            
-          )}
-
-{/*          {contextHolder} */}
-
-          <Button
-            type="primary"
-            onClick={atualizar}
-            disabled={!botao}
-            style={{ marginTop: 16}}
-          >
-            Atualizar
-          </Button>
-
-        </Card>
-
-        {exibirTabela && (
-
           <Card
               size='small'
               style={{
@@ -357,26 +320,65 @@ const ImportGComEstoqueComponent = () => {
               }}
           >
 
-            <div style={{ textAlign: 'left' }}>
-                <Title level={4}
-                    style={{ color: 'var(--primary-color)'}}
-                >GCOM - Quantidades Atualizadas</Title>
-            </div>
+            <Upload {...props} fileList={fileList}>
+              <Button icon={<UploadOutlined />}>Selecionar Excel</Button>
+            </Upload>
 
-            <Table
-                columns={colunas}
-                dataSource={dados}      
-                showSorterTooltip={true}
-                size={'small'}
-                scroll={{ y: 'calc(80vh - 90px)' }}                
-                rowKey={(record) => record._id}
-                pagination={false}
-            />
+            {loading && (
+              <Card style={{ marginTop: 16 }}>
+                <div style={{ textAlign: 'center' }}>
+                  <p>Processando: {progress}%</p>
+                  <Progress percent={progress} status={progress === 100 ? 'success' : 'active'} />
+                </div>
+              </Card>            
+            )}
+
+  {/*          {contextHolder} */}
+
+            <Button
+              type="primary"
+              onClick={atualizar}
+              disabled={!botao}
+              style={{ marginTop: 16}}
+            >
+              Atualizar
+            </Button>
 
           </Card>
 
-        )}    
+          {exibirTabela && (
 
+            <Card
+                size='small'
+                style={{
+                    marginBottom: '10px',
+                    borderColor: '#c36434',
+                    boxShadow: '0 2px 8px #d4b8ab',
+                    borderRadius: 8,                    
+                }}
+            >
+
+              <div style={{ textAlign: 'left' }}>
+                  <Title level={4}
+                      style={{ color: 'var(--primary-color)'}}
+                  >GCOM - Quantidades Atualizadas</Title>
+              </div>
+
+              <Table
+                  columns={colunas}
+                  dataSource={dados}      
+                  showSorterTooltip={true}
+                  size={'small'}
+                  scroll={{ y: 'calc(80vh - 90px)' }}                
+                  rowKey={(record) => record._id}
+                  pagination={false}
+              />
+
+            </Card>
+
+          )}    
+
+      </Spin>
     </div>
   );
 

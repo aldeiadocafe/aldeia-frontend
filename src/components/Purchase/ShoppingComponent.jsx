@@ -545,122 +545,123 @@ const ShoppingComponent = () => {
     return (
         <div style={{ padding: 10 }}>
 
-            <Spin
-    //            percent={"auto"}
-                spinning={loading}
-                fullscreen
-            />
-
-
-            <Title level={2} style={{ color: 'var(--primary-color)'}}>
-                <ShoppingCartOutlined />Lista de Compras
-            </Title>
-
-            {/* Formulário de Inclusão */}
-            <Form
-                form={form}
-                layout="inline"
-                onFinish={onFinish}
-                style= {{ width: '100%', display: 'flex'}}
-            >
-
-                <Form.Item                
-                    name={"empresas"}
-                    key={"empresas"}
-                    style={{ flex: '9'}}
-                    rules={[{required: true, 
-                            message: 'Informar Empresa'}]}
+            <Spin 
+                spinning={loading} 
+                size='large' 
+                tip="Carregando..."
                 >
-                    <Select
-                        disabled={empresa.length === 1}
-                        placeholder="SELECIONAR EMPRESA"
-                        allowClear  //Permite limpar seleção
-                        mode="multiple"
-                        loading={loading}   // Mostrar ícone de carregamento
-                        options={selectEmpresas}
-                    />
-                </Form.Item>
 
-                <Form.Item 
-                    name="itCodigo" 
-                    key={"itCodigo"}
-                    style={{ flex: '10'}}
-                    rules={[{ required: true, message: 'Digite o item!' }]}
+                <Title level={2} style={{ color: 'var(--primary-color)'}}>
+                    <ShoppingCartOutlined />Lista de Compras
+                </Title>
+
+                {/* Formulário de Inclusão */}
+                <Form
+                    form={form}
+                    layout="inline"
+                    onFinish={onFinish}
+                    style= {{ width: '100%', display: 'flex'}}
                 >
-                    <Input placeholder="Nome do item"
-                    style={{ textTransform: 'uppercase' }}/>
-                </Form.Item>
 
-                <Form.Item 
-                    name="quantidade" 
-                    key={"quantidade"}
-                    style={{ flex: '4'}}
-                    rules={[{ required: true, message: 'Qtde Atual Estoq' }]}
-                    >                
-                    <InputNumber 
-                        placeholder="QTDE ATUAL ESTOQ" 
-                        decimalSeparator=','
-                        min={0} 
-                        step={1}
-                        style={{ width: '100%'}}
-                    />
-                </Form.Item>
+                    <Form.Item                
+                        name={"empresas"}
+                        key={"empresas"}
+                        style={{ flex: '9'}}
+                        rules={[{required: true, 
+                                message: 'Informar Empresa'}]}
+                    >
+                        <Select
+                            disabled={empresa.length === 1}
+                            placeholder="SELECIONAR EMPRESA"
+                            allowClear  //Permite limpar seleção
+                            mode="multiple"
+                            loading={loading}   // Mostrar ícone de carregamento
+                            options={selectEmpresas}
+                        />
+                    </Form.Item>
 
-                <Form.Item 
-                    style={{ alignContent: 'flex-end'}}
-                >
-                    <Button 
-                        type="primary" 
-                        htmlType="submit" 
-                        icon={<PlusOutlined />}
+                    <Form.Item 
+                        name="itCodigo" 
+                        key={"itCodigo"}
+                        style={{ flex: '10'}}
+                        rules={[{ required: true, message: 'Digite o item!' }]}
+                    >
+                        <Input placeholder="Nome do item"
+                        style={{ textTransform: 'uppercase' }}/>
+                    </Form.Item>
+
+                    <Form.Item 
+                        name="quantidade" 
+                        key={"quantidade"}
+                        style={{ flex: '4'}}
+                        rules={[{ required: true, message: 'Qtde Atual Estoq' }]}
+                        >                
+                        <InputNumber 
+                            placeholder="QTDE ATUAL ESTOQ" 
+                            decimalSeparator=','
+                            min={0} 
+                            step={1}
+                            style={{ width: '100%'}}
+                        />
+                    </Form.Item>
+
+                    <Form.Item 
+                        style={{ alignContent: 'flex-end'}}
+                    >
+                        <Button 
+                            type="primary" 
+                            htmlType="submit" 
+                            icon={<PlusOutlined />}
+                            >
+                            Adicionar
+                        </Button>
+                    </Form.Item>
+
+                    <Form.Item
+                        name="chListarComprado"
+                        key="chListarComprado"
                         >
-                        Adicionar
-                    </Button>
-                </Form.Item>
+                        <Checkbox
+                            onChange={handleListarComprado}
+                        >
+                            Listar Comprado
+                        </Checkbox>
 
-                <Form.Item
-                    name="chListarComprado"
-                    key="chListarComprado"
-                    >
-                    <Checkbox
-                        onChange={handleListarComprado}
-                    >
-                        Listar Comprado
-                    </Checkbox>
+                    </Form.Item>
+                </Form>
 
-                </Form.Item>
-            </Form>
+                {/* Tabela de Itens */}
+                <Table
+                    columns={colunas}
+                    dataSource={dados}
+                    pagination={false}
+    //                rowClassName={(record) => (record.comprado ? 'row-purchased' : '')}
+                    
+                    style={{marginTop: '5px'}}
+                    tableLayout="auto"
+                    bordered
+                    rowKey={(record) => record._id}
+                    scroll={{x: 'max-content',
+                            y: 'calc(80vh - 80px)'                
+                            }}
+                    summary={() => (
+                        <Table.Summary.Row>
+                            <Table.Summary.Cell colSpan={4}>
+                                <Typography.Text strong>Total de itens: {totalItens}</Typography.Text>
+                            </Table.Summary.Cell>
+                        </Table.Summary.Row>
+                    )}
+                />
 
-            {/* Tabela de Itens */}
-            <Table
-                columns={colunas}
-                dataSource={dados}
-                pagination={false}
-//                rowClassName={(record) => (record.comprado ? 'row-purchased' : '')}
-                
-                style={{marginTop: '5px'}}
-                tableLayout="auto"
-                bordered
-                rowKey={(record) => record._id}
-                scroll={{x: 'max-content',
-                         y: 'calc(80vh - 80px)'                
-                        }}
-                summary={() => (
-                    <Table.Summary.Row>
-                        <Table.Summary.Cell colSpan={4}>
-                            <Typography.Text strong>Total de itens: {totalItens}</Typography.Text>
-                        </Table.Summary.Cell>
-                    </Table.Summary.Row>
-                )}
-            />
+                {/* CSS simples para a linha riscada */}
+                <style>{`
+                    .row-purchased td {
+                    background-color: #fffded;
+                    }
+                `}</style>
 
-            {/* CSS simples para a linha riscada */}
-            <style>{`
-                .row-purchased td {
-                background-color: #fffded;
-                }
-            `}</style>
-
+            </Spin>
+            
         </div>
     );
 };
