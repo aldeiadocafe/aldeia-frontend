@@ -477,484 +477,485 @@ const CompanysComponent = () => {
   return (
     <div>
 
-        <div style={{ textAlign: 'center' }}>
-            <Title level={2}
-                style={{ color: 'var(--primary-color)'}}
-            >Empresa</Title>
-        </div>
-
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
-
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button 
-                type='primary'
-                icon={<AppstoreAddOutlined />}
-                onClick={showFormModal}
-                >
-                    Cadastrar
-            </Button>
-            <br></br>
-            <br></br>
-        </div>
-            
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}                
-            rowKey={(record) => record._id}
-            pagination={false}
-        />
-
-      {/* Modal de Form */}
-      <Modal
-        title={ "Manutenção Cadastro Empresa"}
-        width={"100vw"}
-        style={{ top: 20, padding: 0, margin: 15 }}
-        open={formModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-        onOk={handleOk}
-
-      >        
-        <Form
-            form={form}
-            layout='vertical'
+        <Spin 
+            spinning={loading} 
+            size='large' 
+            tip="Carregando..."
+//            fullscreen
             >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Row gutter={[16, 16]}>
-                <Col span={6}>
-                    <Item
-                        name="cnpj"
-                        label="CNPJ"
-                        rules={[
-                            { validator: validateCpfCnpj },
-                            ]}
+
+            <div style={{ textAlign: 'center' }}>
+                <Title level={2}
+                    style={{ color: 'var(--primary-color)'}}
+                >Empresa</Title>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                    type='primary'
+                    icon={<AppstoreAddOutlined />}
+                    onClick={showFormModal}
                     >
-                        {/* Componente de Máscara integrado ao Input do Antd */}
-                        <PatternFormat
-                            disabled={!isEditing || idCompany}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="##.###.###/####-##"
-                            mask="_"
-                            placeholder="00.000.000/0000-00"
-                        />            
-                    </Item>
-                </Col>
-                <Col span={5}>
-                    <Item
-                        name={"inscricaoEstadual"}
-                        label="Insc Estadual"
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-            </Row>
-            {/* 
-                gutter={[horizontal, vertical]} 
-                Aqui definimos 16px de espaçamento horizontal.
-            */}            
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
-                    <Item
-                        name={"nome"}
-                        label="Nome"
-                        rules={[{required: true, message: 'Informar Nome'}]}
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-                <Col span={12}>
-                    <Item
-                        name={"razaoSocial"}
-                        label="Razão Social"
-                        rules={[{required: true, message: 'Informar Razão Social'}]}
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={14}>
-                    <Item
-                        name={"endereco"}
-                        label="Endereço"
-                        rules={[{required: true, message: 'Informar Endereço'}]}
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-                <Col span={4}>
-                    <Item
-                        name={"numero"}
-                        label="Nro"
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"complemento"}
-                        label="Complemento"
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Item
-                        name={"bairro"}
-                        label="Bairro"
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"municipio"}
-                        label="Município"
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"estado"}
-                        label="Estado"
-                        >
-                        <Select
-                            placeholder="Selecionar um Estado"
-                            allowClear  //Permite limpar seleção
-                            options={estadosBrasileiro}
-                            disabled={!isEditing}
-                        />
-                    </Item>
-                </Col>
-                <Col span={4}>
-                    <Item
-                        name={"cep"}
-                        label="CEP"
-                        >
-                        <PatternFormat
-                            disabled={!isEditing}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="#####-###"   // A- Letra, # Numero
-                            mask="_"
-                            placeholder="00000-000"
-                        />            
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={5}>
-                    <Item
-                        name={"telefone"}
-                        label="Telefone"
-                        >
-                        {/* Componente de Máscara integrado ao Input do Antd */}
-                        <PatternFormat
-                            disabled={!isEditing}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="(##) #####-####"   // A- Letra, # Numero
-                            mask="_"
-                            placeholder="(00) 00000-0000"
-                        />            
-                    </Item>
-                </Col>
-                <Col span={19}>
-                    <Item
-                        name={"email"}
-                        label="E-mail"
-                        rules={[
-                            {required: true, message: 'Informar E-mail'},
-                            {type: 'email',  message: 'O e-mail inserido não é válido!'}
-                        ]}
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder="seu.email@exemplo.com"
-                            />
-                    </Item>
-                </Col>
-            </Row>
-        </Form>
-
-      </Modal>
-
-      <Modal
-        title={ "Eliminar Empresa"}
-        width={"100vw"}
-        style={{ top: 20, padding: 0, margin: 15 }}
-        open={deleteModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-//        onOk={() => setIsPopupOpen(true)}
-
-        footer = {[
-            <Button key="cancela" onClick={handleCancel}>
-                Cancelar
-            </Button>,
-            <Popconfirm
-                key="submit"
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                onConfirm={handlePopupConfirm}  
-                okText="Sim"
-                cancelText="Não"            
-                placement='topLeft'
-                >
-                <Button type="primary" loading={confirmLoading}>
-                    OK
+                        Cadastrar
                 </Button>
-            </Popconfirm>,
-        ]}
+                <br></br>
+                <br></br>
+            </div>
+                
+            <Table
+                columns={colunas}
+                dataSource={dados}      
+                showSorterTooltip={true}
+                size={'small'}
+                scroll={{ y: 'calc(80vh - 90px)' }}                
+                rowKey={(record) => record._id}
+                pagination={false}
+            />
 
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
-            >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Row gutter={[16, 16]}>
-                <Col span={6}>
-                    <Item
-                        name="cnpj"
-                        label="CNPJ"
-                        rules={[
-                            { validator: validateCpfCnpj },
-                            ]}
+            {/* Modal de Form */}
+            <Modal
+                title={ "Manutenção Cadastro Empresa"}
+                width={"100vw"}
+                style={{ top: 20, padding: 0, margin: 15 }}
+                open={formModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+                onOk={handleOk}
+
+            >        
+                <Form
+                    form={form}
+                    layout='vertical'
                     >
-                        {/* Componente de Máscara integrado ao Input do Antd */}
-                        <PatternFormat
-                            disabled={!isEditing}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="##.###.###/####-##"
-                            mask="_"
-                            placeholder="00.000.000/0000-00"
-                        />            
-                    </Item>
-                </Col>
-                <Col span={5}>
                     <Item
-                        name={"inscricaoEstadual"}
-                        label="Insc Estadual"
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
                     </Item>
-                </Col>
-            </Row>
-            {/* 
-                gutter={[horizontal, vertical]} 
-                Aqui definimos 16px de espaçamento horizontal.
-            */}            
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
-                    <Item
-                        name={"nome"}
-                        label="Nome"
-                        rules={[{required: true, message: 'Informar Nome'}]}
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
-                    </Item>
-                </Col>
-                <Col span={12}>
-                    <Item
-                        name={"razaoSocial"}
-                        label="Razão Social"
-                        rules={[{required: true, message: 'Informar Razão Social'}]}
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={14}>
-                    <Item
-                        name={"endereco"}
-                        label="Endereço"
-                        rules={[{required: true, message: 'Informar Endereço'}]}
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
-                    </Item>
-                </Col>
-                <Col span={4}>
-                    <Item
-                        name={"numero"}
-                        label="Nro"
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"complemento"}
-                        label="Complemento"
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={8}>
-                    <Item
-                        name={"bairro"}
-                        label="Bairro"
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"municipio"}
-                        label="Município"
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            />
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"estado"}
-                        label="Estado"
-                        >
-                        <Select
-                            disabled={!isEditing}
-                            placeholder="Selecionar um Estado"
-                            allowClear  //Permite limpar seleção
-                            options={estadosBrasileiro}
-                        />
-                    </Item>
-                </Col>
-                <Col span={4}>
-                    <Item
-                        name={"cep"}
-                        label="CEP"
-                        >
-                        {/* Componente de Máscara integrado ao Input do Antd */}
-                        <PatternFormat
-                            disabled={!isEditing}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="#####-###"   // A- Letra, # Numero
-                            mask="_"
-                            placeholder="00000-000"
-                            onValueChange={(values) => {
-                                // Isso garante que o valor seja atualizado no estado do formulário do Ant Design
-                                Form.useForm()[0]?.setFieldsValue({
-                                    cep: values.value,
-                                });      
-                            }}
-                        />            
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={5}>
-                    <Item
-                        name={"telefone"}
-                        label="Telefone"
-                        >
-                        {/* Componente de Máscara integrado ao Input do Antd */}
-                        <PatternFormat
-                            disabled={!isEditing}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="(##) #####-####"   // A- Letra, # Numero
-                            mask="_"
-                            placeholder="(00) 00000-0000"
-                            onValueChange={(values) => {
-                                // Isso garante que o valor seja atualizado no estado do formulário do Ant Design
-                                Form.useForm()[0]?.setFieldsValue({
-                                    telefone: values.value,
-                                });      
-                            }}
-                        />            
-                    </Item>
-                </Col>
-                <Col span={19}>
-                    <Item
-                        name={"email"}
-                        label="E-mail"
-                        rules={[
-                            {required: true, message: 'Informar E-mail'},
-                            {type: 'email',  message: 'O e-mail inserido não é válido!'}
-                        ]}
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder="seu.email@exemplo.com"
-                            />
-                    </Item>
-                </Col>
-            </Row>
-        </Form>
-      </Modal>
+                    <Row gutter={[16, 16]}>
+                        <Col span={6}>
+                            <Item
+                                name="cnpj"
+                                label="CNPJ"
+                                rules={[
+                                    { validator: validateCpfCnpj },
+                                    ]}
+                            >
+                                {/* Componente de Máscara integrado ao Input do Antd */}
+                                <PatternFormat
+                                    disabled={!isEditing || idCompany}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="##.###.###/####-##"
+                                    mask="_"
+                                    placeholder="00.000.000/0000-00"
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={5}>
+                            <Item
+                                name={"inscricaoEstadual"}
+                                label="Insc Estadual"
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    {/* 
+                        gutter={[horizontal, vertical]} 
+                        Aqui definimos 16px de espaçamento horizontal.
+                    */}            
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Item
+                                name={"nome"}
+                                label="Nome"
+                                rules={[{required: true, message: 'Informar Nome'}]}
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={12}>
+                            <Item
+                                name={"razaoSocial"}
+                                label="Razão Social"
+                                rules={[{required: true, message: 'Informar Razão Social'}]}
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={14}>
+                            <Item
+                                name={"endereco"}
+                                label="Endereço"
+                                rules={[{required: true, message: 'Informar Endereço'}]}
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={4}>
+                            <Item
+                                name={"numero"}
+                                label="Nro"
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"complemento"}
+                                label="Complemento"
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={8}>
+                            <Item
+                                name={"bairro"}
+                                label="Bairro"
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"municipio"}
+                                label="Município"
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"estado"}
+                                label="Estado"
+                                >
+                                <Select
+                                    placeholder="Selecionar um Estado"
+                                    allowClear  //Permite limpar seleção
+                                    options={estadosBrasileiro}
+                                    disabled={!isEditing}
+                                />
+                            </Item>
+                        </Col>
+                        <Col span={4}>
+                            <Item
+                                name={"cep"}
+                                label="CEP"
+                                >
+                                <PatternFormat
+                                    disabled={!isEditing}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="#####-###"   // A- Letra, # Numero
+                                    mask="_"
+                                    placeholder="00000-000"
+                                />            
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={5}>
+                            <Item
+                                name={"telefone"}
+                                label="Telefone"
+                                >
+                                {/* Componente de Máscara integrado ao Input do Antd */}
+                                <PatternFormat
+                                    disabled={!isEditing}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="(##) #####-####"   // A- Letra, # Numero
+                                    mask="_"
+                                    placeholder="(00) 00000-0000"
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={19}>
+                            <Item
+                                name={"email"}
+                                label="E-mail"
+                                rules={[
+                                    {required: true, message: 'Informar E-mail'},
+                                    {type: 'email',  message: 'O e-mail inserido não é válido!'}
+                                ]}
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    placeholder="seu.email@exemplo.com"
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                </Form>
 
+            </Modal>
+
+            <Modal
+                title={ "Eliminar Empresa"}
+                width={"100vw"}
+                style={{ top: 20, padding: 0, margin: 15 }}
+                open={deleteModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+        //        onOk={() => setIsPopupOpen(true)}
+
+                footer = {[
+                    <Button key="cancela" onClick={handleCancel}>
+                        Cancelar
+                    </Button>,
+                    <Popconfirm
+                        key="submit"
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimando permanentemente."
+                        onConfirm={handlePopupConfirm}  
+                        okText="Sim"
+                        cancelText="Não"            
+                        placement='topLeft'
+                        >
+                        <Button type="primary" loading={confirmLoading}>
+                            OK
+                        </Button>
+                    </Popconfirm>,
+                ]}
+
+            >
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Row gutter={[16, 16]}>
+                        <Col span={6}>
+                            <Item
+                                name="cnpj"
+                                label="CNPJ"
+                                rules={[
+                                    { validator: validateCpfCnpj },
+                                    ]}
+                            >
+                                {/* Componente de Máscara integrado ao Input do Antd */}
+                                <PatternFormat
+                                    disabled={!isEditing}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="##.###.###/####-##"
+                                    mask="_"
+                                    placeholder="00.000.000/0000-00"
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={5}>
+                            <Item
+                                name={"inscricaoEstadual"}
+                                label="Insc Estadual"
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    {/* 
+                        gutter={[horizontal, vertical]} 
+                        Aqui definimos 16px de espaçamento horizontal.
+                    */}            
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Item
+                                name={"nome"}
+                                label="Nome"
+                                rules={[{required: true, message: 'Informar Nome'}]}
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={12}>
+                            <Item
+                                name={"razaoSocial"}
+                                label="Razão Social"
+                                rules={[{required: true, message: 'Informar Razão Social'}]}
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={14}>
+                            <Item
+                                name={"endereco"}
+                                label="Endereço"
+                                rules={[{required: true, message: 'Informar Endereço'}]}
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={4}>
+                            <Item
+                                name={"numero"}
+                                label="Nro"
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"complemento"}
+                                label="Complemento"
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={8}>
+                            <Item
+                                name={"bairro"}
+                                label="Bairro"
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"municipio"}
+                                label="Município"
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"estado"}
+                                label="Estado"
+                                >
+                                <Select
+                                    disabled={!isEditing}
+                                    placeholder="Selecionar um Estado"
+                                    allowClear  //Permite limpar seleção
+                                    options={estadosBrasileiro}
+                                />
+                            </Item>
+                        </Col>
+                        <Col span={4}>
+                            <Item
+                                name={"cep"}
+                                label="CEP"
+                                >
+                                {/* Componente de Máscara integrado ao Input do Antd */}
+                                <PatternFormat
+                                    disabled={!isEditing}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="#####-###"   // A- Letra, # Numero
+                                    mask="_"
+                                    placeholder="00000-000"
+                                    onValueChange={(values) => {
+                                        // Isso garante que o valor seja atualizado no estado do formulário do Ant Design
+                                        Form.useForm()[0]?.setFieldsValue({
+                                            cep: values.value,
+                                        });      
+                                    }}
+                                />            
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={5}>
+                            <Item
+                                name={"telefone"}
+                                label="Telefone"
+                                >
+                                {/* Componente de Máscara integrado ao Input do Antd */}
+                                <PatternFormat
+                                    disabled={!isEditing}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="(##) #####-####"   // A- Letra, # Numero
+                                    mask="_"
+                                    placeholder="(00) 00000-0000"
+                                    onValueChange={(values) => {
+                                        // Isso garante que o valor seja atualizado no estado do formulário do Ant Design
+                                        Form.useForm()[0]?.setFieldsValue({
+                                            telefone: values.value,
+                                        });      
+                                    }}
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={19}>
+                            <Item
+                                name={"email"}
+                                label="E-mail"
+                                rules={[
+                                    {required: true, message: 'Informar E-mail'},
+                                    {type: 'email',  message: 'O e-mail inserido não é válido!'}
+                                ]}
+                                >
+                                <Input 
+                                    disabled={!isEditing}
+                                    style={{ textTransform: 'uppercase' }}
+                                    placeholder="seu.email@exemplo.com"
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
+
+        </Spin>
     </div>
 
   )

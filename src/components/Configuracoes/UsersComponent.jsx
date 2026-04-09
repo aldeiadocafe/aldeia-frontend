@@ -429,296 +429,299 @@ const UsersComponent = () => {
             >Usuário</Title>
         </div>
 
-        <Spin
-//            percent={"auto"}
-            spinning={loading}
-            fullscreen
-        />
-
-
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button 
-                type='primary'
-                icon={<AppstoreAddOutlined />}
-                onClick={showFormModal}
-                >
-                    Cadastrar
-            </Button>
-            <br></br>
-            <br></br>
-        </div>
-            
-        <Table
-            columns={colunas}
-            dataSource={dados}      
-            showSorterTooltip={true}
-            size={'small'}
-            scroll={{ y: 'calc(80vh - 90px)' }}                
-            rowKey={(record) => record._id}
-            pagination={false}
-        />
-
-      {/* Modal de Form */}
-      <Modal
-        title={ "Manutenção Cadastro Usuário"}
-        width={"100vw"}
-        style={{ top: 20, padding: 0, margin: 15 }}
-        open={formModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-        onOk={handleOk}
-
-      >        
-        <Form
-            form={form}
-            layout='vertical'
+        <Spin 
+            spinning={loading} 
+            size='large' 
+            tip="Carregando..."
+//            fullscreen
             >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
-                    <Item
-                        name={"nome"}
-                        label="Nome"
-                        rules={[{required: true, message: 'Informar Nome'}]}
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing || idUser}
-                            />
-                    </Item>
-                </Col>
-                <Col span={12}>
-                    <Item
-                        name={"email"}
-                        label="E-mail"
-                        rules={[
-                            {required: true, message: 'Informar E-mail'},
-                            {type: 'email',  message: 'O e-mail inserido não é válido!'}
-                        ]}
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder="seu.email@exemplo.com"
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
-                    <Item
-                        name={"senha"}
-                        label="Senha"
-                        rules={[{required: true, message: 'Informar Senha'}]}
-                        >
-                        <Input.Password
-                            disabled={!isEditing}
-                            placeholder="Informar Senha"
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        />            
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"telefone"}
-                        label="Telefone"
-                        >
-                        {/* Componente de Máscara integrado ao Input do Antd */}
-                        <PatternFormat
-                            disabled={!isEditing}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="(##) #####-####"   // A- Letra, # Numero
-                            mask="_"
-                            placeholder="(00) 00000-0000"
-                        />            
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"situacao"}
-                        label="Situação"
-                        rules={[{required: true, message: 'Selecionar Situação'}]}
-                        >
-                        <Select
-                            disabled={!isEditing}
-                            placeholder="Selecionar uma situação"
-                            allowClear  //Permite limpar seleção
-                        >
-                            <Option value="ATIVO">ATIVO</Option>
-                            <Option value="OBSOLETO">OBSOLETO</Option>
-                        </Select>
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={18}>
-                    <Item
-                        name="empresas"
-                        rules={[{required: true, 
-                                message: 'Informar Empresa'}]}
-                        >
-                        <Select
-                            prefix="Empresas"
-                            disabled={!isEditing}
-                            dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
-                            placeholder="Selecionar Empresa"
-                            mode="multiple"
-                            allowClear  //Permite limpar seleção
-                            loading={loading}   // Mostrar ícone de carregamento
-                            options={selectEmpresas}
-                        >
-                        </Select>
-                    </Item>
-                </Col>
-            </Row>
-        </Form>
 
-      </Modal>
 
-      <Modal
-        title={ "Eliminar Usuário"}
-        width={"100vw"}
-        style={{ top: 20, padding: 0, margin: 15 }}
-        open={deleteModal}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}        
-//        onOk={() => setIsPopupOpen(true)}
-
-        footer = {[
-            <Button key="cancela" onClick={handleCancel}>
-                Cancelar
-            </Button>,
-            <Popconfirm
-                key="submit"
-                title="Confirma a exclusão do registro?"
-                description="Ao confirmar o registro será elimando permanentemente."
-                onConfirm={handlePopupConfirm}  
-                okText="Sim"
-                cancelText="Não"            
-                placement='topLeft'
-                >
-                <Button type="primary" loading={confirmLoading}>
-                    OK
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                    type='primary'
+                    icon={<AppstoreAddOutlined />}
+                    onClick={showFormModal}
+                    >
+                        Cadastrar
                 </Button>
-            </Popconfirm>,
-        ]}
+                <br></br>
+                <br></br>
+            </div>
+                
+            <Table
+                columns={colunas}
+                dataSource={dados}      
+                showSorterTooltip={true}
+                size={'small'}
+                scroll={{ y: 'calc(80vh - 90px)' }}                
+                rowKey={(record) => record._id}
+                pagination={false}
+            />
 
-      >
-        
-        <Form
-            form={form}
-            layout='vertical'
+            {/* Modal de Form */}
+            <Modal
+                title={ "Manutenção Cadastro Usuário"}
+                width={"100vw"}
+                style={{ top: 20, padding: 0, margin: 15 }}
+                open={formModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+                onOk={handleOk}
+
+            >        
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
+                    <Item
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
+                    </Item>
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Item
+                                name={"nome"}
+                                label="Nome"
+                                rules={[{required: true, message: 'Informar Nome'}]}
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing || idUser}
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={12}>
+                            <Item
+                                name={"email"}
+                                label="E-mail"
+                                rules={[
+                                    {required: true, message: 'Informar E-mail'},
+                                    {type: 'email',  message: 'O e-mail inserido não é válido!'}
+                                ]}
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    placeholder="seu.email@exemplo.com"
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Item
+                                name={"senha"}
+                                label="Senha"
+                                rules={[{required: true, message: 'Informar Senha'}]}
+                                >
+                                <Input.Password
+                                    disabled={!isEditing}
+                                    placeholder="Informar Senha"
+                                    iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"telefone"}
+                                label="Telefone"
+                                >
+                                {/* Componente de Máscara integrado ao Input do Antd */}
+                                <PatternFormat
+                                    disabled={!isEditing}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="(##) #####-####"   // A- Letra, # Numero
+                                    mask="_"
+                                    placeholder="(00) 00000-0000"
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"situacao"}
+                                label="Situação"
+                                rules={[{required: true, message: 'Selecionar Situação'}]}
+                                >
+                                <Select
+                                    disabled={!isEditing}
+                                    placeholder="Selecionar uma situação"
+                                    allowClear  //Permite limpar seleção
+                                >
+                                    <Option value="ATIVO">ATIVO</Option>
+                                    <Option value="OBSOLETO">OBSOLETO</Option>
+                                </Select>
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={18}>
+                            <Item
+                                name="empresas"
+                                rules={[{required: true, 
+                                        message: 'Informar Empresa'}]}
+                                >
+                                <Select
+                                    prefix="Empresas"
+                                    disabled={!isEditing}
+                                    dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
+                                    placeholder="Selecionar Empresa"
+                                    mode="multiple"
+                                    allowClear  //Permite limpar seleção
+                                    loading={loading}   // Mostrar ícone de carregamento
+                                    options={selectEmpresas}
+                                >
+                                </Select>
+                            </Item>
+                        </Col>
+                    </Row>
+                </Form>
+
+            </Modal>
+
+            <Modal
+                title={ "Eliminar Usuário"}
+                width={"100vw"}
+                style={{ top: 20, padding: 0, margin: 15 }}
+                open={deleteModal}
+                confirmLoading={confirmLoading}
+                onCancel={handleCancel}        
+        //        onOk={() => setIsPopupOpen(true)}
+
+                footer = {[
+                    <Button key="cancela" onClick={handleCancel}>
+                        Cancelar
+                    </Button>,
+                    <Popconfirm
+                        key="submit"
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimando permanentemente."
+                        onConfirm={handlePopupConfirm}  
+                        okText="Sim"
+                        cancelText="Não"            
+                        placement='topLeft'
+                        >
+                        <Button type="primary" loading={confirmLoading}>
+                            OK
+                        </Button>
+                    </Popconfirm>,
+                ]}
+
             >
-            <Item
-                name={"_id"}
-                style={{ display: 'none'}}
-            >
-                <Input />
-            </Item>
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
+                
+                <Form
+                    form={form}
+                    layout='vertical'
+                    >
                     <Item
-                        name={"email"}
-                        label="E-mail"
-                        rules={[
-                            {required: true, message: 'Informar E-mail'},
-                            {type: 'email',  message: 'O e-mail inserido não é válido!'}
-                        ]}
-                        >
-                        <Input 
-                            disabled={!isEditing || idUser}
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder="seu.email@exemplo.com"
-                            />
+                        name={"_id"}
+                        style={{ display: 'none'}}
+                    >
+                        <Input />
                     </Item>
-                </Col>
-                <Col span={12}>
-                    <Item
-                        name={"nome"}
-                        label="Nome"
-                        rules={[{required: true, message: 'Informar Nome'}]}
-                        >
-                        <Input 
-                            style={{ textTransform: 'uppercase' }}
-                            disabled={!isEditing}
-                            />
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={12}>
-                    <Item
-                        name={"senha"}
-                        label="Senha"
-                        rules={[{required: true, message: 'Informar Senha'}]}
-                        >
-                        <Input.Password
-                            disabled={!isEditing}
-                            placeholder="Informar Senha"
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        />            
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"telefone"}
-                        label="Telefone"
-                        >
-                        {/* Componente de Máscara integrado ao Input do Antd */}
-                        <PatternFormat
-                            disabled={!isEditing}
-                            customInput={Input} // Usa o estilo do Ant Design
-                            format="(##) #####-####"   // A- Letra, # Numero
-                            mask="_"
-                            placeholder="(00) 00000-0000"
-                        />            
-                    </Item>
-                </Col>
-                <Col span={6}>
-                    <Item
-                        name={"situacao"}
-                        label="Situação"
-                        rules={[{required: true, message: 'Selecionar Situação'}]}
-                        >
-                        <Select
-                            disabled={!isEditing}
-                            placeholder="Selecionar uma situação"
-                            allowClear  //Permite limpar seleção
-                        >
-                            <Option value="ATIVO">ATIVO</Option>
-                            <Option value="OBSOLETO">OBSOLETO</Option>
-                        </Select>
-                    </Item>
-                </Col>
-            </Row>
-            <Row gutter={[16, 16]}>
-                <Col span={18}>
-                    <Item
-                        name="empresas"
-                        rules={[{required: true, 
-                                message: 'Informar Empresa'}]}
-                        >
-                        <Select
-                            prefix="Empresas"
-                            disabled={!isEditing}
-                            dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
-                            placeholder="Selecionar Empresa"
-                            mode="multiple"
-                            allowClear  //Permite limpar seleção
-                            loading={loading}   // Mostrar ícone de carregamento
-                            options={selectEmpresas}
-                        >
-                        </Select>
-                    </Item>
-                </Col>
-            </Row>
-        </Form>
-      </Modal>
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Item
+                                name={"email"}
+                                label="E-mail"
+                                rules={[
+                                    {required: true, message: 'Informar E-mail'},
+                                    {type: 'email',  message: 'O e-mail inserido não é válido!'}
+                                ]}
+                                >
+                                <Input 
+                                    disabled={!isEditing || idUser}
+                                    style={{ textTransform: 'uppercase' }}
+                                    placeholder="seu.email@exemplo.com"
+                                    />
+                            </Item>
+                        </Col>
+                        <Col span={12}>
+                            <Item
+                                name={"nome"}
+                                label="Nome"
+                                rules={[{required: true, message: 'Informar Nome'}]}
+                                >
+                                <Input 
+                                    style={{ textTransform: 'uppercase' }}
+                                    disabled={!isEditing}
+                                    />
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Item
+                                name={"senha"}
+                                label="Senha"
+                                rules={[{required: true, message: 'Informar Senha'}]}
+                                >
+                                <Input.Password
+                                    disabled={!isEditing}
+                                    placeholder="Informar Senha"
+                                    iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"telefone"}
+                                label="Telefone"
+                                >
+                                {/* Componente de Máscara integrado ao Input do Antd */}
+                                <PatternFormat
+                                    disabled={!isEditing}
+                                    customInput={Input} // Usa o estilo do Ant Design
+                                    format="(##) #####-####"   // A- Letra, # Numero
+                                    mask="_"
+                                    placeholder="(00) 00000-0000"
+                                />            
+                            </Item>
+                        </Col>
+                        <Col span={6}>
+                            <Item
+                                name={"situacao"}
+                                label="Situação"
+                                rules={[{required: true, message: 'Selecionar Situação'}]}
+                                >
+                                <Select
+                                    disabled={!isEditing}
+                                    placeholder="Selecionar uma situação"
+                                    allowClear  //Permite limpar seleção
+                                >
+                                    <Option value="ATIVO">ATIVO</Option>
+                                    <Option value="OBSOLETO">OBSOLETO</Option>
+                                </Select>
+                            </Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col span={18}>
+                            <Item
+                                name="empresas"
+                                rules={[{required: true, 
+                                        message: 'Informar Empresa'}]}
+                                >
+                                <Select
+                                    prefix="Empresas"
+                                    disabled={!isEditing}
+                                    dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
+                                    placeholder="Selecionar Empresa"
+                                    mode="multiple"
+                                    allowClear  //Permite limpar seleção
+                                    loading={loading}   // Mostrar ícone de carregamento
+                                    options={selectEmpresas}
+                                >
+                                </Select>
+                            </Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
+
+        </Spin>
 
     </div>
 

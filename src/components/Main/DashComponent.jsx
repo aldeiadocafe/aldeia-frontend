@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Column } from '@ant-design/plots'
-import { Button, Card, Col, Input, Layout, Row, Space, Table, Grid, Form, Select } from 'antd'
+import { Button, Card, Col, Input, Layout, Row, Space, Table, Grid, Form, Select, Spin } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 
 import { getAllDatesItem } from '../../services/DatesItemBalanceService'
@@ -306,10 +306,9 @@ const DashComponent = () => {
 
   const carregarDados = async () => {
 
-    setLoading(true);
-
     try {
 
+      setLoading(true);
       setEmpresa(null)
 
       if (user.empresas) {
@@ -321,7 +320,6 @@ const DashComponent = () => {
           }))
           setSelectEmpresas(formatarDados)
 
-          setLoading(false)
           form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
 
 //          setEmpresa(empresas => user.empresas.map(empresa => empresa._id))
@@ -389,6 +387,10 @@ const DashComponent = () => {
 
     } catch (error) {
         console.error(error);
+    } finally {
+
+      setLoading(false); //Libera a tela
+
     }
 
   }
@@ -438,134 +440,143 @@ const DashComponent = () => {
   }, [])
 
   return (
-    <Layout >      
-      <Content>
+    <div>
+      <Spin 
+        spinning={loading} 
+        size='large' 
+        tip="Carregando..."
+        >
 
-        <Card 
-          size='small'
-          style={{ height: 'calc(11vh)'}}
-          >
-          <Row gutter={[16, 16]}>
-            <Col>
+        <Layout >      
+          <Content>
 
-              <Title level={4}
-                  style={{ color: 'var(--primary-color)'}}
-              >Escolher Empresa</Title>
-            </Col>
+            <Card 
+              size='small'
+              style={{ height: 'calc(11vh)'}}
+              >
+              <Row gutter={[16, 16]}>
+                <Col>
 
-            <Col span={12}>
-              <Form
-                  form={form}
-                  >
-                    <Item
-                        name={"empresas"}
-                        key={"empresas"}
-                        rules={[{required: true, 
-                                message: 'Informar Empresa'}]}
-                        >
-                        <Select
-                            disabled={empresa.length === 1}
-                            placeholder="Selecionar Empresa"
-                            allowClear  //Permite limpar seleção
-                            mode="multiple"
-                            loading={loading}   // Mostrar ícone de carregamento
-                            options={selectEmpresas}
-                            onChange={handleOnChageEmpresa}
-                        >
-                        </Select>
-                    </Item>
-                </Form>
-            </Col>
-          </Row>  
+                  <Title level={4}
+                      style={{ color: 'var(--primary-color)'}}
+                  >Escolher Empresa</Title>
+                </Col>
 
-        </Card>
+                <Col span={12}>
+                  <Form
+                      form={form}
+                      >
+                        <Item
+                            name={"empresas"}
+                            key={"empresas"}
+                            rules={[{required: true, 
+                                    message: 'Informar Empresa'}]}
+                            >
+                            <Select
+                                disabled={empresa.length === 1}
+                                placeholder="Selecionar Empresa"
+                                allowClear  //Permite limpar seleção
+                                mode="multiple"
+                                loading={loading}   // Mostrar ícone de carregamento
+                                options={selectEmpresas}
+                                onChange={handleOnChageEmpresa}
+                            >
+                            </Select>
+                        </Item>
+                    </Form>
+                </Col>
+              </Row>  
 
-        <Row 
-          style={{ marginTop: '5px' }}
-          gutter={[16, 16]}>
-
-          {/* xs={24} para celular (1 card por linha) */}
-          {/* md={12} para desktop (2 cards por linha) */}
-          <Col 
-            xs={24}
-            md={8}
-            span={8}
-            >
-          
-            <Card
-              title="Total de Produtos à Vencer"
-              styles={{
-                body:{ 
-                    height: cardBarra,
-                    overflow: 'hidden' 
-                  },
-              }}
-            >            
-              <Column {...config} />
             </Card>
 
-          </Col>
+            <Row 
+              style={{ marginTop: '5px' }}
+              gutter={[16, 16]}>
 
-          <Col 
-            xs={24}
-            md={16}
-            span={16}
-            >
-            <Card
-              title="Aldeia X GCom"
-            >
+              {/* xs={24} para celular (1 card por linha) */}
+              {/* md={12} para desktop (2 cards por linha) */}
+              <Col 
+                xs={24}
+                md={8}
+                span={8}
+                >
+              
+                <Card
+                  title="Total de Produtos à Vencer"
+                  styles={{
+                    body:{ 
+                        height: cardBarra,
+                        overflow: 'hidden' 
+                      },
+                  }}
+                >            
+                  <Column {...config} />
+                </Card>
 
+              </Col>
+
+              <Col 
+                xs={24}
+                md={16}
+                span={16}
+                >
+                <Card
+                  title="Aldeia X GCom"
+                >
+
+                  <Table
+                      columns={colunasGCom}
+                      dataSource={dadosGCom}      
+                      showSorterTooltip={true}
+                      size={'small'}
+                      tableLayout="auto"
+                      scroll={{ y: gcomHeight}}                
+                      rowKey={(record) => record._id}
+                      pagination={false}
+    /*                  
+                      pagination={{
+                          tabela,
+                          // The available options for items per page
+                          pageSizeOptions: ['5', '10', '20', '30'], 
+                          // Display the size changer
+                          showSizeChanger: true, 
+                          // Set the default page size
+                  //        defaultPageSize: 5,
+                          // Optional: show total items count
+                          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+                          // Optional: update tabela page state on change
+                          onChange: (page) => {
+                          setTabela(page);
+                          },
+                      }}        
+    */                      
+                  />
+
+                </Card>
+              </Col>
+
+            </Row>
+
+            <Card 
+              title="Produtos por Data de Validade" 
+              style={{ marginTop: '5px' }}>
               <Table
-                  columns={colunasGCom}
-                  dataSource={dadosGCom}      
+                  columns={colunas} 
+                  dataSource={datesItem} 
                   showSorterTooltip={true}
                   size={'small'}
                   tableLayout="auto"
-                  scroll={{ y: gcomHeight}}                
+                  scroll={{ y: validadeHeight }}                
+    //              scroll={{ y: 110 }}                
                   rowKey={(record) => record._id}
-                  pagination={false}
-/*                  
-                  pagination={{
-                      tabela,
-                      // The available options for items per page
-                      pageSizeOptions: ['5', '10', '20', '30'], 
-                      // Display the size changer
-                      showSizeChanger: true, 
-                      // Set the default page size
-              //        defaultPageSize: 5,
-                      // Optional: show total items count
-                      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                      // Optional: update tabela page state on change
-                      onChange: (page) => {
-                      setTabela(page);
-                      },
-                  }}        
-*/                      
+                  pagination={false}        
               />
 
             </Card>
-          </Col>
-
-        </Row>
-
-        <Card 
-          title="Produtos por Data de Validade" 
-          style={{ marginTop: '5px' }}>
-          <Table
-              columns={colunas} 
-              dataSource={datesItem} 
-              showSorterTooltip={true}
-              size={'small'}
-              tableLayout="auto"
-              scroll={{ y: validadeHeight }}                
-//              scroll={{ y: 110 }}                
-              rowKey={(record) => record._id}
-              pagination={false}        
-          />
-
-        </Card>
-      </Content>
-    </Layout>
+          </Content>
+        </Layout>
+      </Spin>
+    </div>
   )
 }
 
