@@ -266,11 +266,11 @@ const PlacesInventoryComponent = () => {
 
     const carregarDados = async () => {
 
-        setLoading(true);      
-
-        setDados([]);
-
         try {
+
+            setLoading(true);      
+
+            setDados([]);
 
             const empresas = await getAllCompanys()
 

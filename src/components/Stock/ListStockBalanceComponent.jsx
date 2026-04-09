@@ -292,58 +292,61 @@ const ListStockBalanceComponent = () => {
       
     const carregarDados = async () => {
  
-        setLoading(true);
+        try {
 
-        setDados([])
+            setLoading(true);
 
-        let unit
-        //Unidade
-        await getAllUnits().then((response) => {
-            unit = response.data
+            setDados([])
 
-        })
+            let unit
+            //Unidade
+            await getAllUnits().then((response) => {
+                unit = response.data
 
-        await getAllDatesItem().then((response) => {
+            })
 
-            const dadosAux = response.data.map(item => ({
-                key:            item._id,
-                idItem:         item.item._id,
-                dataValidade:   item.dataValidade,
-                quantidade:     item.quantidade,
-            }))
+            await getAllDatesItem().then((response) => {
 
-            setExpandedDateItem(dadosAux);
+                const dadosAux = response.data.map(item => ({
+                    key:            item._id,
+                    idItem:         item.item._id,
+                    dataValidade:   item.dataValidade,
+                    quantidade:     item.quantidade,
+                }))
 
-        }).catch((error)=> {
+                setExpandedDateItem(dadosAux);
+
+            })
+
+            setDadosGCom([])
+
+            await getAllStockBalances().then(response => {
+
+                const dadosAux = response.data.map(item => ({
+                    key:            item._id,
+                    idItem:         item.item._id,
+                    itCodigo:       item.item.itCodigo,
+                    descricao:      item.item.descricao,
+                    qtde:           item.quantidade,                
+                    unit:           item.item.unit,
+                    unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
+                    gcomEstoque:    item.gcomEstoque,
+                    diferenca:      item.quantidade - item.gcomEstoque,
+                    dataInventario: item.dataInventario,
+                    dataGCom:       item.dataGCom,
+                }))
+
+                setDados(dadosAux);
+
+            })
+
+        } catch (error) {
             console.error(error);
-        });
+        } finally {
 
-        setDadosGCom([])
+            setLoading(false);
 
-        await getAllStockBalances().then(response => {
-
-            const dadosAux = response.data.map(item => ({
-                key:            item._id,
-                idItem:         item.item._id,
-                itCodigo:       item.item.itCodigo,
-                descricao:      item.item.descricao,
-                qtde:           item.quantidade,                
-                unit:           item.item.unit,
-                unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
-                gcomEstoque:    item.gcomEstoque,
-                diferenca:      item.quantidade - item.gcomEstoque,
-                dataInventario: item.dataInventario,
-                dataGCom:       item.dataGCom,
-            }))
-
-            setDados(dadosAux);
-
-        }).catch((error)=> {
-            console.error(error);
-        });
-
-        setLoading(false);
-
+        }
     }
 
     const expandedRowRender = (record) => {

@@ -448,10 +448,9 @@ const ShoppingComponent = () => {
 
     const carregarDados = async () => {
         
-        setLoading(true);
-
         try {
 
+            setLoading(true);
             setDados([])
             setEmpresa(null)
 
@@ -526,6 +525,10 @@ const ShoppingComponent = () => {
 
         } catch (error) {
             console.error(error);
+        } finally {
+
+            setLoading(false);
+
         }
 
     }

@@ -333,28 +333,33 @@ const ItemConfComponent = () => {
 
     const carregarCount = async() => {
 
-        setLoading(true);        
-        setDados([])
-        
-        getAllByPlaces(placesId).then((response) => {
+        try {
 
-            const dados = response.data.map((count) => ({
-                _id:            count._id,
-                descricao:      count.item.descricao,
-                dataValidade:   dayjs.utc(count.dataValidade),
-                quantidade:     count.quantidade
-            }))
+            setLoading(true);        
+            setDados([])
+            
+            await getAllByPlaces(placesId).then((response) => {
 
-            setDados(dados);
+                const dados = response.data.map((count) => ({
+                    _id:            count._id,
+                    descricao:      count.item.descricao,
+                    dataValidade:   dayjs.utc(count.dataValidade),
+                    quantidade:     count.quantidade
+                }))
 
-        }).catch((error)=> {
+                setDados(dados);
+
+            })
+
+        } catch (error) {
             console.error(error);
-        });
+        } finally {
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+            setSelectedRowKeys([]);
+            setLoading(false);
+
+        }
+
 
     }
 

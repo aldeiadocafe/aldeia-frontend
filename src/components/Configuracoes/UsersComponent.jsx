@@ -314,30 +314,34 @@ const UsersComponent = () => {
 
     const carregarDados = async () => {
 
-        setLoading(true);
+        try {
 
-        setDados([])
-        await getAllUsers().then((response) => {
+            setLoading(true);
 
-            const dadosAux = response.data.map(user => ({
-                _id:        user._id,
-                email:      user.email,
-                nome:       user.nome,
-                senha:      user.senha,
-                telefone:   user.telefone,
-                situacao:   user.situacao,
-                empresas:   user.empresas,
-            }))
-            setDados(dadosAux);
+            setDados([])
+            await getAllUsers().then((response) => {
 
-        }).catch((error)=> {
+                const dadosAux = response.data.map(user => ({
+                    _id:        user._id,
+                    email:      user.email,
+                    nome:       user.nome,
+                    senha:      user.senha,
+                    telefone:   user.telefone,
+                    situacao:   user.situacao,
+                    empresas:   user.empresas,
+                }))
+                setDados(dadosAux);
+
+            })
+
+        } catch (error) {
             console.error(error);
-        });
+        } finally {
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+            setSelectedRowKeys([]);
+            setLoading(false);
+
+        }
 
     }
 

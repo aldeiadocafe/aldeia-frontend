@@ -316,20 +316,25 @@ const ListConversationsComponent = () => {
         
     }
 
-    const carregarDados = () => {
-        setLoading(true);
+    const carregarDados = async () => {
 
-        setDados([])
-        getAllConversations().then((response) => {
-            setDados(response.data);
-        }).catch((error)=> {
+        try {
+
+            setLoading(true);
+
+            setDados([])
+            await getAllConversations().then((response) => {
+                setDados(response.data);
+            })
+
+        } catch (error) {
             console.error(error);
-        });
+        } finally {
 
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
+            setSelectedRowKeys([]);
+            setLoading(false);
+
+        }
 
     }
 

@@ -278,46 +278,51 @@ const InventoryComponent = () => {
 
     const carregarDados = async () => {
 
-        setLoading(true);
-        setEmpresa(null)
+        try {
 
-        if (user.empresas) {
+            setLoading(true);
+            setEmpresa(null)
 
-            // Empresa
-            const formatarDados = user.empresas.map((company) => ({
-                value: company._id,
-                label: company.nome
-            }))
-            setSelectEmpresas(formatarDados)
+            if (user.empresas) {
+
+                // Empresa
+                const formatarDados = user.empresas.map((company) => ({
+                    value: company._id,
+                    label: company.nome
+                }))
+                setSelectEmpresas(formatarDados)
+
+            }
+            setDados([])        
+            await getAllInventorys().then((response) => {
+
+                const ids = user.empresas.map(usuario => usuario._id)
+
+                const dadosAux = response.data
+                    .filter(item => ids.includes(item.empresa._id))
+                    .map(item => ({
+                        _id:            item._id,
+                        empresa:        item.empresa,
+                        empresaNome:    item.empresa?.nome,
+                        dataInventario: item.dataInventario,
+                        descricao:      item.descricao.toUpperCase(),
+                        tipoInventario: item.tipoInventario.toUpperCase(),
+                        situacao:       item.situacao.toUpperCase(),
+
+                }))
+                setDados(dadosAux);
+
+            })
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+
+            setSelectedRowKeys([]);
+            setLoading(false);
 
         }
-        setDados([])        
-        await getAllInventorys().then((response) => {
 
-            const ids = user.empresas.map(usuario => usuario._id)
-
-            const dadosAux = response.data
-                .filter(item => ids.includes(item.empresa._id))
-                .map(item => ({
-                    _id:            item._id,
-                    empresa:        item.empresa,
-                    empresaNome:    item.empresa?.nome,
-                    dataInventario: item.dataInventario,
-                    descricao:      item.descricao.toUpperCase(),
-                    tipoInventario: item.tipoInventario.toUpperCase(),
-                    situacao:       item.situacao.toUpperCase(),
-
-            }))
-            setDados(dadosAux);
-
-        }).catch((error)=> {
-            console.error(error);
-        });
-
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
 
     }
 

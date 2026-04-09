@@ -227,18 +227,12 @@ const UnitComponent = () => {
                 }))
 
                 setDados(dadosAux);
-            })).catch((error)=> {
-                console.error(error);
-            });
-
-            setTimeout(() => {
-            setSelectedRowKeys([]);
-            setLoading(false);
-            }, 1000);    
+            }))
 
         } catch (error) {
             console.error("Erro ao carregar dados:", error)            
         } finally {
+            setSelectedRowKeys([]);
             setLoading(false)
         }
 

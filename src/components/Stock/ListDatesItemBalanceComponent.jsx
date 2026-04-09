@@ -176,37 +176,42 @@ const ListDatesItemBalanceComponent = () => {
 
     const carregarDados = async () => {
 
- 
-        setLoading(true);
-        setDados([])
+        try {
 
-        let unit
-        //Unidade
-        await getAllUnits().then((response) => {
-            unit = response.data
+            setLoading(true);
+            setDados([])
 
-        })
+            let unit
+            //Unidade
+            await getAllUnits().then((response) => {
+                unit = response.data
 
-        await getAllDatesItem().then((response) => {
+            })
 
-            const dadosAux = response.data.map(item => ({
-                _id:            item._id,
-                idItem:         item.item._id,
-                itCodigo:       item.item.itCodigo,
-                descricao:      item.item.descricao,
-                quantidade:     item.quantidade,                
-                unit:           item.item.unit,
-                unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
-                dataValidade:   item.dataValidade,
-            }))
+            await getAllDatesItem().then((response) => {
 
-            setDados(dadosAux);
+                const dadosAux = response.data.map(item => ({
+                    _id:            item._id,
+                    idItem:         item.item._id,
+                    itCodigo:       item.item.itCodigo,
+                    descricao:      item.item.descricao,
+                    quantidade:     item.quantidade,                
+                    unit:           item.item.unit,
+                    unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
+                    dataValidade:   item.dataValidade,
+                }))
 
-        }).catch((error)=> {
+                setDados(dadosAux);
+
+            })
+
+        } catch (error) {
             console.error(error);
-        });
+        } finally {
 
-        setLoading(false);
+            setLoading(false);
+
+        }
 
     }
 
