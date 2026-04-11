@@ -73,7 +73,7 @@ const MainLayout = () => {
     };
 
     return (
-        <Layout className="full-height-layout">
+        <Layout style={{height: '100vh'}}>
             <Sider 
                 collapsedWidth='40px'
                 collapsed={collapsed} 

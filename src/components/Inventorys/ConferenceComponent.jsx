@@ -141,28 +141,28 @@ const ConferenceComponent = () => {
 
     const btnPesquisar = async () => {
 
-        const local          = form.getFieldValue('local');
-
-        let processo = '?'
-
-        if(form.getFieldValue('dataInventario')) {
-
-            const dataInventario = dayjs.utc(form.getFieldValue('dataInventario')).format('YYYY-MM-DD')
-            processo = processo + 'dataInventario=' + dataInventario
-
-        }
-
-        if(local) {
-
-            if(processo) processo = processo + '&'
-
-            processo = processo + 'local=' + local.toString().toUpperCase()
-
-        }
-
-        setLoading(true);
-
         try {
+
+            setLoading(true);
+
+            const local          = form.getFieldValue('local');
+
+            let processo = '?'
+
+            if(form.getFieldValue('dataInventario')) {
+
+                const dataInventario = dayjs.utc(form.getFieldValue('dataInventario')).format('YYYY-MM-DD')
+                processo = processo + 'dataInventario=' + dataInventario
+
+            }
+
+            if(local) {
+
+                if(processo) processo = processo + '&'
+
+                processo = processo + 'local=' + local.toString().toUpperCase()
+
+            }
 
             const empresas = await getAllCompanys()
 
@@ -189,14 +189,13 @@ const ConferenceComponent = () => {
 
             }
 
-        }  catch (error) {
-            setDados([])            
-            message.error(error);
+        } catch (error) {
+            console.error(error);
         } finally {
-            setTimeout(() => {
+
             setSelectedRowKeys([]);
             setLoading(false);
-            }, 1000);    
+
         }
 
     }

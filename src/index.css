@@ -15,10 +15,6 @@
     --gray-color: #747474;
 }
 
-.full-height-layout {
-  height: 100vh;
-}
-
 .sider-logo {
   display: flex;
   justify-content: center;

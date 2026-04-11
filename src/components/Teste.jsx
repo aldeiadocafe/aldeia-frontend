@@ -1,57 +1,82 @@
-import React from 'react';
-import { Layout, Menu, Button } from 'antd';
-import {
-  DashboardOutlined,
-  LogoutOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-
-const { Sider } = Layout;
+import React, { useState } from 'react';
+import { Layout, Menu, Button, Dropdown, Space, Avatar } from 'antd';
+import Sider from 'antd/es/layout/Sider';
+import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 
 const Teste = () => {
-  return (
-    <Sider
-      breakpoint="lg"
-//      collapsedWidth="0"
-      style={{
-        height: '100vh',
-        position: 'fixed',
-        left: 0,
-      }}
-    >
-      <div style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}>
-        {/* Parte Superior: Logo e Menu */}
-        <div>
-          <div className="logo" style={{ height: 32, margin: 16, background: 'rgba(255,255,255,.2)' }} />
-          <Menu
-            theme="dark"
-            mode="inline"
-            defaultSelectedKeys={['1']}
-            items={[
-              { key: '1', icon: <DashboardOutlined />, label: 'Dashboard' },
-              { key: '2', icon: <UserOutlined />, label: 'Perfil' },
-            ]}
-          />
-        </div>
 
-        {/* Rodapé: Botão Logout */}
-        <div style={{ padding: '50px' }}>
-          <Button
-            type="text"
-            icon={<LogoutOutlined />}
-            style={{ color: 'white', width: '100%', textAlign: 'left' }}
-            onClick={() => console.log('Log out')}
-          >
-            Sair
-          </Button>
-        </div>
-      </div>
-    </Sider>
+    // 1. Defina os itens do menu como um objeto de configuração
+    const items = [
+        {
+            key: '1',
+            label: 'Perfil',
+            icon: <SettingOutlined />,
+        },
+        {
+            type: 'divider',
+        },
+        {
+            key: '3',
+            label: 'Logout',
+            icon: <LogoutOutlined />,
+            danger: true,
+        },
+    ];
+
+  const [collapsed, setCollapsed] = useState(true);
+
+
+  return (
+    <Layout style={{height: '100vh'}}>
+
+      <Sider
+        collapsedWidth='40px'
+        collapsed={collapsed} 
+//        collapsible
+        trigger={null}
+        onMouseLeave={() => setCollapsed(true)}
+        onMouseEnter={() => setCollapsed(false)}
+        style={{
+          overflow: 'auto',
+          height: '100vh',
+          position: 'fixed',
+          left: 0,
+          background: 'var(--primary-color)'
+        }}
+      >      
+
+        <div 
+          style={{ display: 'flex', 
+                   flexDirection: 'column', 
+                  height: 'calc(100vh - 93px)',
+                  }}
+                  >
+
+          {/* Botão Logout no Rodapé da Sidebar  */}
+          <div style={{ padding: '8px', 
+                        marginTop: 'auto',
+                        color: 'white',}}>
+
+              <Dropdown
+                  menu={{
+                      items
+                  }}
+              // O trigger padrão é 'hover', mas você pode mudar para ['click']
+              //      trigger={['click']} 
+              >
+                  <Space>
+                      <Avatar shape="square" 
+                          size="small" 
+                          icon={<UserOutlined />} />            
+                      Teste
+                  </Space>
+              </Dropdown>
+          </div>
+        </div>        
+
+      </Sider>
+
+    </Layout>
   );
 };
 
