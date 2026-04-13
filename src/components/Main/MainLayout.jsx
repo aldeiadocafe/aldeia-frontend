@@ -27,7 +27,7 @@ const MainLayout = () => {
     const screens = useBreakpoint()
 
   // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
-    const customHeight = screens.md ? '100vh' : 'calc(100vh - 100px)'
+    const customHeight = screens.xl ? '100vh' : 'calc(100vh - 100px)'
 
     // 1. Defina os itens do menu como um objeto de configuração
     const items = [
