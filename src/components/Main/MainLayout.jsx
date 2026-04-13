@@ -80,11 +80,11 @@ const MainLayout = () => {
     };
 
     return (
-        <Layout style={{height: '100vh'}}>
+        <Layout style={{height: customHeight}}>
             <Sider 
                 collapsedWidth='40px'
                 collapsed={collapsed} 
-                collapsible
+//                collapsible
                 trigger={null}
                 onMouseLeave={() => setCollapsed(true)}
                 onMouseEnter={() => setCollapsed(false)}
