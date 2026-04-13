@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Content } from 'antd/es/layout/layout';
-import { Avatar, Button, Layout } from 'antd';
+import { Avatar, Button, Grid, Layout } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 
 
@@ -12,6 +12,8 @@ import { Dropdown, Space } from 'antd';
 
 import { useAuth } from '../Login/AuthContext';
 
+const { useBreakpoint } = Grid
+
 const MainLayout = () => {
 
     const { logout } = useAuth()
@@ -22,6 +24,11 @@ const MainLayout = () => {
 
     const { user } = useAuth();
     
+    const screens = useBreakpoint()
+
+  // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
+    const customHeight = screens.md ? '100vh' : 'calc(100vh - 100px)'
+
     // 1. Defina os itens do menu como um objeto de configuração
     const items = [
         {
@@ -81,14 +88,15 @@ const MainLayout = () => {
                 trigger={null}
                 onMouseLeave={() => setCollapsed(true)}
                 onMouseEnter={() => setCollapsed(false)}
-                style={{ background: 'var(--primary-color)' /* Sua cor personalizada */ }}
+                style={{ 
+                    background: 'var(--primary-color)' /* Sua cor personalizada */ }}
                 >
 
                 <div
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        height: '100vh',
+                        height: customHeight,
                     }}
                 >
                     <a href='/'>
