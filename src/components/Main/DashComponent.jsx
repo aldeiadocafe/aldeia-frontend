@@ -49,12 +49,12 @@ const DashComponent = () => {
   const screens = useBreakpoint();
 
   // Define a altura baseada no breakpoint xs
-  const plotHeight = screens.xs ? 120 : 150;
-  const gcomHeight = screens.xs ? 120 : 93;
-  const validadeHeight = screens.xs ? 120 : 215;
+  // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
+  const plotHeight = screens.xl ? 150 : 90
+  const gcomHeight = screens.xl ? 130 : 70
+  const validadeHeight = screens.xl ? 215 : 60;
 
-    // Define a altura baseada se é xs ou menor
-  const cardBarra = screens.xs ? '135px' : '180px';
+  const cardBarra = screens.xl ? '180px' : '100px'
 
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -452,7 +452,7 @@ const DashComponent = () => {
 
             <Card 
               size='small'
-              style={{ height: 'calc(11vh)'}}
+              style={{ height: 'calc(8vh)'}}
               >
               <Row gutter={[16, 16]}>
                 <Col>
@@ -505,8 +505,9 @@ const DashComponent = () => {
                   title="Total de Produtos à Vencer"
                   styles={{
                     body:{ 
-                        height: cardBarra,
-                        overflow: 'hidden' 
+                        height: cardBarra,                        
+                        overflow: 'hidden',
+                        padding: 5,
                       },
                   }}
                 >            
@@ -521,7 +522,12 @@ const DashComponent = () => {
                 span={16}
                 >
                 <Card
-                  title="Aldeia X GCom"
+                  title="Aldeia X GCom"                  
+                  styles={{
+                    body:{ 
+                        padding: 5,
+                      },
+                  }}
                 >
 
                   <Table
@@ -530,7 +536,7 @@ const DashComponent = () => {
                       showSorterTooltip={true}
                       size={'small'}
                       tableLayout="auto"
-                      scroll={{ y: gcomHeight}}                
+                      scroll={{ y: gcomHeight}}               
                       rowKey={(record) => record._id}
                       pagination={false}
     /*                  
@@ -559,7 +565,13 @@ const DashComponent = () => {
 
             <Card 
               title="Produtos por Data de Validade" 
-              style={{ marginTop: '5px' }}>
+              style={{marginTop: '5px'}}
+              styles ={{ 
+                  body:{ 
+                      padding: 5,
+                    },
+                  }}
+              >
               <Table
                   columns={colunas} 
                   dataSource={datesItem} 
