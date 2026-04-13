@@ -50,12 +50,29 @@ const DashComponent = () => {
 
   // Define a altura baseada no breakpoint xs
   // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
+  const gcomHeight = screens.xl ? 130 : screens.xs ? '35px' : 70
+  const validadeHeight = screens.xl ? 215 : screens.xs ? '35px' : 60;
+
+  const cardBarra = screens.xl ? '180px' : screens.xs ? '90px' : '100px'
   const plotHeight = screens.xl ? 150 : 90
-  const gcomHeight = screens.xl ? 130 : 70
-  const validadeHeight = screens.xl ? 215 : 60;
 
-  const cardBarra = screens.xl ? '180px' : '100px'
+/*
+  Tela do Note
+    Largura: 	1234px
+    Altura:		642px
 
+  Tablet Saka
+    Em pé	>> largura:	601px
+             Altura:	780px
+
+    Deitado >> Largura: 	1006px
+               Altura: 	427px	
+
+  Celular
+    Em pé	>> Largura:	384px
+             Altura:	690px
+
+*/
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
       confirm();
@@ -455,7 +472,7 @@ const DashComponent = () => {
               style={{ height: 'calc(8vh)'}}
               >
               <Row gutter={[16, 16]}>
-                <Col>
+                <Col span={8}>
 
                   <Title level={4}
                       style={{ color: 'var(--primary-color)'}}

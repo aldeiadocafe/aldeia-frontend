@@ -1,88 +1,40 @@
-import React, { useState } from 'react';
-import { Layout, Menu, Button, Dropdown, Space, Avatar, Grid } from 'antd';
-import Sider from 'antd/es/layout/Sider';
-import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Layout, Typography, Card } from 'antd';
 
-const { useBreakpoint } = Grid
+const { Content } = Layout;
+const { Title, Text } = Typography;
 
 const Teste = () => {
+  // 1. Estado para armazenar as dimensões
+  const [dimensoes, setDimensoes] = useState({
+    largura: window.innerWidth,
+    altura: window.innerHeight,
+  });
 
-    const screens = useBreakpoint()
+  // 2. Efeito para atualizar as dimensões quando a tela for redimensionada
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensoes({
+        largura: window.innerWidth,
+        altura: window.innerHeight,
+      });
+    };
 
-  // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
-    const customHeight = screens.md ? '100vh' : 'calc(100vh - 100px)'
-
-    // 1. Defina os itens do menu como um objeto de configuração
-    const items = [
-        {
-            key: '1',
-            label: 'Perfil',
-            icon: <SettingOutlined />,
-        },
-        {
-            type: 'divider',
-        },
-        {
-            key: '3',
-            label: 'Logout',
-            icon: <LogoutOutlined />,
-            danger: true,
-        },
-    ];
-
-  const [collapsed, setCollapsed] = useState(true);
-
+    window.addEventListener('resize', handleResize);
+    
+    // Limpa o listener ao desmontar o componente
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
-    <Layout style={{height: '100vh'}}>
-
-      <Sider
-        collapsedWidth='40px'
-        collapsed={collapsed} 
-//        collapsible
-        trigger={null}
-        onMouseLeave={() => setCollapsed(true)}
-        onMouseEnter={() => setCollapsed(false)}
-        style={{
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-          background: 'var(--primary-color)'
-        }}
-      >      
-
-        <div 
-          style={{ display: 'flex', 
-                   flexDirection: 'column', 
-                  height: customHeight,
-                  }}
-                  >
-
-          {/* Botão Logout no Rodapé da Sidebar  */}
-          <div style={{ padding: '8px', 
-                        marginTop: 'auto',
-                        color: 'white',}}>
-
-              <Dropdown
-                  menu={{
-                      items
-                  }}
-              // O trigger padrão é 'hover', mas você pode mudar para ['click']
-              //      trigger={['click']} 
-              >
-                  <Space>
-                      <Avatar shape="square" 
-                          size="small" 
-                          icon={<UserOutlined />} />            
-                      Teste
-                  </Space>
-              </Dropdown>
-          </div>
-        </div>        
-
-      </Sider>
-
+    <Layout style={{ padding: '24px', minHeight: '100vh' }}>
+      <Content>
+        <Card title="Dimensões da Tela (Ant Design)">
+          <Title level={4}>Largura: <Text type="success">{dimensoes.largura}px</Text></Title>
+          <Title level={4}>Altura: <Text type="success">{dimensoes.altura}px</Text></Title>
+          <p>Redimensione a janela para ver os valores mudarem.</p>
+        </Card>
+      </Content>
     </Layout>
   );
 };
