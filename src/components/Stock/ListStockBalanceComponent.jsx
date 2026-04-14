@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Table, Badge, Spin, Input, Space, Button } from 'antd';
+import { Table, Spin, Input, Space, Button, Row, Col, Select, Form } from 'antd';
 import { DownloadOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
 
@@ -15,11 +15,22 @@ import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { normalizarTexto } from '../../Funcoes/Utils';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
+
 const ListStockBalanceComponent = () => {
 
+    const { user } = useAuth();
+
+    const [ form ]  = Form.useForm();
+    const { Item }  = Form;
+
+    const [selectEmpresas,  setSelectEmpresas]  = useState([]);
+    const [empresa,         setEmpresa]         = useState([])
+
+    const [dadosCompleto,   setDadosCompleto]       = useState([])
     const [dados,       setDados]                   = useState([])
     const [expandedDateItem, setExpandedDateItem ]  = useState([])
 
@@ -44,6 +55,7 @@ const ListStockBalanceComponent = () => {
     const exportToExcel = () => {
 
         const dadosExcel = dados.map(item => ({
+            Empresa:            item.nomeEmpresa,
             Item:               item.itCodigo,
             Descrição:          item.descricao,
             Unid:               item.unidade,
@@ -91,17 +103,19 @@ const ListStockBalanceComponent = () => {
         if (ws['F1']) ws['F1'].s = headerStyle;
         if (ws['G1']) ws['G1'].s = headerStyle;
         if (ws['H1']) ws['H1'].s = headerStyle;
+        if (ws['I1']) ws['I1'].s = headerStyle;
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
-            { wch: 10 }, // Largura da Coluna A
-            { wch: 50 }, // Largura da Coluna B
-            { wch: 5  }, // Largura da Coluna C
-            { wch: 15 }, // Largura da Coluna D
+            { wch: 20 }, // Largura da Coluna A
+            { wch: 30 }, // Largura da Coluna B
+            { wch: 50 }, // Largura da Coluna C
+            { wch: 5  }, // Largura da Coluna D
             { wch: 15 }, // Largura da Coluna E
             { wch: 15 }, // Largura da Coluna F
-            { wch: 15 }, // Largura da Coluna F
-            { wch: 15 }, // Largura da Coluna F
+            { wch: 15 }, // Largura da Coluna G
+            { wch: 15 }, // Largura da Coluna H
+            { wch: 15 }, // Largura da Coluna I
         ]
 
         // Obtém o total de linhas (exclui o cabeçalho se json_to_sheet for usado sem customização)
@@ -112,17 +126,17 @@ const ListStockBalanceComponent = () => {
         // Exemplo para a coluna B2:B10
         for (let i = 2; i <= (range.e.r + 1); i++) {
 //            const cellAddress = 'D' + i;
-            if (!ws['D' + i]) continue; // Pular se a célula estiver vazia
-            ws['D' + i].s = rightAlignStyle; // Aplica o estilo
-            ws['E' + i].s = rightAlignStyle; // Aplica o estilo
+            if (!ws['E' + i]) continue; // Pular se a célula estiver vazia
             ws['F' + i].s = rightAlignStyle; // Aplica o estilo
+            ws['G' + i].s = rightAlignStyle; // Aplica o estilo
+            ws['H' + i].s = rightAlignStyle; // Aplica o estilo
 
             //Formatar em data
-            ws['G' + i].z = 'dd/mm/yyyy'
-            ws['G' + i].t = 'd' // Define o tipo como Data
-
             ws['H' + i].z = 'dd/mm/yyyy'
             ws['H' + i].t = 'd' // Define o tipo como Data
+
+            ws['I' + i].z = 'dd/mm/yyyy'
+            ws['I' + i].t = 'd' // Define o tipo como Data
         }
 
         // Cria um novo workbook
@@ -193,6 +207,15 @@ const ListStockBalanceComponent = () => {
 
   // Colunas principais
   const colunas = [
+    {
+        title: 'Empresa', 
+        dataIndex: 'nomeEmpresa', 
+        key: 'empresa',
+        sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ...getColumnSearchProps('nomeEmpresa'),
+        ellipsis: true,
+    },
     {
         title: 'Item', 
         dataIndex: 'itCodigo', 
@@ -296,7 +319,23 @@ const ListStockBalanceComponent = () => {
 
             setLoading(true);
 
-            setDados([])
+            setEmpresa([])
+            if (user.empresas) {
+
+                // Empresa
+                const formatarDados = user.empresas.map((company) => ({
+                    value: company._id,
+                    label: company.nome
+                }))
+                setSelectEmpresas(formatarDados)
+
+                form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+
+                setEmpresa(user.empresas)
+
+            }
+
+            setDados([])            
 
             let unit
             //Unidade
@@ -314,7 +353,7 @@ const ListStockBalanceComponent = () => {
                     quantidade:     item.quantidade,
                 }))
 
-                setExpandedDateItem(dadosAux);
+                setExpandedDateItem(dadosAux);                
 
             })
 
@@ -334,8 +373,11 @@ const ListStockBalanceComponent = () => {
                     diferenca:      item.quantidade - item.gcomEstoque,
                     dataInventario: item.dataInventario,
                     dataGCom:       item.dataGCom,
+                    empresa:        item.empresa,
+                    nomeEmpresa:    item.empresa.nome,
                 }))
 
+                setDadosCompleto(dadosAux);
                 setDados(dadosAux);
 
             })
@@ -391,6 +433,21 @@ const ListStockBalanceComponent = () => {
         setExpandedRowKeys([]);
     };
 
+    const handleOnChageEmpresa = async (value) => {
+
+        try {
+            
+            const dadosAux = dadosCompleto.filter(dados => value.includes(dados.empresa._id))            
+            setDados(dadosAux)
+
+
+        } catch {
+            console.log("Erro")
+        }
+    }
+
+
+
     useEffect(() => {
         carregarDados()
     }, [])
@@ -412,23 +469,58 @@ const ListStockBalanceComponent = () => {
                 >Consultar Saldo do Item</Title>
             </div>
 
-            <div style={{
-                display: 'flex',
-                justifyContent: 'flex-end'
-            }}
-            >
-                <Space style={{ marginBottom: 16 }}>
-                    <Button onClick={expandAll}>Expandir Tudo</Button>
-                    <Button onClick={collapseAll}>Recolher Tudo</Button>
-                    <Button 
-                        type="primary" 
-                        icon={<DownloadOutlined />} 
-                        onClick={exportToExcel}
+            <Row gutter={[16, 16]}>
+
+                <Col span={12}>
+
+                    <Form
+                        form={form}
                     >
-                        Exportar para Excel
-                    </Button>                
-                </Space>
-            </div>
+
+                        <Item
+                            name={"empresas"}
+                            key={"empresas"}
+                            label={"Selecionar Empresa"}
+                            rules={[{required: true, 
+                                    message: 'Informar Empresa'}]}
+                            >
+
+                            <Select
+                                disabled={empresa.length === 1}
+                                placeholder="Selecionar Empresa"
+                                allowClear  //Permite limpar seleção
+                                mode="multiple"
+                                loading={loading}   // Mostrar ícone de carregamento
+                                options={selectEmpresas}
+                                onChange={handleOnChageEmpresa}
+                            />
+
+                        </Item>
+
+                    </Form>
+                </Col>
+
+                <Col span={12}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end'
+                    }}
+                    >
+                        <Space style={{ marginBottom: 16 }}>
+                            <Button onClick={expandAll}>Expandir Tudo</Button>
+                            <Button onClick={collapseAll}>Recolher Tudo</Button>
+                            <Button 
+                                type="primary" 
+                                icon={<DownloadOutlined />} 
+                                onClick={exportToExcel}
+                            >
+                                Exportar para Excel
+                            </Button>                
+                        </Space>
+                    </div>
+                </Col>
+
+            </Row>
 
             <Table
                 columns={colunas}
