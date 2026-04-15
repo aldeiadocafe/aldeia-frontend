@@ -368,6 +368,7 @@ const DashComponent = () => {
             empresa:      item.empresa,
             nomeEmpresa:  item.empresa.nome
           }))
+          
         setGComCompleto(dados)
         setDadosGCom(dados)
 
@@ -375,10 +376,11 @@ const DashComponent = () => {
 
       setDatesCompleto([])
       setDatesItem([])
+      
       await getAllDatesItem().then((response) => {
 
         const dados = response.data.map(item => ({
-          idItem:       item.item._id,
+          idItem:       item.item._id,          
           itCodigo:     item.item.itCodigo,
           descricao:    item.item.descricao,
           unit:         item.item.unit,
@@ -388,7 +390,7 @@ const DashComponent = () => {
           empresa:      item.empresa,
           nomeEmpresa:  item.empresa.nome
         }))
-
+        
         setDatesCompleto(dados)
         setDatesItem(dados)
 

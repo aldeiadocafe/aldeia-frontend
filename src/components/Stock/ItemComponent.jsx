@@ -400,22 +400,26 @@ const ItemComponent = () => {
 
     // Chamado se o usuário confirmar na Popconfirm
     const handlePopupConfirm = () => {
-        
+
         if(form.getFieldValue('_id')){
-            deleteItem(form.getFieldValue('_id')).then((response) => {
+
+            return deleteItem(form.getFieldValue('_id')).then((response) => {
                 message.success('Registro eliminado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
                 setDeleteModal(false); // Fecha o Modal principal
 
             }).catch((error)=> {
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
+
+                if (error.response) {  
+
+                    message.error(error.response.data.message || 'Ocorreu um erro inesperado');
                 } else {
                     message.error('Erro ao criar!');
                 }
             });
         }
+            
     };
 
     // Chamado se o usuário cancelar na Popconfirm
