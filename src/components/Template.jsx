@@ -396,17 +396,19 @@ const ListInventoryComponent = () => {
         
         if(form.getFieldValue('_id')){
 
-            deleteInventory(form.getFieldValue('_id')).then((response) => {
+            return deleteInventory(form.getFieldValue('_id')).then((response) => {
                 message.success('Registro eliminado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
                 setDeleteModal(false); // Fecha o Modal principal
 
             }).catch((error)=> {
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
+
+                if (error.response) {  
+
+                    message.error(error.response.data.message || error.response.data || 'Ocorreu um erro inesperado');
                 } else {
-                    message.error('Erro ao criar!');
+                    message.error('Erro ao elimninar');
                 }
             });
         }

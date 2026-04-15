@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button, Input, Space, Spin, Table, DatePicker } from 'antd'
+import { Button, Input, Space, Spin, Table, DatePicker, Form, Row, Col, Select } from 'antd'
 import { DownloadOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 
 import Title from 'antd/es/typography/Title';
@@ -12,6 +12,7 @@ import * as XLSX from 'xlsx-js-style'
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { normalizarTexto } from '../../Funcoes/Utils';
+import { useAuth } from '../Login/AuthContext';
 
 dayjs.extend(utc)
 
@@ -19,8 +20,17 @@ const { RangePicker } = DatePicker;
 
 const ListDatesItemBalanceComponent = () => {
 
-    const [tabela,      setTabela]      = useState(1);
-    const [dados,       setDados]       = useState([])
+    const { user } = useAuth()
+
+    const [ form ] = Form.useForm()
+    const { Item } = Form
+
+    const [selectEmpresas,  setSelectEmpresas]  = useState([]);
+    const [empresa,         setEmpresa]         = useState([])
+
+    const [tabela,          setTabela]          = useState(1);
+    const [dadosCompleto,   setDadosCompleto]   = useState([])
+    const [dados,           setDados]           = useState([])
 
     const [loading, setLoading]         = useState(false);
 
@@ -93,6 +103,15 @@ const ListDatesItemBalanceComponent = () => {
             onHeaderCell: () => ({style: { display: 'none'}}),
             onCell: () => ({ style: {display: 'none'}})            
         },        
+        {
+            title: 'Empresa', 
+            dataIndex: 'nomeEmpresa', 
+            key: 'empresa',
+            sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            ...getColumnSearchProps('nomeEmpresa'),
+            ellipsis: true,
+        },
         {
             dataIndex:  'itCodigo',
             title: 'Item',
@@ -179,6 +198,23 @@ const ListDatesItemBalanceComponent = () => {
         try {
 
             setLoading(true);
+
+            setEmpresa([])
+            if (user.empresas) {
+
+                // Empresa
+                const formatarDados = user.empresas.map((company) => ({
+                    value: company._id,
+                    label: company.nome
+                }))
+                setSelectEmpresas(formatarDados)
+
+                form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+
+                setEmpresa(user.empresas)
+
+            }
+
             setDados([])
 
             let unit
@@ -199,8 +235,11 @@ const ListDatesItemBalanceComponent = () => {
                     unit:           item.item.unit,
                     unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
                     dataValidade:   item.dataValidade,
+                    empresa:        item.empresa,
+                    nomeEmpresa:    item.empresa.nome
                 }))
 
+                setDadosCompleto(dadosAux)
                 setDados(dadosAux);
 
             })
@@ -217,9 +256,10 @@ const ListDatesItemBalanceComponent = () => {
 
     const exportToExcel = () => {
 
-        const headers = ["Item", "Descrição", "Unid", "Data Validade", "Quantidade"];
+        const headers = ["Empresa", "Item", "Descrição", "Unid", "Data Validade", "Quantidade"];
 
         const dadosExcel = dados.map(item => ({
+            Empresa:        item.nomeEmpresa,
             itCodigo:       item.itCodigo,
             descricao:      item.descricao,
             unidade:        item.unidade,
@@ -255,19 +295,21 @@ const ListDatesItemBalanceComponent = () => {
         }
 
         // Para atribuir conteudo utilizar .v
-        ws['A1'].v = "Item"
-        ws['B1'].v = "Descrição"
-        ws['C1'].v = "Unid"
-        ws['D1'].v = "Dt Validade"
-        ws['E1'].v = "Quantidade"
+        ws['A1'].v = "Empresa"
+        ws['B1'].v = "Item"
+        ws['C1'].v = "Descrição"
+        ws['D1'].v = "Unid"
+        ws['E1'].v = "Dt Validade"
+        ws['F1'].v = "Quantidade"
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
-            { wch: 10 }, // Largura da Coluna A
-            { wch: 50 }, // Largura da Coluna B
-            { wch: 5  }, // Largura da Coluna C
-            { wch: 12 }, // Largura da Coluna D
-            { wch: 15 }, // Largura da Coluna E
+            { wch: 20 }, // Largura da Coluna A
+            { wch: 30 }, // Largura da Coluna B
+            { wch: 50 }, // Largura da Coluna C
+            { wch: 5  }, // Largura da Coluna D
+            { wch: 12 }, // Largura da Coluna E
+            { wch: 15 }, // Largura da Coluna F
         ]
 
         // Cria um novo workbook
@@ -286,6 +328,19 @@ const ListDatesItemBalanceComponent = () => {
 
     }
     
+    const handleOnChageEmpresa = async (value) => {
+
+        try {
+            
+            const dadosAux = dadosCompleto.filter(dados => value.includes(dados.empresa._id))            
+            setDados(dadosAux)
+
+
+        } catch {
+            console.log("Erro")
+        }
+    }
+
     useEffect(() => {
         carregarDados()
     }, [])
@@ -306,21 +361,56 @@ const ListDatesItemBalanceComponent = () => {
                     >Consultar Item por Data de Validade</Title>
                 </div>
 
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end'
-                    }}
-                >
+                <Row gutter={[16, 16]} >
 
-                    <Button 
-                        type="primary" 
-                        icon={<DownloadOutlined />} 
-                        onClick={exportToExcel}
-                    >
-                        Exportar para Excel
-                    </Button>                
+                    <Col span={12}>
 
-                </div>
+                        <Form
+                            form={form}
+                        >
+
+                            <Item
+                                name={"empresas"}
+                                key={"empresas"}
+                                label={"Selecionar Empresa"}
+                                rules={[{required: true, 
+                                        message: 'Informar Empresa'}]}
+                                >
+
+                                <Select
+                                    disabled={empresa.length === 1}
+                                    placeholder="Selecionar Empresa"
+                                    allowClear  //Permite limpar seleção
+                                    mode="multiple"
+                                    loading={loading}   // Mostrar ícone de carregamento
+                                    options={selectEmpresas}
+                                    onChange={handleOnChageEmpresa}
+                                />
+
+                            </Item>
+
+                        </Form>
+
+                    </Col>
+                    <Col span={12}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end'
+                            }}
+                        >
+
+                            <Button 
+                                type="primary" 
+                                icon={<DownloadOutlined />} 
+                                onClick={exportToExcel}
+                            >
+                                Exportar para Excel
+                            </Button>                
+
+                        </div>
+                    </Col>
+
+                </Row>
 
                 <Table
                     columns={colunas} 

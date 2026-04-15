@@ -413,9 +413,9 @@ const ItemComponent = () => {
 
                 if (error.response) {  
 
-                    message.error(error.response.data.message || 'Ocorreu um erro inesperado');
+                    message.error(error.response.data.message || error.response.data || 'Ocorreu um erro inesperado');
                 } else {
-                    message.error('Erro ao criar!');
+                    message.error('Erro ao eliminar!');
                 }
             });
         }
