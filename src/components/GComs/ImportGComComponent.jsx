@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Table, Input, Space, Upload, message, Spin, Button, Card, Progress, notification } from 'antd';
+import { Table, Input, Space, Upload, message, Spin, Button, Card, Progress, notification, Form, Row, Col, Select } from 'antd';
 import { UploadOutlined, SearchOutlined } from '@ant-design/icons';
 
 import * as XLSX from 'xlsx';
@@ -7,9 +7,19 @@ import Title from 'antd/es/typography/Title';
 import { updateGComEstoque } from '../../services/StockBalanceService';
 
 import { getAllStockBalances } from '../../services/StockBalanceService';
+import { useAuth } from '../Login/AuthContext';
 
 
 const ImportGComEstoqueComponent = () => {
+
+  const { user } = useAuth();
+
+  const [ form ]  = Form.useForm();
+  const { Item }  = Form;
+
+  const [selectEmpresas,      setSelectEmpresas]      = useState([]);
+  const [empresas,            setEmpresas]            = useState([])
+  const [empresaSelecionada,  setEmpresaSelecionada]  = useState([])
 
   const [dadosStock, setDadosStock]   = useState([])
   const [dadosExcel, setDadosExcel]   = useState([])
@@ -214,8 +224,8 @@ const ImportGComEstoqueComponent = () => {
 
           // Busca idStock
           const stock = dadosStock.find( stock => stock.itCodigo.toString().toUpperCase() ===
-                                                    item.itCodigo.toString().toUpperCase())
-
+                                                    item.itCodigo.toString().toUpperCase() &&
+                                                    stock.empresa._id === empresaSelecionada[0]._id)
 
           return {
             _id:  stock ? stock._id : null,
@@ -264,7 +274,6 @@ const ImportGComEstoqueComponent = () => {
           message.error('Nenhuma linha atualizada! Verificar arquivo!');
         }
         
-
         setProgress(100)
         
         setFileList([]); // Limpa o estado quando o arquivo é removido
@@ -277,21 +286,60 @@ const ImportGComEstoqueComponent = () => {
 
   }
 
+  const handleOnChangeEmpresa = (value) => {  
+    const emp = empresas.find(emp => emp._id === value);
+    setEmpresaSelecionada(emp ? [emp] : [])
+
+  }  
+
   useEffect( () => {
 
-    // Carregar Saldo Estoque
-    getAllStockBalances().then( response => {
+    try {
 
-      // Ler
-      const dados = response.data.map(item => ({
-        _id:        item._id,
-        itCodigo:   item.item.itCodigo,
-        descricao:  item.item.descricao,
-      }))
-      setDadosStock(dados)
+      setLoading(true);
 
-    })
-      
+      setEmpresas([])
+      setEmpresaSelecionada([])
+      if (user.empresas) {
+
+          // Empresa
+          const formatarDados = user.empresas.map((company) => ({
+              value: company._id,
+              label: company.nome
+          }))
+          setSelectEmpresas(formatarDados)
+
+          form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+
+          setEmpresaSelecionada(user.empresas[0]._id)
+          setEmpresas(user.empresas)
+
+      }
+
+      // Carregar Saldo Estoque
+      getAllStockBalances().then( response => {
+
+        // Ler
+        const dados = response.data.map(item => ({
+          _id:          item._id,
+          itCodigo:     item.item.itCodigo,
+          descricao:    item.item.descricao,
+          empresa:      item.empresa,
+          nomeEmpresa:  item.empresa.nome,
+
+        }))
+        setDadosStock(dados)
+
+      })
+
+    } catch (error) {
+        console.error(error);
+    } finally {
+
+        setLoading(false);
+
+    }
+            
   }, [])
 
   return (
@@ -320,9 +368,48 @@ const ImportGComEstoqueComponent = () => {
               }}
           >
 
-            <Upload {...props} fileList={fileList}>
-              <Button icon={<UploadOutlined />}>Selecionar Excel</Button>
-            </Upload>
+            <Row gutter={[16, 16]}>
+
+              {user.empresas.length !== 1 && (
+              
+                <Col span={12}>
+
+                  <Form
+                      form={form}
+                  >
+
+                      <Item
+                          name={"empresas"}
+                          key={"empresas"}
+                          label={"Selecionar Empresa"}
+                          rules={[{required: true, 
+                                  message: 'Informar Empresa'}]}
+                          >
+
+                          <Select
+                              placeholder="Selecionar Empresa"
+                              allowClear                //Permite limpar seleção
+                              loading={loading}         // Mostrar ícone de carregamento
+                              options={selectEmpresas}
+                              onChange={handleOnChangeEmpresa}
+                          />
+
+                      </Item>
+
+                  </Form>
+
+                </Col>
+              )}
+              <Col span={8} >
+                <Upload {...props} fileList={fileList}>
+                  <Button 
+                    disabled={empresas.length === 0}
+                    icon={<UploadOutlined />}
+                  >Selecionar Excel</Button>
+                </Upload>
+              </Col>
+              
+            </Row>
 
             {loading && (
               <Card style={{ marginTop: 16 }}>

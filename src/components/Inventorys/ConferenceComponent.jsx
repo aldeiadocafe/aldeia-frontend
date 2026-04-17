@@ -231,6 +231,7 @@ const ConferenceComponent = () => {
                     >Conferência</Title>
                 </div>
 
+{/*
                 <Card
                     style={{
                         marginBottom: '10px',
@@ -296,29 +297,40 @@ const ConferenceComponent = () => {
                     </Form>
 
                 </Card>
+*/}
 
-                <Table
-                    columns={colunas}
-                    dataSource={dados}      
-                    showSorterTooltip={true}
-                    size={'small'}
-                    scroll={{ y: 'calc(80vh - 90px)' }}    
-                    rowKey={(record) => record._id}
-                    pagination={false}
-                    onRow={(record, rowIndex) => {
-                        return {
-                        onClick: (event) => {
-                            btnContagem(record, rowIndex, event);
-                        }, // Evento de clique na linha
-                        // Outros eventos também podem ser adicionados aqui, como onDoubleClick, onMouseEnter, etc.
-                        // onDoubleClick: event => {}, 
-                        // onContextMenu: event => {},
-                        };
+                <Card
+                    style={{
+                        marginBottom: '10px',
+                        borderColor: '#c36434',
+                        boxShadow: '0 2px 8px #d4b8ab',
+                        borderRadius: 8,                    
                     }}
-                    // Opcional: Adiciona um cursor de mãozinha para indicar que a linha é clicável via CSS
-                    rowClassName="clickable-row"             
-                />
+                >
 
+                    <Table
+                        columns={colunas}
+                        dataSource={dados}      
+                        showSorterTooltip={true}
+                        size={'small'}
+                        scroll={{ y: 'calc(80vh - 90px)' }}    
+                        rowKey={(record) => record._id}
+                        pagination={false}
+                        onRow={(record, rowIndex) => {
+                            return {
+                            onClick: (event) => {
+                                btnContagem(record, rowIndex, event);
+                            }, // Evento de clique na linha
+                            // Outros eventos também podem ser adicionados aqui, como onDoubleClick, onMouseEnter, etc.
+                            // onDoubleClick: event => {}, 
+                            // onContextMenu: event => {},
+                            };
+                        }}
+                        // Opcional: Adiciona um cursor de mãozinha para indicar que a linha é clicável via CSS
+                        rowClassName="clickable-row"             
+                    />
+
+                </Card>
             </Spin>
 
         </div>

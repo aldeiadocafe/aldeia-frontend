@@ -253,6 +253,7 @@ const PlacesInventoryComponent = () => {
 
                 //Prossiga com a acao
                 gravarDados(values);
+                setFormModal(false);
 
             } catch (errorInfo) {
 

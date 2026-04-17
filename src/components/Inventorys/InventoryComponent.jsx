@@ -265,6 +265,8 @@ const InventoryComponent = () => {
 
                 //Prossiga com a acao
                 await gravarDados(values);
+                setFormModal(false);
+
 
             } catch (errorInfo) {
 
