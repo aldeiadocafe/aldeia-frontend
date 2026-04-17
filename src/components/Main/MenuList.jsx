@@ -90,7 +90,8 @@ const MenuList = () => {
                             Inventário
                         </Link>,
 
-                },                
+                },          
+/*                      
                 {
                     key: 'placesInventory',
                     icon: <BookOutlined />,
@@ -100,6 +101,7 @@ const MenuList = () => {
                         </Link>,
 
                 },                                
+*/                
                 {
                     key: 'conferencia',
                     icon: <CalculatorOutlined />,

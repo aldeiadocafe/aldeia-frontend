@@ -207,46 +207,57 @@ const InventoryComponent = () => {
             usuarioAlteracao:   user ? user._id : null,
         };
 
-        setLoading(true);    
+        try {
 
-        if (!values._id) {
+            setLoading(true);    
 
-            createInventory(inventory).then((response) => {
-                message.success('Registro criado com sucesso!')
-                form.resetFields(); //Limpa os campos ao fechar
-                carregarDados();
-                //setFormModal(false)
+            if (!values._id) {
 
+                createInventory(inventory).then((response) => {
+                    message.success('Registro criado com sucesso!')
+                    form.resetFields(); //Limpa os campos ao fechar
+                    carregarDados();
+                    //setFormModal(false)
 
-            }).catch((error)=> {
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
-                } else {
-                    message.error('Erro ao criar!');
-                }
-            });
-        } else {
+                }).catch((error)=> {
+                    if (error.response) {
+                        message.error(error.response.data || 'Erro no servidor');
+                    } else {
+                        message.error('Erro ao criar!');
+                    }
+                });
+            } else {
 
-            updateInventory(values._id, inventory).then((response) => {
+                updateInventory(values._id, inventory).then((response) => {
 
-                message.success('Registro atualizado com sucesso!')
-                form.resetFields(); //Limpa os campos ao fechar
-                carregarDados();
-                setFormModal(false)
+                    message.success('Registro atualizado com sucesso!')
+                    form.resetFields(); //Limpa os campos ao fechar
+                    carregarDados();
+                    setFormModal(false)
 
-            }).catch((error)=> {
+                }).catch((error)=> {
 
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
-                } else {
-                    message.error('Erro ao criar!');
-                }
-            });
+                    if (error.response) {
+                        message.error(error.response.data || 'Erro no servidor');
+                    } else {
+                        message.error('Erro ao criar!');
+                    }
+                });
+                
+            }        
             
-        }        
-        setLoading(false);    
-         
-    };
+        } catch (error) {
+            if (error.response) {
+                message.error(error.response.data.message || error.response.data || 'Erro no servidor');
+            } else {
+                message.error('Erro ao criar!');
+            }
+
+        } finally {
+            setLoading(false)
+        }
+
+    }
 
     const handleCancel = () => {        
         setFormModal(false);
@@ -404,8 +415,9 @@ const InventoryComponent = () => {
                 setDeleteModal(false); // Fecha o Modal principal
 
             }).catch((error)=> {
+console.log(error)                
                 if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
+                    message.error(error.response.data.message || error.response.data || 'Erro no servidor');
                 } else {
                     message.error('Erro ao criar!');
                 }
