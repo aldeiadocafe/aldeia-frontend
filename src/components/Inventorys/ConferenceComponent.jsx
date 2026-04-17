@@ -122,7 +122,7 @@ const ConferenceComponent = () => {
         },
         {
             dataIndex:  "local",
-            title:      "Localização",
+            title:      "Descrição",
             sorter: (a, b) => a.local.localeCompare(b.local),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('local'),
