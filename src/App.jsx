@@ -19,7 +19,7 @@ import MainLayout from './components/Main/MainLayout';
 import DashComponent from './components/Main/DashComponent';
 import CompanysComponent from './components/Configuracoes/CompanysComponent';
 import UsersComponent from './components/Configuracoes/UsersComponent';
-import ListConversationsComponent from './components/Stock/ListConversationsComponent';
+import ConversationsComponent from './components/Stock/ConversationsComponent';
 import ItemComponent from './components/Stock/ItemComponent';
 import ImportEstoqueGComComponent from './components/GComs/ImportGComComponent';
 import ListStockBalanceComponent from './components/Stock/ListStockBalanceComponent';
@@ -136,7 +136,7 @@ function App() {
                   <Route path='/conversationsitem'    
                     element={
                       <PrivateRoute>
-                        {/*<ListConversationsComponent/> */}
+                        <ConversationsComponent/>
                       </PrivateRoute>
                     }/>
 

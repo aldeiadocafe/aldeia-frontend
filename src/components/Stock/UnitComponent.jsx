@@ -303,7 +303,11 @@ const UnitComponent = () => {
                 setDeleteModal(false); // Fecha o Modal principal
 
             }).catch((error)=> {
-                message.error('Erro ao criar!');
+                if (error.response) {
+                    message.error(error.response.data.message || error.response.data || 'Erro no servidor');
+                } else {
+                    message.error('Erro ao eliminar!');
+                }
             });
         }
     };

@@ -9,7 +9,7 @@ import { createConversations, deleteConversations, getAllConversations, updateCo
 
 dayjs.extend(utc)
 
-const ListConversationsComponent = () => {
+const ConversationsComponent = () => {
     
     const [tabela,          setTabela]          = useState(1);
     const [dados,           setDados]           = useState([]);
@@ -440,9 +440,9 @@ const ListConversationsComponent = () => {
 
             }).catch((error)=> {
                 if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
+                    message.error(error.response.data.message || error.response.data || 'Erro no servidor');
                 } else {
-                    message.error('Erro ao criar!');
+                    message.error('Erro ao eliminar!');
                 }
             });
         }
@@ -460,7 +460,7 @@ const ListConversationsComponent = () => {
             <div style={{ textAlign: 'center' }}>
                 <Title level={2}
                     style={{ color: 'var(--primary-color)'}}
-                >Inventário</Title>
+                >Fator de Conversão</Title>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -646,4 +646,4 @@ const ListConversationsComponent = () => {
   )
 }
 
-export default ListConversationsComponent
+export default ConversationsComponent
