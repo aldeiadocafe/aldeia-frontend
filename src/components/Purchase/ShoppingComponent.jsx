@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Table, Input, Button, Form, Checkbox, InputNumber, Space, Typography, Select, Row, Col, DatePicker, message, Spin } from 'antd';
 import { SearchOutlined, PlusOutlined, DeleteOutlined, ShoppingCartOutlined, FileSearchOutlined } from '@ant-design/icons';
 import 'antd/dist/reset.css'; // Importa os estilos do Ant Design v5
@@ -36,13 +36,16 @@ const ShoppingComponent = () => {
 
     let listarComprado = false
 
+    const ipuntItCodigo      = useRef(null)
+
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
         minimumFractionDigits: 3,
     });
 
     // Função para adicionar item à lista
-    const onFinish = (values) => {
+    // Gravar
+    const onFinish = async(values) => {
 
         setLoading(true);
 
@@ -64,15 +67,16 @@ const ShoppingComponent = () => {
                 nomeSolicitacao:    user.nome,
             };
 
-            createShopping(newItem).then((response) => {
+            await createShopping(newItem).then((response) => {
 
-                message.success('Registro criado com sucesso!')
                 setTotalItens(totalItens + 1)
 
                 newItem._id = response.data._id
 
                 setDados([...dados, newItem]);
                 form.resetFields(['itCodigo', 'quantidade']); // Limpa o formulário
+
+                message.success('Registro criado com sucesso!')
                 
             })
 
@@ -81,7 +85,15 @@ const ShoppingComponent = () => {
             message.error(error)
 
         } finally {
+
             setLoading(false);
+
+            // 3. Aplicar o foco após o "spin" sumir
+            // O setTimeout pequeno garante que o DOM esteja pronto
+            setTimeout(() => {
+                ipuntItCodigo.current?.focus();
+            }, 0);
+
         }
 
     };
@@ -585,12 +597,14 @@ const ShoppingComponent = () => {
 
                     <Form.Item 
                         name="itCodigo" 
-                        key={"itCodigo"}
-                        style={{ flex: '10'}}
+                        key={"itCodigo"}     
+                        style={{ flex: '10'}}                        
                         rules={[{ required: true, message: 'Digite o item!' }]}
                     >
-                        <Input placeholder="Nome do item"
-                        style={{ textTransform: 'uppercase' }}/>
+                        <Input 
+                            ref={ipuntItCodigo}                   
+                            placeholder="Nome do item"
+                            style={{ textTransform: 'uppercase' }}/>
                     </Form.Item>
 
                     <Form.Item 

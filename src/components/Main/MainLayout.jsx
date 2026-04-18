@@ -81,10 +81,13 @@ const MainLayout = () => {
 
     return (
         <Layout style={{height: customHeight}}>
+            
             <Sider 
                 collapsedWidth='40px'
-                collapsed={collapsed} 
+//                collapsed= {false} //bispo {collapsed} 
+                collapsed= {collapsed} 
 //                collapsible
+                width={230} // Lagura Normal
                 trigger={null}
                 onMouseLeave={() => setCollapsed(true)}
                 onMouseEnter={() => setCollapsed(false)}
@@ -97,6 +100,8 @@ const MainLayout = () => {
                         display: 'flex',
                         flexDirection: 'column',
                         height: customHeight,
+                        padding: '0px',
+                        margin: '0px',
                     }}
                 >
                     <a href='/'>
@@ -111,7 +116,10 @@ const MainLayout = () => {
                         </div>
                     </a>
 
-                    <MenuList/>
+                    <MenuList
+                        defaultSelectedKeys={['1']}
+                        mode='inline'
+                    />
 
                     {/* Botão Logout no Rodapé da Sidebar  */}
                     <div style={{ padding: '8px', 

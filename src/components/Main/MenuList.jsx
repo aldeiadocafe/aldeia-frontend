@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { AlertOutlined, AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 
 import { Menu, ConfigProvider } from 'antd';
 import { Link } from 'react-router-dom';
@@ -70,6 +70,15 @@ const MenuList = () => {
                             label: 
                                 <Link to="/datesitemsbalance">
                                     Data Validade
+                                </Link>,
+
+                        },
+                        {
+                            key: 'criticalItems',
+                            icon: <AlertOutlined />,
+                            label: 
+                                <Link to="/criticalitems">
+                                    Itens Críticos
                                 </Link>,
 
                         },
@@ -213,7 +222,8 @@ const MenuList = () => {
             className='menu-bar'
             items={menuItems}
             onClick={onClick}
-            selectedKeys={[current]}>
+            selectedKeys={[current]}
+            >
         </Menu>
         
     </ConfigProvider>

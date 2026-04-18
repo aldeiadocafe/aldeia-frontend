@@ -23,6 +23,7 @@ import ConversationsComponent from './components/Stock/ConversationsComponent';
 import ItemComponent from './components/Stock/ItemComponent';
 import ImportEstoqueGComComponent from './components/GComs/ImportGComComponent';
 import ListStockBalanceComponent from './components/Stock/ListStockBalanceComponent';
+import ListCriticalItemsComponent from './components/Stock/ListCriticalItemsComponent';
 import ListDatesItemBalanceComponent from './components/Stock/ListDatesItemBalanceComponent';
 import InventoryComponent from './components/Inventorys/InventoryComponent';
 import PlacesInventoryComponent from './components/Inventorys/PlacesInventoryComponent';
@@ -153,6 +154,14 @@ function App() {
                     element={
                       <PrivateRoute>
                         <ListStockBalanceComponent/>
+                      </PrivateRoute>
+                    }/>
+
+                  {/* http://localhost:5173/criticalitems */}
+                  <Route path='/criticalitems'    
+                    element={
+                      <PrivateRoute>
+                        <ListCriticalItemsComponent/>
                       </PrivateRoute>
                     }/>
 

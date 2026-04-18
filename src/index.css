@@ -32,7 +32,7 @@
 .menu-bar {  
   display: flex;
   flex-direction: column;
-  font-size: 0.80rem;
+  font-size: 0,70rem;
   position: relative;
   margin-top: 0;
   background-color: var(--primary-color);  
@@ -65,7 +65,7 @@
 
 /* Retirar underline do menu */
 .ant-menu-item a,
-.ant-menu-submenu-title a {
+.ant-menu-submenu-title a {  
   text-decoration: none !important;
 }
 
