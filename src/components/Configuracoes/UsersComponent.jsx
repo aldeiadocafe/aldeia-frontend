@@ -504,6 +504,7 @@ const UsersComponent = () => {
                 <Form
                     form={form}
                     layout='vertical'
+                    initialValues={{situacao: 'ATIVO'}}
                     >
                     <Item
                         name={"_id"}

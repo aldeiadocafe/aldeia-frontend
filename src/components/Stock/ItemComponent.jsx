@@ -399,15 +399,17 @@ const ItemComponent = () => {
     }
 
     // Chamado se o usuário confirmar na Popconfirm
-    const handlePopupConfirm = () => {
+    const handlePopupConfirm = async () => {
 
         if(form.getFieldValue('_id')){
 
-            return deleteItem(form.getFieldValue('_id')).then((response) => {
+            return await deleteItem(form.getFieldValue('_id')).then((response) => {
+
+                setDeleteModal(false); // Fecha o Modal principal                
                 message.success('Registro eliminado com sucesso!')
+
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
-                setDeleteModal(false); // Fecha o Modal principal
 
             }).catch((error)=> {
 
@@ -477,6 +479,7 @@ const ItemComponent = () => {
                 <Form
                     form={form}
                     layout='vertical'
+                    initialValues={{situacao: 'ATIVO'}}
                     >
                     <Item
                         name={"_id"}

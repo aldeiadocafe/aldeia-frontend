@@ -415,7 +415,7 @@ const InventoryComponent = () => {
                 setDeleteModal(false); // Fecha o Modal principal
 
             }).catch((error)=> {
-console.log(error)                
+                
                 if (error.response) {
                     message.error(error.response.data.message || error.response.data || 'Erro no servidor');
                 } else {
@@ -516,6 +516,7 @@ console.log(error)
                 <Form
                     form={form}
                     layout='vertical'
+                    initialValues={{tipoInventario: 'PARCIAL'}}
                     >
                     <Item
                         name={"_id"}

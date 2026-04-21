@@ -4,6 +4,7 @@ import axios from 'axios';
 const REST_API_BASE_URL = API_BASE_URL + 'items';
 
 export const createItem = (item) => axios.post(REST_API_BASE_URL, item);
+export const createItemsGCom = (items) => axios.post(REST_API_BASE_URL + '/gcom', items);
 
 export const getAllItems    = () => axios.get(REST_API_BASE_URL);
 export const getItemById    = (itemId) => axios.get(REST_API_BASE_URL + '/' + itemId);

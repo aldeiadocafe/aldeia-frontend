@@ -4,10 +4,12 @@ import { UploadOutlined, SearchOutlined } from '@ant-design/icons';
 
 import * as XLSX from 'xlsx';
 import Title from 'antd/es/typography/Title';
-import { updateGComEstoque } from '../../services/StockBalanceService';
+import { gcomCreateStockBalance, updateGComEstoque } from '../../services/StockBalanceService';
 
+import { createItem, createItemsGCom, getAllItems } from '../../services/ItemService';
 import { getAllStockBalances } from '../../services/StockBalanceService';
 import { useAuth } from '../Login/AuthContext';
+import { getAllUnits } from '../../services/UnitService';
 
 
 const ImportGComEstoqueComponent = () => {
@@ -19,10 +21,11 @@ const ImportGComEstoqueComponent = () => {
 
   const [selectEmpresas,      setSelectEmpresas]      = useState([]);
   const [empresas,            setEmpresas]            = useState([])
-  const [empresaSelecionada,  setEmpresaSelecionada]  = useState([])
+  const [empresaSelecionada,  setEmpresaSelecionada]  = useState('')
 
   const [dadosStock, setDadosStock]   = useState([])
   const [dadosExcel, setDadosExcel]   = useState([])
+  const [unit,       setUnit]         = useState([])    
 
   const [fileList, setFileList]       = useState('')
   const [progress, setProgress]       = useState(0)
@@ -177,6 +180,7 @@ const ImportGComEstoqueComponent = () => {
     }
   };
 
+  //Gravar
   const atualizar = async () => {
     
     setLoading(true)
@@ -196,7 +200,7 @@ const ImportGComEstoqueComponent = () => {
       }
     }
 
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
 
       setProgress(50) // Lendo arquivo concluido
 
@@ -204,81 +208,137 @@ const ImportGComEstoqueComponent = () => {
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, { type: 'binary' });
 
-      setTimeout( () => {
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
+      try {
 
-        // 2. Definir o intervalo (range)
-        // Exemplo: Pular as primeiras 3 linhas e ler a partir da 4ª (índice 3)
-        // A1-style range pode ser usado: range: "A4:D100"
-        // Ou base 0: {s: {r: 3, c: 0}, e: {r: 1000, c: 3}} (Linha 4, Col A até Col D)
-        
-        const jsonData = XLSX.utils.sheet_to_json(ws, {
-          range: 10, // Começa na 11ª linha (pula as primeiras 10)
-          header: ["itCodigo", "descricao", "unidade", "quantidade"]// Opcional: Define nomes de colunas
-        });
+        setTimeout( () => {
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
 
-        setDadosExcel(jsonData)
-
-        const item = jsonData.map(item => {   
-
-          // Busca idStock
-          const stock = dadosStock.find( stock => stock.itCodigo.toString().toUpperCase() ===
-                                                    item.itCodigo.toString().toUpperCase() &&
-                                                    stock.empresa._id === empresaSelecionada[0]._id)
-
-          return {
-            _id:  stock ? stock._id : null,
-            gcomEstoque: item.quantidade,
-          }
-        })
-
-        const items = item.filter(item => item._id !== null 
-                      && item._id !== undefined 
-                      && item._id !== "")
-
-        if (items.length > 0 ) {
-
-          updateGComEstoque(items).then(response => {
-
-            message.success(`Atualizado ${items.length} linhas com sucesso.`);
-
-            const dadosAux = items.map(item => {
-
-              const stock = dadosStock.find( stock => stock._id === item._id)
-
-              return {
-                _id:          item._id,
-                itCodigo:     stock.itCodigo,
-                descricao:    stock.descricao,
-                gcomEstoque:  item.gcomEstoque
-              }
-
-            })
-
-            setDados(dadosAux)
-            setExibirTabela(true)
-
-      //      openNotification()
-          }).catch((error)=> {
-
-              if (error.response) {
-                  message.error(error.response.data || 'Erro no servidor');
-              } else {
-                  message.error('Erro ao atualizar!');
-              }
-                  
+          // 2. Definir o intervalo (range)
+          // Exemplo: Pular as primeiras 3 linhas e ler a partir da 4ª (índice 3)
+          // A1-style range pode ser usado: range: "A4:D100"
+          // Ou base 0: {s: {r: 3, c: 0}, e: {r: 1000, c: 3}} (Linha 4, Col A até Col D)
+          
+          const jsonData = XLSX.utils.sheet_to_json(ws, {
+            range: 10, // Começa na 11ª linha (pula as primeiras 10)
+            header: ["itCodigo", "descricao", "unidade", "quantidade"]// Opcional: Define nomes de colunas
           });
 
-        } else {
-          message.error('Nenhuma linha atualizada! Verificar arquivo!');
-        }
-        
-        setProgress(100)
-        
-        setFileList([]); // Limpa o estado quando o arquivo é removido
-        setLoading(false)
-      }, 2000)  // Atraso para visualizacao da barra
+          setDadosExcel(jsonData)
+
+          const itemExcel = jsonData.map(item => {   
+
+            // Busca idStock
+            const stock = dadosStock.find( stock => stock.itCodigo.toString().toUpperCase() === item.itCodigo.toString().toUpperCase()
+                            && stock.empresa._id === empresaSelecionada)
+
+            return {
+              _id:  stock ? stock._id : null,
+              itCodigo:     item.itCodigo,
+              descricao:    item.descricao,  
+              unidade:      item.unidade,
+              gcomEstoque:  item.quantidade,
+            }
+          })
+
+          const itemsCriar = itemExcel
+                            .filter(item => item.gcomEstoque != 0 &&
+                                            item._id === null &&
+                                            item.unidade !== null &&
+                                            item.unidade !== undefined &&
+                                            item.unidade !== ""
+                            )
+                            .map(item => {
+
+            const unidade = unit.find( u => u.unidade.toString().toUpperCase() === item.unidade.toString().trim().toUpperCase())
+
+            if (unidade) {
+
+              return {                                   
+                itCodigo:       item.itCodigo.toUpperCase(),
+                descricao:      item.descricao.toUpperCase(),
+                unit:           unidade._id,
+                situacao:       'ATIVO',
+                usuarioCriacao: user ? user._id : null,
+              }
+            }                                
+                
+          })
+
+          if (itemsCriar.length > 0) {
+
+            // Cadastrar Items que não existem
+            createItemsGCom(itemsCriar.filter(item => item !== undefined)).then(response => {
+
+              const itensCriados = itemsCriar.filter(item => item !== undefined)
+
+              //Criar StockBalance para os itens criados
+              const stocksCriar = itensCriados
+                                .map(item => ({
+                      itCodigo:     item.itCodigo,
+                      descricao:    item.descricao,
+                      empresa:      empresaSelecionada,
+                      gcomEstoque:  itemExcel.find(i => i.itCodigo === item.itCodigo).gcomEstoque
+                    }
+              ))
+
+              gcomCreateStockBalance (stocksCriar).then( response => {
+
+              })
+                
+            });
+
+          }
+
+          const items = itemExcel.filter(item => item._id !== null 
+                        && item._id !== undefined 
+                        && item._id !== "")
+
+          if (items.length > 0 ) {
+
+            updateGComEstoque(items).then(response => {
+
+              message.success(`Atualizado ${items.length} linhas com sucesso.`);
+
+              const dadosAux = items.map(item => {
+
+                const stock = dadosStock.find( stock => stock._id === item._id)
+
+                return {
+                  _id:          item._id,
+                  itCodigo:     stock.itCodigo,
+                  descricao:    stock.descricao,
+                  gcomEstoque:  item.gcomEstoque
+                }
+
+              })
+
+              setDados(dadosAux)
+              setExibirTabela(true)
+
+        //      openNotification()
+            })
+
+          } else {
+            message.error('Nenhuma linha atualizada! Verificar arquivo!');
+          }
+          
+          setProgress(100)
+          
+        }, 2000)  // Atraso para visualizacao da barra
+
+      } catch (error) {
+
+          if (error.response) {
+              message.error(error.response.data.message || error.response.data || 'Erro no servidor');
+          } else {
+              message.error('Erro ao criar!');
+          }
+
+      } finally {
+          setFileList([]); // Limpa o estado quando o arquivo é removido
+          setLoading(false)
+      }
 
     }
 
@@ -287,58 +347,69 @@ const ImportGComEstoqueComponent = () => {
   }
 
   const handleOnChangeEmpresa = (value) => {  
-    const emp = empresas.find(emp => emp._id === value);
-    setEmpresaSelecionada(emp ? [emp] : [])
+
+//    const emp = empresas.find(emp => emp._id === value);
+    setEmpresaSelecionada(value)
 
   }  
 
   useEffect( () => {
 
-    try {
+    const carregarDados = async () => {
 
-      setLoading(true);
+      try {
 
-      setEmpresas([])
-      setEmpresaSelecionada([])
-      if (user.empresas) {
+        setLoading(true);
 
-          // Empresa
-          const formatarDados = user.empresas.map((company) => ({
-              value: company._id,
-              label: company.nome
+        setEmpresas([])
+        setEmpresaSelecionada('')
+        if (user.empresas) {
+
+            // Empresa
+            const formatarDados = user.empresas.map((company) => ({
+                value: company._id,
+                label: company.nome
+            }))
+            setSelectEmpresas(formatarDados)
+
+            form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+
+            setEmpresaSelecionada(user.empresas[0]._id)
+            setEmpresas(user.empresas)
+
+        }
+
+        // Carregar Unidades
+        const unitAux = await getAllUnits().then((response) => response.data)
+        setUnit(unitAux)
+
+        // Carregar Saldo Estoque
+        await getAllStockBalances().then( response => {
+
+          // Ler
+          const dados = response.data.map(item => ({
+            _id:          item._id,
+            itCodigo:     item.item.itCodigo,
+            descricao:    item.item.descricao,
+            empresa:      item.empresa,
+            nomeEmpresa:  item.empresa.nome,
+
           }))
-          setSelectEmpresas(formatarDados)
+          setDadosStock(dados)
 
-          form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+        })
 
-          setEmpresaSelecionada(user.empresas[0]._id)
-          setEmpresas(user.empresas)
+      } catch (error) {
+          console.error(error);
+      } finally {
+
+          setLoading(false);
 
       }
 
-      // Carregar Saldo Estoque
-      getAllStockBalances().then( response => {
-
-        // Ler
-        const dados = response.data.map(item => ({
-          _id:          item._id,
-          itCodigo:     item.item.itCodigo,
-          descricao:    item.item.descricao,
-          empresa:      item.empresa,
-          nomeEmpresa:  item.empresa.nome,
-
-        }))
-        setDadosStock(dados)
-
-      })
-
-    } catch (error) {
-        console.error(error);
-    } finally {
-
-        setLoading(false);
-
     }
+
+    carregarDados();
             
   }, [])
 

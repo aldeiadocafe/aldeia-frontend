@@ -8,6 +8,7 @@ import Title from 'antd/es/typography/Title';
 import { getAllStockBalances } from '../../services/StockBalanceService';
 import { getAllDatesItem } from '../../services/DatesItemBalanceService';
 import { getAllUnits } from '../../services/UnitService'
+import { getAllItems } from '../../services/ItemService';
 
 import * as XLSX from 'xlsx-js-style'
 import { saveAs } from 'file-saver';
@@ -337,12 +338,10 @@ const ListCriticalItemsComponent = () => {
 
             setDados([])            
 
-            let unit
             //Unidade
-            await getAllUnits().then((response) => {
-                unit = response.data
+            const unit = await getAllUnits().then((response) => response.data)
 
-            })
+            const items = await getAllItems().then((response) => response.data)
 
             await getAllDatesItem().then((response) => {
 
@@ -360,7 +359,7 @@ const ListCriticalItemsComponent = () => {
             setDadosGCom([])
 
             await getAllStockBalances().then(response => {
-
+/*
                 const dadosAux = response.data.map(item => ({
                     key:            item._id,
                     idItem:         item.item._id,
@@ -376,6 +375,33 @@ const ListCriticalItemsComponent = () => {
                     empresa:        item.empresa,
                     nomeEmpresa:    item.empresa.nome,
                 }))
+*/
+                let dadosAux
+
+                response.data.map(item => {
+
+                    const itemInfo = items.find(i => i._id === item.item._id)
+                    const unitInfo = unit.find(u => u._id === itemInfo.unit)
+
+                    if (itemInfo.quantidadeMinima >= item.quantidade) {
+                        dadosAux = [...(dadosAux || []), {
+                            key:            item._id,
+                            idItem:         item.item._id,
+                            itCodigo:       item.item.itCodigo,
+                            descricao:      item.item.descricao,
+                            qtde:               item.quantidade, 
+                            quantidadeMinima: itemInfo.quantidadeMinima,               
+                            unit:           item.item.unit,
+                            unidade:        unitInfo.unidade,
+                            gcomEstoque:    item.gcomEstoque,
+                            diferenca:      item.quantidade - item.gcomEstoque,
+                            dataInventario: item.dataInventario,
+                            dataGCom:       item.dataGCom,
+                            empresa:        item.empresa,
+                            nomeEmpresa:    item.empresa.nome,
+                        }]  
+                    }
+                })
 
                 setDadosCompleto(dadosAux);
                 setDados(dadosAux);
@@ -466,7 +492,7 @@ const ListCriticalItemsComponent = () => {
             <div style={{ textAlign: 'center' }}>
                 <Title level={2}
                     style={{ color: 'var(--primary-color)'}}
-                >Consultar Saldo do Item</Title>
+                >Consultar Itens Críticos</Title>
             </div>
 
             <Row gutter={[16, 16]}>

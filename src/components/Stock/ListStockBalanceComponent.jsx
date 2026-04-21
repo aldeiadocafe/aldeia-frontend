@@ -348,6 +348,7 @@ const ListStockBalanceComponent = () => {
 
                 const dadosAux = response.data.map(item => ({
                     key:            item._id,
+                    empresa:        item.empresa,
                     idItem:         item.item._id,
                     dataValidade:   item.dataValidade,
                     quantidade:     item.quantidade,
@@ -394,7 +395,10 @@ const ListStockBalanceComponent = () => {
     const expandedRowRender = (record) => {
 
         //Filtrar dados da filha
-        const filterItem = expandedDateItem.filter((item) => item.idItem === record.idItem)
+        const filterItem = expandedDateItem.filter((item) => 
+                item.idItem === record.idItem &&
+                item.empresa._id === record.empresa._id
+        )
 
         return (
             <div style={{ width: '45%',  }}> {/* margin: '0 auto' Container reduzido */}
