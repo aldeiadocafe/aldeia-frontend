@@ -479,7 +479,9 @@ const ItemComponent = () => {
                 <Form
                     form={form}
                     layout='vertical'
-                    initialValues={{situacao: 'ATIVO'}}
+                    initialValues={{situacao: 'ATIVO',
+                                    quantidadeMinima: 0
+                                }}
                     >
                     <Item
                         name={"_id"}
