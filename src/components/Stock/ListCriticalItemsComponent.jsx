@@ -33,16 +33,10 @@ const ListCriticalItemsComponent = () => {
 
     const [dadosCompleto,   setDadosCompleto]       = useState([])
     const [dados,       setDados]                   = useState([])
-    const [expandedDateItem, setExpandedDateItem ]  = useState([])
 
     const [searchText,      setSearchText]      = useState([])
     
     const [dadosGCom, setDadosGCom]       = useState([])
-
-    // 1. Estado para armazenar as chaves (keys) das linhas expandidas
-    const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-
-    const [datesItem, setDatesItem]     = useState([])
 
     const [loading, setLoading] = useState(false);
 
@@ -60,6 +54,7 @@ const ListCriticalItemsComponent = () => {
             Item:               item.itCodigo,
             Descrição:          item.descricao,
             Unid:               item.unidade,
+            "Qtde Mínima":      formatter.format(item.quantidadeMinima),
             Quantidade:         formatter.format(item.qtde),
             GCom:               formatter.format(item.gcomEstoque),
             "Estoq - GCOM":     formatter.format(item.diferenca),
@@ -105,6 +100,7 @@ const ListCriticalItemsComponent = () => {
         if (ws['G1']) ws['G1'].s = headerStyle;
         if (ws['H1']) ws['H1'].s = headerStyle;
         if (ws['I1']) ws['I1'].s = headerStyle;
+        if (ws['J1']) ws['J1'].s = headerStyle;
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
@@ -117,6 +113,7 @@ const ListCriticalItemsComponent = () => {
             { wch: 15 }, // Largura da Coluna G
             { wch: 15 }, // Largura da Coluna H
             { wch: 15 }, // Largura da Coluna I
+            { wch: 15 }, // Largura da Coluna J
         ]
 
         // Obtém o total de linhas (exclui o cabeçalho se json_to_sheet for usado sem customização)
@@ -128,16 +125,17 @@ const ListCriticalItemsComponent = () => {
         for (let i = 2; i <= (range.e.r + 1); i++) {
 //            const cellAddress = 'D' + i;
             if (!ws['E' + i]) continue; // Pular se a célula estiver vazia
+            ws['E' + i].s = rightAlignStyle; // Aplica o estilo
             ws['F' + i].s = rightAlignStyle; // Aplica o estilo
             ws['G' + i].s = rightAlignStyle; // Aplica o estilo
             ws['H' + i].s = rightAlignStyle; // Aplica o estilo
 
             //Formatar em data
-            ws['H' + i].z = 'dd/mm/yyyy'
-            ws['H' + i].t = 'd' // Define o tipo como Data
-
             ws['I' + i].z = 'dd/mm/yyyy'
             ws['I' + i].t = 'd' // Define o tipo como Data
+
+            ws['J' + i].z = 'dd/mm/yyyy'
+            ws['J' + i].t = 'd' // Define o tipo como Data
         }
 
         // Cria um novo workbook
@@ -152,7 +150,7 @@ const ListCriticalItemsComponent = () => {
         // 5. Gerar arquivo e baixar
         const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        saveAs(data, 'saldo_item.xlsx');
+        saveAs(data, 'item_critico.xlsx');
 
     }
 
@@ -246,6 +244,15 @@ const ListCriticalItemsComponent = () => {
         ellipsis: true,
     },
     {
+        title: 'Qtde Mínima', 
+        dataIndex: 'quantidadeMinima', 
+        key: 'quantidadeMinima',
+        align: 'right',
+        sorter: (a, b) => a.quantidadeMinima - b.quantidadeMinima,
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        render: (value) => formatter.format(value),
+    },
+    {
         title: 'Quantidade', 
         dataIndex: 'qtde', 
         key: 'qtde',
@@ -292,28 +299,6 @@ const ListCriticalItemsComponent = () => {
     },
   ];
 
-    // Colunas da sub-tabela
-    const expandedColunas = [
-        {
-            dataIndex:  "dataValidade",
-            title:      "Dt Valid",
-            sorter: (a, b) => new Date(a.dataValidade).getTime() - new Date(b.dataValidade).getTime(),
-            // Optional: set a default sort order
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
-        },
-        {
-            title: 'Quantidade', 
-            dataIndex: 'quantidade', 
-            key: 'quantidade',
-            align: 'right',
-            sorter: (a, b) => a.quantidade - b.quantidade,
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            render: (value) => formatter.format(value),
-        },
-    ];
-
-      
     const carregarDados = async () => {
  
         try {
@@ -343,63 +328,39 @@ const ListCriticalItemsComponent = () => {
 
             const items = await getAllItems().then((response) => response.data)
 
-            await getAllDatesItem().then((response) => {
-
-                const dadosAux = response.data.map(item => ({
-                    key:            item._id,
-                    idItem:         item.item._id,
-                    dataValidade:   item.dataValidade,
-                    quantidade:     item.quantidade,
-                }))
-
-                setExpandedDateItem(dadosAux);                
-
-            })
-
             setDadosGCom([])
-
             await getAllStockBalances().then(response => {
-/*
-                const dadosAux = response.data.map(item => ({
-                    key:            item._id,
-                    idItem:         item.item._id,
-                    itCodigo:       item.item.itCodigo,
-                    descricao:      item.item.descricao,
-                    qtde:           item.quantidade,                
-                    unit:           item.item.unit,
-                    unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
-                    gcomEstoque:    item.gcomEstoque,
-                    diferenca:      item.quantidade - item.gcomEstoque,
-                    dataInventario: item.dataInventario,
-                    dataGCom:       item.dataGCom,
-                    empresa:        item.empresa,
-                    nomeEmpresa:    item.empresa.nome,
-                }))
-*/
+
                 let dadosAux
 
                 response.data.map(item => {
 
                     const itemInfo = items.find(i => i._id === item.item._id)
-                    const unitInfo = unit.find(u => u._id === itemInfo.unit)
+                    const unitInfo = unit.find(u => u._id === itemInfo.unit._id)
 
-                    if (itemInfo.quantidadeMinima >= item.quantidade) {
-                        dadosAux = [...(dadosAux || []), {
-                            key:            item._id,
-                            idItem:         item.item._id,
-                            itCodigo:       item.item.itCodigo,
-                            descricao:      item.item.descricao,
-                            qtde:               item.quantidade, 
-                            quantidadeMinima: itemInfo.quantidadeMinima,               
-                            unit:           item.item.unit,
-                            unidade:        unitInfo.unidade,
-                            gcomEstoque:    item.gcomEstoque,
-                            diferenca:      item.quantidade - item.gcomEstoque,
-                            dataInventario: item.dataInventario,
-                            dataGCom:       item.dataGCom,
-                            empresa:        item.empresa,
-                            nomeEmpresa:    item.empresa.nome,
-                        }]  
+                    if (itemInfo.quantidadeMinima != undefined 
+                        && itemInfo.quantidadeMinima >= 0) {
+
+                        if (itemInfo.quantidadeMinima >= item.quantidade 
+                            || item.quantidade === undefined) {
+
+                            dadosAux = [...(dadosAux || []), {
+                                key:            item._id,
+                                idItem:         item.item._id,
+                                itCodigo:       item.item.itCodigo,
+                                descricao:      item.item.descricao,
+                                qtde:               item.quantidade, 
+                                quantidadeMinima: itemInfo.quantidadeMinima,               
+                                unit:           item.item.unit,
+                                unidade:        unitInfo.unidade,
+                                gcomEstoque:    item.gcomEstoque,
+                                diferenca:      item.quantidade - item.gcomEstoque,
+                                dataInventario: item.dataInventario,
+                                dataGCom:       item.dataGCom,
+                                empresa:        item.empresa,
+                                nomeEmpresa:    item.empresa.nome,
+                            }]  
+                        }
                     }
                 })
 
@@ -417,48 +378,6 @@ const ListCriticalItemsComponent = () => {
         }
     }
 
-    const expandedRowRender = (record) => {
-
-        //Filtrar dados da filha
-        const filterItem = expandedDateItem.filter((item) => item.idItem === record.idItem)
-
-        return (
-            <div style={{ width: '45%',  }}> {/* margin: '0 auto' Container reduzido */}
-                <Table 
-                    columns={expandedColunas} 
-                    dataSource={filterItem} 
-                    title={() => (
-                        <Title level={4}
-                            style={{ 
-                                color: 'var(--primary-color)',
-                                padding: '0px',
-                                margin: '0px',
-                            }}
-                        >
-                            Data de Validade
-                        </Title>
-                    )} // <--- Título aqui
-                    size={'small'}
-                    showSorterTooltip={true}
-                    tableLayout='auto'
-                    pagination={false}
-                />
-            </div>
-        )
-
-    }
-
-    // 2. Função para expandir todas as linhas
-    const expandAll = () => {
-        const allKeys = dados.map((record) => record.key);
-        setExpandedRowKeys(allKeys);
-    };
-
-    // 3. Função para recolher todas as linhas
-    const collapseAll = () => {
-        setExpandedRowKeys([]);
-    };
-
     const handleOnChageEmpresa = async (value) => {
 
         try {
@@ -471,8 +390,6 @@ const ListCriticalItemsComponent = () => {
             console.log("Erro")
         }
     }
-
-
 
     useEffect(() => {
         carregarDados()
@@ -533,8 +450,6 @@ const ListCriticalItemsComponent = () => {
                     }}
                     >
                         <Space style={{ marginBottom: 16 }}>
-                            <Button onClick={expandAll}>Expandir Tudo</Button>
-                            <Button onClick={collapseAll}>Recolher Tudo</Button>
                             <Button 
                                 type="primary" 
                                 icon={<DownloadOutlined />} 
@@ -556,47 +471,6 @@ const ListCriticalItemsComponent = () => {
                 tableLayout='auto'
     //            onChange={onChange}
                 scroll={{ y: 'calc(80vh - 50px)' }}
-                expandable={{ 
-                    expandedRowRender,
-                    // 4. Conectar o estado controlado
-                    expandedRowKeys: expandedRowKeys,
-                    // 5. Atualizar o estado quando o usuário clicar manualmente
-                    onExpand: (expanded, record) => {
-                        const keys = expanded
-                        ? [...expandedRowKeys, record.key] // Adiciona se expandir
-                        : expandedRowKeys.filter((key) => key !== record.key); // Remove se fechar
-                        setExpandedRowKeys(keys);
-                    },                
-                }}
-    /*            
-                expandable={{            
-                    expandedRowRender: (record) => (
-                        <Table 
-                            columns={expandedColunas} 
-                            dataSource={expandedDateItem} 
-                            title={() => 'Data de Validade'} // <--- Título aqui
-                            size={'small'}
-                            showSorterTooltip={true}
-                            tableLayout='auto'
-                            pagination={{
-                                tabela,
-                                // The available options for items per page
-                                pageSizeOptions: ['5', '10', '20', '30'], 
-                                // Display the size changer
-                                showSizeChanger: true, 
-                                // Set the default page size
-                        //        defaultPageSize: 5,
-                                // Optional: show total items count
-                                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                                // Optional: update tabela page state on change
-                                onChange: (page) => {
-                                setTabela(page);
-                                },
-                            }}
-                        />
-                    ),
-                }}
-    */
                 pagination={false}
 
             />
