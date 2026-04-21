@@ -459,7 +459,6 @@ const ImportGComEstoqueComponent = () => {
 
                           <Select
                               placeholder="Selecionar Empresa"
-                              allowClear                //Permite limpar seleção
                               loading={loading}         // Mostrar ícone de carregamento
                               options={selectEmpresas}
                               onChange={handleOnChangeEmpresa}
