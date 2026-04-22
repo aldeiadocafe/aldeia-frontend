@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { AlertOutlined, AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 
-import { Menu, ConfigProvider } from 'antd';
+import { Menu, ConfigProvider, Grid } from 'antd';
 import { Link } from 'react-router-dom';
 import { BiBox, BiBuilding, BiUnite } from 'react-icons/bi';
 import { BsArrowLeftRight, BsBoxSeam, BsCashStack, BsReceiptCutoff, BsCart2, BsListTask } from 'react-icons/bs';
 
+const { useBreakpoint } = Grid
+
 const MenuList = () => {
 
     const [current, setCurrent] = useState('1');
+
+    const screens = useBreakpoint()
 
     const menuItems = [
         { 
@@ -170,7 +174,10 @@ const MenuList = () => {
                 },
             ]
         },
+// XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
 */        
+        // Este item só aparece em telas grandes (lg ou superior)
+        screens.xs &&
         { 
             key: 'sistema',
             icon: <SettingOutlined />,

@@ -51,10 +51,10 @@ const DashComponent = () => {
   // Define a altura baseada no breakpoint xs
   // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
   const gcomHeight = screens.xl ? 130 : 70
-  const validadeHeight = screens.xl ? 215 : 60;
+  const validadeHeight = screens.xl ? 180 : 100;
 
-  const cardBarra = screens.xl ? '180px' : screens.xs ? '90px' : '100px'
-  const plotHeight = screens.xl ? 150 : 90
+  const cardBarra = screens.xl ? '220px' : screens.xs ? '90px' : '100px'
+  const plotHeight = screens.xl ? 200 : 90
 
 /*
   Tela do Note
@@ -70,8 +70,10 @@ const DashComponent = () => {
 
   Celular
     Em pé	>> Largura:	384px
-             Altura:	690px
+             Altura:	630px
 
+    Deitado >>  Largura:  384px
+                Altura:   198 px
 */
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -321,99 +323,6 @@ const DashComponent = () => {
 
   }
 
-  const carregarDados = async () => {
-
-    try {
-
-      setLoading(true);
-      setEmpresa(null)
-
-      if (user.empresas) {
-
-          // Empresa
-          const formatarDados = user.empresas.map((company) => ({
-              value: company._id,
-              label: company.nome
-          }))
-          setSelectEmpresas(formatarDados)
-
-          form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
-
-//          setEmpresa(empresas => user.empresas.map(empresa => empresa._id))
-          setEmpresa(user.empresas)
-
-      }
-
-      let unit
-      await getAllUnits().then((response) => {
-        unit = response.data
-      }).catch((error)=> {
-          console.error(error);
-      });
-
-      setGComCompleto([])
-      setDadosGCom([])
-
-      await getAllStockBalances().then(response => {
-
-        const dados = response.data
-          .map(item => ({
-            _id:          item._id,
-            itCodigo:     item.item.itCodigo,
-            descricao:    item.item.descricao,
-            unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
-            quantidade:   item.quantidade,
-            gcomEstoque:  item.gcomEstoque,
-            diferenca:    item.quantidade - item.gcomEstoque,
-            empresa:      item.empresa,
-            nomeEmpresa:  item.empresa.nome
-          }))
-          
-        setGComCompleto(dados)
-        setDadosGCom(dados)
-
-      })
-
-      setDatesCompleto([])
-      setDatesItem([])
-      
-      await getAllDatesItem().then((response) => {
-
-        const dados = response.data.map(item => ({
-          idItem:       item.item._id,          
-          itCodigo:     item.item.itCodigo,
-          descricao:    item.item.descricao,
-          unit:         item.item.unit,
-          unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
-          dataValidade: item.dataValidade,
-          quantidade:   item.quantidade,
-          empresa:      item.empresa,
-          nomeEmpresa:  item.empresa.nome
-        }))
-        
-        setDatesCompleto(dados)
-        setDatesItem(dados)
-
-        if (dados.length > 0) {
-
-          atualizarBarra(dados)
-
-        }
-
-      }).catch((error)=> {
-          console.error(error);
-      });
-
-    } catch (error) {
-        console.error(error);
-    } finally {
-
-      setLoading(false); //Libera a tela
-
-    }
-
-  }
-
   // 2. Chart configuration
   const config = {
     data,
@@ -452,36 +361,139 @@ const DashComponent = () => {
     }
   }
 
+  const heightCardEmpresa = () => {
+
+    if ( screens.sm ) return 'calc(14vh)'
+    if ( screens.md ) return 'calc(8vh)'
+
+    return 'calc(8vh)'
+
+  } 
+
   useEffect(() => {
+
+    const carregarDados = async () => {
+
+      try {
+
+        setLoading(true);
+        setEmpresa(null)
+
+        if (user.empresas) {
+
+            // Empresa
+            const formatarDados = user.empresas.map((company) => ({
+                value: company._id,
+                label: company.nome
+            }))
+            setSelectEmpresas(formatarDados)
+
+            form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+
+  //          setEmpresa(empresas => user.empresas.map(empresa => empresa._id))
+            setEmpresa(user.empresas)
+
+        }
+
+        let unit
+        await getAllUnits().then((response) => {
+          unit = response.data
+        }).catch((error)=> {
+            console.error(error);
+        });
+
+        setGComCompleto([])
+        setDadosGCom([])
+
+        await getAllStockBalances().then(response => {
+
+          const dados = response.data
+            .map(item => ({
+              _id:          item._id,
+              itCodigo:     item.item.itCodigo,
+              descricao:    item.item.descricao,
+              unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
+              quantidade:   item.quantidade,
+              gcomEstoque:  item.gcomEstoque,
+              diferenca:    item.quantidade - item.gcomEstoque,
+              empresa:      item.empresa,
+              nomeEmpresa:  item.empresa.nome
+            }))
+            
+          setGComCompleto(dados)
+          setDadosGCom(dados)
+
+        })
+
+        setDatesCompleto([])
+        setDatesItem([])
+        
+        await getAllDatesItem().then((response) => {
+
+          const dados = response.data.map(item => ({
+            idItem:       item.item._id,          
+            itCodigo:     item.item.itCodigo,
+            descricao:    item.item.descricao,
+            unit:         item.item.unit,
+            unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
+            dataValidade: item.dataValidade,
+            quantidade:   item.quantidade,
+            empresa:      item.empresa,
+            nomeEmpresa:  item.empresa.nome
+          }))
+          
+          setDatesCompleto(dados)
+          setDatesItem(dados)
+
+          if (dados.length > 0) {
+
+            atualizarBarra(dados)
+
+          }
+
+        }).catch((error)=> {
+            console.error(error);
+        });
+
+      } catch (error) {
+          console.error(error);
+      } finally {
+
+        setLoading(false); //Libera a tela
+
+      }
+
+    }
 
     carregarDados()
 
   }, [])
 
   return (
-    <div>
-      <Spin 
-        spinning={loading} 
-        size='large' 
-        tip="Carregando..."
-        >
+    
+    <Spin 
+      spinning={loading} 
+      size='large' 
+      tip="Carregando..."
+      >
 
+      <div>
         <Layout >      
           <Content>
 
             <Card 
               size='small'
-              style={{ height: 'calc(8vh)'}}
+              style={{ height: heightCardEmpresa()}}
               >
               <Row gutter={[16, 16]}>
-                <Col span={8}>
-
-                  <Title level={4}
-                      style={{ color: 'var(--primary-color)'}}
-                  >Escolher Empresa</Title>
-                </Col>
-
-                <Col span={12}>
+                {(screens.md || screens.sm) &&
+                  <Col span={8}>
+                    <Title level={4}
+                        style={{ color: 'var(--primary-color)'}}
+                    >Escolher Empresa</Title>
+                  </Col>
+                }
+                <Col md={12} sm={12} xs={23}>
                   <Form
                       form={form}
                       >
@@ -558,6 +570,7 @@ const DashComponent = () => {
                       scroll={{ y: gcomHeight}}               
                       rowKey={(record) => record._id}
                       pagination={false}
+                      loading={loading}
     /*                  
                       pagination={{
                           tabela,
@@ -601,13 +614,16 @@ const DashComponent = () => {
     //              scroll={{ y: 110 }}                
                   rowKey={(record) => record._id}
                   pagination={false}        
+                  loading={loading}
+
               />
 
             </Card>
           </Content>
         </Layout>
-      </Spin>
-    </div>
+      </div>
+
+    </Spin>
   )
 }
 

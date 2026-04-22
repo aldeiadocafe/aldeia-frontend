@@ -27,7 +27,30 @@ const MainLayout = () => {
     const screens = useBreakpoint()
 
   // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
-    const customHeight = screens.xl ? '100vh' : 'calc(100vh - 100px)'
+/*
+  Tela do Note
+    Largura: 	1234px
+    Altura:		642px
+
+  Tablet Saka
+    Em pé	>> largura:	601px
+             Altura:	780px
+
+    Deitado >> Largura: 	1006px
+               Altura: 	427px	
+
+  Celular
+    Em pé	>> Largura:	384px
+             Altura:	630px
+
+    Deitado >>  Largura:  747 px
+                Altura:   198 px
+
+*/  
+    const customHeight = screens.xl ? '100vh' : 
+                    screens.xs ? 'calc(100vh - 60px)' :
+                    //screens.sm ? 'calc(100vh - 100px)' : 
+                        'calc(100vh - 100px)'
 
     // 1. Defina os itens do menu como um objeto de configuração
     const items = [
