@@ -258,8 +258,8 @@ const ItemConfComponent = () => {
             placesInventory:    placesId,   
             item:               values._idItem,
             dataValidade:       dayjs.utc(values.dataValidade),
-            quantidade:         values.quantidade,
-            zerar:              values.chZerar ? true : false,
+            quantidade:         values.chZerar ? 0 : values.quantidade,
+            zerar:              false, //values.chZerar ? true : false,
             usuarioCriacao:     user ? user._id : null,
             usuarioAlteracao:   user ? user._id : null,
 
