@@ -308,6 +308,7 @@ const InventoryComponent = () => {
                 setSelectEmpresas(formatarDados)
 
             }
+
             setDados([])        
             await getAllInventorys().then((response) => {
 
@@ -315,7 +316,8 @@ const InventoryComponent = () => {
 
                 const dadosAux = response.data
                     .filter(item => ids.includes(item.empresa._id))
-                    .filter(item => item.situacao.toUpperCase() === 'FINALIZADO' && listarFinalizado)
+                    .filter(item => (listarFinalizado) ||
+                                    (item.situacao.toUpperCase() !== 'FINALIZADO' && !listarFinalizado) )
                     .map(item => ({
                         _id:            item._id,
                         empresa:        item.empresa,
