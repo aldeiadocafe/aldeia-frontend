@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Col, Row} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Col, Row, Checkbox} from 'antd'
 import Title from 'antd/es/typography/Title';
 
 import dayjs from 'dayjs';
@@ -31,7 +31,9 @@ const InventoryComponent = () => {
 
     const [isEditing, setIsEditing]                 = useState(true);
     const [idInventory, setIdInventory]             = useState();
-    
+
+    let listarFinalizado = false
+
     const { Option, OptGroup } = Select;
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -313,6 +315,7 @@ const InventoryComponent = () => {
 
                 const dadosAux = response.data
                     .filter(item => ids.includes(item.empresa._id))
+                    .filter(item => item.situacao.toUpperCase() === 'FINALIZADO' && listarFinalizado)
                     .map(item => ({
                         _id:            item._id,
                         empresa:        item.empresa,
@@ -467,6 +470,13 @@ const InventoryComponent = () => {
         
     };
 
+    const handleListarFinalizados = async(e) => {
+
+        listarFinalizado = e.target.checked
+
+        await carregarDados()
+    }
+
   return (
     <div>
 
@@ -483,15 +493,22 @@ const InventoryComponent = () => {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button 
-                    type='primary'
-                    icon={<AppstoreAddOutlined />}
-                    onClick={showFormModal}
+
+                <Space>
+                    <Button 
+                        type='primary'
+                        icon={<AppstoreAddOutlined />}
+                        onClick={showFormModal}
+                        >
+                            Cadastrar
+                    </Button>
+
+                    <Checkbox
+                        onChange={handleListarFinalizados}
                     >
-                        Cadastrar
-                </Button>
-                <br></br>
-                <br></br>
+                        Listar Finalizados
+                    </Checkbox>
+                </Space>
             </div>
                 
             <Table

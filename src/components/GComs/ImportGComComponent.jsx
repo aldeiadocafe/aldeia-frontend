@@ -240,7 +240,8 @@ const ImportGComEstoqueComponent = () => {
               gcomEstoque:  item.quantidade,
             }
           })
-
+console.log(itemExcel)          
+/*
           const itemsCriar = itemExcel
                             .filter(item => item.gcomEstoque != 0 &&
                                             item._id === null &&
@@ -322,7 +323,7 @@ const ImportGComEstoqueComponent = () => {
           } else {
             message.error('Nenhuma linha atualizada! Verificar arquivo!');
           }
-          
+*/          
           setProgress(100)
           
         }, 2000)  // Atraso para visualizacao da barra
