@@ -23,10 +23,6 @@ const ImportGComEstoqueComponent = () => {
   const [empresas,            setEmpresas]            = useState([])
   const [empresaSelecionada,  setEmpresaSelecionada]  = useState('')
 
-  const [dadosStock, setDadosStock]   = useState([])
-  const [dadosExcel, setDadosExcel]   = useState([])
-  const [unit,       setUnit]         = useState([])    
-
   const [fileList, setFileList]       = useState('')
   const [progress, setProgress]       = useState(0)
   const [loading, setLoading]         = useState(false);
@@ -183,8 +179,6 @@ const ImportGComEstoqueComponent = () => {
   //Gravar
   const atualizar = async () => {
     
-    setLoading(true)
-
     setBotao(false)
     setExibirTabela(false)
     setProgress(0)
@@ -200,6 +194,8 @@ const ImportGComEstoqueComponent = () => {
       }
     }
 
+    setLoading(true)
+
     reader.onload = async (evt) => {
 
       setProgress(50) // Lendo arquivo concluido
@@ -210,7 +206,7 @@ const ImportGComEstoqueComponent = () => {
 
       try {
 
-        setTimeout( () => {
+        setTimeout( async () => {
           const wsname = wb.SheetNames[0];
           const ws = wb.Sheets[wsname];
 
@@ -224,83 +220,95 @@ const ImportGComEstoqueComponent = () => {
             header: ["itCodigo", "descricao", "unidade", "quantidade"]// Opcional: Define nomes de colunas
           });
 
-          setDadosExcel(jsonData)
+          const unit  = await getAllUnits().then(response => response.data)
+          let items = await getAllItems().then(response => response.data)
+          let dadosStockCompleto = await getAllStockBalances().then(response => response.data)
+          let dadosStock = dadosStockCompleto.filter(stock => stock.empresa._id === empresaSelecionada)
 
-          const itemExcel = jsonData.map(item => {   
+          // Carregar itens com quantidade <> 0 e diferente de "Total"
+          const itemExcel = jsonData.filter(item => item.quantidade != 0 
+                                                && ! item.itCodigo.toUpperCase().trim().startsWith("TOTAL"))
 
-            // Busca idStock
-            const stock = dadosStock.find( stock => stock.itCodigo.toString().toUpperCase() === item.itCodigo.toString().toUpperCase()
-                            && stock.empresa._id === empresaSelecionada)
+          //Verificar se todos os itens já estão cadastrados
+          const novosItens = itemExcel
+                              .filter(excel => !items.some(item => item.itCodigo === excel.itCodigo))
+                              .filter(excel => unit.some(unid => unid.unidade.toUpperCase().trim() === excel.unidade.toUpperCase().trim()))
+          if (novosItens.length > 0) {
 
-            return {
-              _id:  stock ? stock._id : null,
-              itCodigo:     item.itCodigo,
-              descricao:    item.descricao,  
-              unidade:      item.unidade,
-              gcomEstoque:  item.quantidade,
-            }
-          })
-console.log(itemExcel)          
-/*
-          const itemsCriar = itemExcel
-                            .filter(item => item.gcomEstoque != 0 &&
-                                            item._id === null &&
-                                            item.unidade !== null &&
-                                            item.unidade !== undefined &&
-                                            item.unidade !== ""
-                            )
-                            .map(item => {
-
-            const unidade = unit.find( u => u.unidade.toString().toUpperCase() === item.unidade.toString().trim().toUpperCase())
-
-            if (unidade) {
-
-              return {                                   
+            const criar = novosItens.map(item => ({
                 itCodigo:       item.itCodigo.toUpperCase(),
                 descricao:      item.descricao.toUpperCase(),
-                unit:           unidade._id,
+                unit:           unit.find( u => u.unidade.toString().toUpperCase() === item.unidade.toString().trim().toUpperCase()),
                 situacao:       'ATIVO',
                 usuarioCriacao: user ? user._id : null,
+            }))          
+
+            await createItemsGCom(criar)
+
+            items = await getAllItems().then(response => response.data)
+
+          }
+          // Criar registro na Stock para os itens que não tem
+          let stockCriar = []
+          itemExcel
+              .filter(excel => items.some(item => item.itCodigo === excel.itCodigo.toUpperCase().trim()))
+              .map(item => {
+
+            let criar = false
+
+            // Criar caso nao exista StockBalance / Empresa
+            if (! dadosStock.find(stock => stock.item.itCodigo === item.itCodigo.toUpperCase().trim())) {              
+
+              const idItem = items.find(items => items.itCodigo === item.itCodigo.toUpperCase().trim())
+
+              const novoStock = {
+                item:         idItem ? idItem._id : null,
+                itCodigo:     item.itCodigo,
+                descricao:    item.descricao,
+                unidade:      item.unidade,
+                gcomEstoque:  item.quantidade,
+                empresa:      empresaSelecionada,
               }
-            }                                
-                
+
+              stockCriar.push(novoStock)
+            }
+
           })
 
-          if (itemsCriar.length > 0) {
+          if (stockCriar.length > 0) {
 
-            // Cadastrar Items que não existem
-            createItemsGCom(itemsCriar.filter(item => item !== undefined)).then(response => {
-
-              const itensCriados = itemsCriar.filter(item => item !== undefined)
-
-              //Criar StockBalance para os itens criados
-              const stocksCriar = itensCriados
-                                .map(item => ({
-                      itCodigo:     item.itCodigo,
-                      descricao:    item.descricao,
-                      empresa:      empresaSelecionada,
-                      gcomEstoque:  itemExcel.find(i => i.itCodigo === item.itCodigo).gcomEstoque
-                    }
-              ))
-
-              gcomCreateStockBalance (stocksCriar).then( response => {
-
-              })
-                
-            });
+            await gcomCreateStockBalance (stockCriar)
 
           }
 
-          const items = itemExcel.filter(item => item._id !== null 
-                        && item._id !== undefined 
-                        && item._id !== "")
+          // Carregar Stock
+          dadosStockCompleto = []
+          dadosStock = []
 
-          if (items.length > 0 ) {
+          dadosStockCompleto = await getAllStockBalances().then(response => response.data)
+          dadosStock = dadosStockCompleto.filter(stock => stock.empresa._id === empresaSelecionada)
 
-            updateGComEstoque(items).then(response => {
+          const atualizStock = dadosStock          
+                              .filter(stock => itemExcel.some(excel => excel.itCodigo.toUpperCase().trim()) &&
+                                               stock.empresa._id === empresaSelecionada)
+                              .map(stock => {
 
-              message.success(`Atualizado ${items.length} linhas com sucesso.`);
+                                const gcomEst = itemExcel.find(excel => excel.itCodigo.toUpperCase().trim() === stock.item.itCodigo)
 
+                                return {
+                                  _id:          stock._id,
+                                  itCodigo:     stock.item.itCodigo,
+                                  descricao:    stock.item.descricao,
+                                  gcomEstoque:  gcomEst ? gcomEst.quantidade : 0,                                  
+                                }
+                              })
+
+          if (atualizStock.length > 0 ) {
+
+            updateGComEstoque(atualizStock).then(response => {
+
+              message.success(`Atualizado ${atualizStock.length} linhas com sucesso.`);
+/*
               const dadosAux = items.map(item => {
 
                 const stock = dadosStock.find( stock => stock._id === item._id)
@@ -313,8 +321,8 @@ console.log(itemExcel)
                 }
 
               })
-
-              setDados(dadosAux)
+*/
+              setDados(atualizStock)
               setExibirTabela(true)
 
         //      openNotification()
@@ -323,7 +331,7 @@ console.log(itemExcel)
           } else {
             message.error('Nenhuma linha atualizada! Verificar arquivo!');
           }
-*/          
+            
           setProgress(100)
           
         }, 2000)  // Atraso para visualizacao da barra
@@ -379,26 +387,6 @@ console.log(itemExcel)
             setEmpresas(user.empresas)
 
         }
-
-        // Carregar Unidades
-        const unitAux = await getAllUnits().then((response) => response.data)
-        setUnit(unitAux)
-
-        // Carregar Saldo Estoque
-        await getAllStockBalances().then( response => {
-
-          // Ler
-          const dados = response.data.map(item => ({
-            _id:          item._id,
-            itCodigo:     item.item.itCodigo,
-            descricao:    item.item.descricao,
-            empresa:      item.empresa,
-            nomeEmpresa:  item.empresa.nome,
-
-          }))
-          setDadosStock(dados)
-
-        })
 
       } catch (error) {
           console.error(error);
