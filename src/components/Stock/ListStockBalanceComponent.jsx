@@ -220,7 +220,7 @@ const ListStockBalanceComponent = () => {
         title: 'Item', 
         dataIndex: 'itCodigo', 
         key: 'itCodigo',
-        sorter: (a, b) => a.itcodigo.localeCompare(b.itcodigo),
+        sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('itCodigo'),
         ellipsis: true,
