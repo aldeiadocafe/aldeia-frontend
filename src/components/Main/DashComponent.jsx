@@ -14,6 +14,7 @@ import Title from 'antd/es/typography/Title';
 
 import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
+import { getAllItems } from '../../services/ItemService'
 
 
 dayjs.extend(utc)
@@ -402,19 +403,24 @@ const DashComponent = () => {
             console.error(error);
         });
 
+        const items = await getAllItems().then(response => response.data)
+
         setGComCompleto([])
         setDadosGCom([])
 
         let dadosStock
+
         await getAllStockBalances().then(response => {
 
           dadosStock = response.data
+            .filter(stock => stock.item != undefined)
+            .filter(stock => items.some(item => item._id === stock.item._id))
             .map(item => ({
               _id:          item._id,
               idItem:       item.item._id,
               itCodigo:     item.item.itCodigo,
               descricao:    item.item.descricao,
-              unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
+              unidade:      unit ? (unit.find(unit => unit._id === item.item.unit).unidade) : null,
               quantidade:   item.quantidade,
               gcomEstoque:  item.gcomEstoque,
               diferenca:    item.quantidade - item.gcomEstoque,
@@ -435,7 +441,9 @@ const DashComponent = () => {
 
         if (dadosDate) {
 
-          const dados = dadosDate.filter((dates) => dadosStock.some((stock) => stock.idItem     === dates.item._id &&
+          const dados = dadosDate
+                                 .filter(dates => dates.item != undefined)
+                                 .filter((dates) => dadosStock.some((stock) => stock.idItem     === dates.item._id &&
                                                                                stock.idEmpresa  === dates.empresa._id))
                                  .map(item => ({
                                       idItem:       item.item._id,          

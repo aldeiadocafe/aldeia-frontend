@@ -190,7 +190,7 @@ const ItemConfComponent = () => {
 
     // onSearch é acionado quando o usuário digita no input
     const onSearchDescricao = (value) => {
-        
+console.log(value)        
         let res = []
         if (!value) {
             res = []
@@ -471,6 +471,7 @@ const ItemConfComponent = () => {
                                     .map(item => {
 
                             return {
+                                key:        item._id,
                                 _idItem:    item._id,
                                 itCodigo:   item.itCodigo,
                                 unit:       item.unit,
