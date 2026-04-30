@@ -395,78 +395,84 @@ const DashComponent = () => {
             setEmpresa(user.empresas)
 
         }
-
-        let unit
+        
         await getAllUnits().then((response) => {
-          unit = response.data
+          
+          const unit = response.data
+
+          await getAllItems().then(response => {
+
+            const items = response.data
+
+            setGComCompleto([])
+            setDadosGCom([])
+
+            let dadosStock
+
+            await getAllStockBalances().then(response => {
+
+              dadosStock = response.data
+                .filter(stock => stock.item != undefined)
+                .filter(stock => items.some(item => item._id === stock.item._id))
+                .map(item => ({
+                  _id:          item._id,
+                  idItem:       item.item._id,
+                  itCodigo:     item.item.itCodigo,
+                  descricao:    item.item.descricao,
+                  unidade:      unit ? (unit.find(unit => unit._id === item.item.unit).unidade) : null,
+                  quantidade:   item.quantidade,
+                  gcomEstoque:  item.gcomEstoque,
+                  diferenca:    item.quantidade - item.gcomEstoque,
+                  idEmpresa:    item.empresa._id,
+                  empresa:      item.empresa,
+                  nomeEmpresa:  item.empresa.nome
+                }))
+                
+              setGComCompleto(dadosStock)
+              setDadosGCom(dadosStock)
+
+            })
+
+            setDatesCompleto([])
+            setDatesItem([])
+
+            const dadosDate = await getAllDatesItem().then(response => response.data)
+
+            if (dadosDate) {
+
+              const dados = dadosDate
+                                    .filter(dates => dates.item != undefined)
+                                    .filter((dates) => dadosStock.some((stock) => stock.idItem     === dates.item._id &&
+                                                                                  stock.idEmpresa  === dates.empresa._id))
+                                    .map(item => ({
+                                          idItem:       item.item._id,          
+                                          itCodigo:     item.item.itCodigo,
+                                          descricao:    item.item.descricao,
+                                          unit:         item.item.unit,
+                                          unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
+                                          dataValidade: item.dataValidade,
+                                          quantidade:   item.quantidade,
+                                          empresa:      item.empresa,
+                                          nomeEmpresa:  item.empresa.nome
+                                    }))
+
+              if (dados.length > 0) {
+
+                setDatesCompleto(dados)
+                setDatesItem(dados)
+                
+                atualizarBarra(dados)
+
+              }              
+
+            }
+
+          })
+
         }).catch((error)=> {
             console.error(error);
         });
 
-        const items = await getAllItems().then(response => response.data)
-
-        setGComCompleto([])
-        setDadosGCom([])
-
-        let dadosStock
-
-        await getAllStockBalances().then(response => {
-
-          dadosStock = response.data
-            .filter(stock => stock.item != undefined)
-            .filter(stock => items.some(item => item._id === stock.item._id))
-            .map(item => ({
-              _id:          item._id,
-              idItem:       item.item._id,
-              itCodigo:     item.item.itCodigo,
-              descricao:    item.item.descricao,
-              unidade:      unit ? (unit.find(unit => unit._id === item.item.unit).unidade) : null,
-              quantidade:   item.quantidade,
-              gcomEstoque:  item.gcomEstoque,
-              diferenca:    item.quantidade - item.gcomEstoque,
-              idEmpresa:    item.empresa._id,
-              empresa:      item.empresa,
-              nomeEmpresa:  item.empresa.nome
-            }))
-            
-          setGComCompleto(dadosStock)
-          setDadosGCom(dadosStock)
-
-        })
-
-        setDatesCompleto([])
-        setDatesItem([])
-
-        const dadosDate = await getAllDatesItem().then(response => response.data)
-
-        if (dadosDate) {
-
-          const dados = dadosDate
-                                 .filter(dates => dates.item != undefined)
-                                 .filter((dates) => dadosStock.some((stock) => stock.idItem     === dates.item._id &&
-                                                                               stock.idEmpresa  === dates.empresa._id))
-                                 .map(item => ({
-                                      idItem:       item.item._id,          
-                                      itCodigo:     item.item.itCodigo,
-                                      descricao:    item.item.descricao,
-                                      unit:         item.item.unit,
-                                      unidade:      (unit.find(unit => unit._id === item.item.unit).unidade),
-                                      dataValidade: item.dataValidade,
-                                      quantidade:   item.quantidade,
-                                      empresa:      item.empresa,
-                                      nomeEmpresa:  item.empresa.nome
-                                }))
-
-          if (dados.length > 0) {
-
-            setDatesCompleto(dados)
-            setDatesItem(dados)
-            
-            atualizarBarra(dados)
-
-          }              
-
-        }
 
       } catch (error) {
           console.error(error);
