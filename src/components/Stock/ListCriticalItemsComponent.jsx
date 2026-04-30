@@ -36,8 +36,6 @@ const ListCriticalItemsComponent = () => {
 
     const [searchText,      setSearchText]      = useState([])
     
-    const [dadosGCom, setDadosGCom]       = useState([])
-
     const [loading, setLoading] = useState(false);
 
     const [tabela,      setTabela]      = useState(1);
@@ -57,7 +55,7 @@ const ListCriticalItemsComponent = () => {
             "Qtde Mínima":      formatter.format(item.quantidadeMinima),
             Quantidade:         formatter.format(item.qtde),
             GCom:               formatter.format(item.gcomEstoque),
-            "Estoq - GCOM":     formatter.format(item.diferenca),
+            "Mínima - GCOM":    formatter.format(item.diferenca),
             "Data Inventário":  item.dataInventario,
             "Data GCom":        item.dataGCom
         }))
@@ -271,7 +269,7 @@ const ListCriticalItemsComponent = () => {
         render: (value) => formatter.format(value),
     },
     {
-        title: 'Estoq - GCom', 
+        title: 'Mínima - GCom', 
         dataIndex: 'diferenca', 
         key: 'diferenca',
         align: 'right',
@@ -305,6 +303,11 @@ const ListCriticalItemsComponent = () => {
 
             setLoading(true);
 
+            const empresasUsuario = user.empresas.map((company) => ({
+                    _id:    company._id,
+                    nome:   company.nome
+                }))
+
             setEmpresa([])
             if (user.empresas) {
 
@@ -326,48 +329,72 @@ const ListCriticalItemsComponent = () => {
             //Unidade
             const unit = await getAllUnits().then((response) => response.data)
 
-            const items = await getAllItems().then((response) => response.data)
+            const itemsAux = await getAllItems().then((response) => response.data)
+            const items = itemsAux.filter(item => item.quantidadeMinima > 0)
 
-            setDadosGCom([])
-            await getAllStockBalances().then(response => {
+            const stockCompleto = await getAllStockBalances().then(response => response.data)
 
-                let dadosAux
+            let dadosAux = []
 
-                response.data.map(item => {
+            items.map(item => {
 
-                    const itemInfo = items.find(i => i._id === item.item._id)
-                    const unitInfo = unit.find(u => u._id === itemInfo.unit._id)
+                empresasUsuario.map(empresa => {
 
-                    if (itemInfo.quantidadeMinima != undefined 
-                        && itemInfo.quantidadeMinima >= 0) {
+                    //Caso não encontre o item Stock                
+                    const stockAux = stockCompleto.filter ( stock => stock.item._id     === item._id &&
+                                                                     stock.empresa._id  === empresa._id
+                    )
+                    if (stockAux.length === 0) {
 
-                        if (itemInfo.quantidadeMinima >= item.quantidade 
-                            || item.quantidade === undefined) {
+                        dadosAux = [...(dadosAux || []), {
+                            key:                crypto.randomUUID(),
+                            idItem:             item._id,
+                            itCodigo:           item.itCodigo,
+                            descricao:          item.descricao,
+                            qtde:               null, 
+                            quantidadeMinima:   item.quantidadeMinima,
+                            unit:               item.unit,
+                            unidade:            item.unit.descricao,
+                            gcomEstoque:        null,
+                            diferenca:          item.quantidadeMinima * -1,
+                            empresa:            empresa,
+                            nomeEmpresa:        empresa.nome,
+                        }]  
 
-                            dadosAux = [...(dadosAux || []), {
-                                key:            item._id,
-                                idItem:         item.item._id,
-                                itCodigo:       item.item.itCodigo,
-                                descricao:      item.item.descricao,
-                                qtde:               item.quantidade, 
-                                quantidadeMinima: itemInfo.quantidadeMinima,               
-                                unit:           item.item.unit,
-                                unidade:        unitInfo.unidade,
-                                gcomEstoque:    item.gcomEstoque,
-                                diferenca:      item.quantidade - item.gcomEstoque,
-                                dataInventario: item.dataInventario,
-                                dataGCom:       item.dataGCom,
-                                empresa:        item.empresa,
-                                nomeEmpresa:    item.empresa.nome,
-                            }]  
-                        }
+                    } else {
+
+                        //Verifica se saldo é menor que QuantidadeMinima
+                        stockCompleto.filter(stock => stock.empresa._id === empresa._id &&
+                                                      stock.item._id === item._id &&
+                                                    ( stock.gcomEstoque < item.quantidadeMinima ||
+                                                      stock.gcomEstoque === undefined))
+                                    .map(stock => {
+                                        dadosAux = [...(dadosAux || []), {
+                                            key:                crypto.randomUUID(),
+                                            idItem:             item._id,
+                                            itCodigo:           item.itCodigo,
+                                            descricao:          item.descricao,
+                                            qtde:               stock.quantidade, 
+                                            quantidadeMinima:   item.quantidadeMinima,
+                                            unit:               item.unit,
+                                            unidade:            item.unit.unidade,
+                                            gcomEstoque:        stock.gcomEstoque,
+                                            diferenca:          (stock.gcomEstoque ? stock.gcomEstoque : 0)  - item.quantidadeMinima,
+                                            dataInventario:     stock.dataInventario,
+                                            dataGCom:           stock.dataGCom,
+                                            empresa:            stock.empresa,
+                                            nomeEmpresa:        stock.empresa.nome,
+                                        }]  
+                                    })
+
                     }
+
                 })
 
-                setDadosCompleto(dadosAux);
-                setDados(dadosAux);
-
             })
+
+            setDadosCompleto(dadosAux);
+            setDados(dadosAux);
 
         } catch (error) {
             console.error(error);
@@ -451,6 +478,7 @@ const ListCriticalItemsComponent = () => {
                     >
                         <Space style={{ marginBottom: 16 }}>
                             <Button 
+                                disabled={ dados.length === 0}
                                 type="primary" 
                                 icon={<DownloadOutlined />} 
                                 onClick={exportToExcel}
