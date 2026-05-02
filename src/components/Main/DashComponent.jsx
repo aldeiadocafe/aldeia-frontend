@@ -413,7 +413,7 @@ const DashComponent = () => {
 
               dadosStock = response.data
                 .filter(stock => stock.item != undefined && 
-                                 stock.quantidade <> 0
+                                 stock.quantidade != 0
                 )
                 .filter(stock => items.some(item => item._id === stock.item._id))
                 .map(item => ({
@@ -443,7 +443,9 @@ const DashComponent = () => {
             if (dadosDate.length > 0) {
 
               const dados = dadosDate
-                                    .filter(dates => dates.item != undefined)
+                                    .filter(dates => dates.item != undefined && 
+                                                     dates.quantidade != 0
+                                    )
                                     .filter((dates) => dadosStock.some((stock) => stock.idItem     === dates.item._id &&
                                                                                   stock.idEmpresa  === dates.empresa._id))
                                     .map(item => ({
