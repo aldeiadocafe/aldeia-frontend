@@ -396,11 +396,11 @@ const DashComponent = () => {
 
         }
         
-        await getAllUnits().then((response) => {
-          
+        await getAllUnits().then(async (response) => {
+         
           const unit = response.data
 
-          await getAllItems().then(response => {
+          await getAllItems().then(async response => {
 
             const items = response.data
 
@@ -409,7 +409,7 @@ const DashComponent = () => {
 
             let dadosStock
 
-            await getAllStockBalances().then(response => {
+            await getAllStockBalances().then( async response => {
 
               dadosStock = response.data
                 .filter(stock => stock.item != undefined)
@@ -438,7 +438,7 @@ const DashComponent = () => {
 
             const dadosDate = await getAllDatesItem().then(response => response.data)
 
-            if (dadosDate) {
+            if (dadosDate.length > 0) {
 
               const dados = dadosDate
                                     .filter(dates => dates.item != undefined)

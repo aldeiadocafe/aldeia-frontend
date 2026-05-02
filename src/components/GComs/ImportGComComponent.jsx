@@ -226,18 +226,30 @@ const ImportGComEstoqueComponent = () => {
           let dadosStock = dadosStockCompleto.filter(stock => stock.empresa._id === empresaSelecionada)
 
           // Carregar itens com quantidade <> 0 e diferente de "Total"
-          const itemExcel = jsonData.filter(item => item.quantidade != 0 
+          const itemExcelAux = jsonData.filter(item => item.quantidade != 0 
                                                 && ! item.itCodigo.toUpperCase().trim().startsWith("TOTAL"))
+
+          // Array com Descricao Unica
+          const uniqueDescricao = new Set()
+          const itemExcel = itemExcelAux.filter( item => {
+            if (uniqueDescricao.has(item.descricao)) {
+              return false
+            } else {
+              uniqueDescricao.add(item.descricao)
+              return true
+            }
+          })
 
           //Verificar se todos os itens já estão cadastrados
           const novosItens = itemExcel
-                              .filter(excel => !items.some(item => item.itCodigo === excel.itCodigo))
+                              .filter(excel => !items.some(item => item.itCodigo.trim().toUpperCase() === excel.itCodigo.trim().toUpperCase()))
                               .filter(excel => unit.some(unid => unid.unidade.toUpperCase().trim() === excel.unidade.toUpperCase().trim()))
+                              
           if (novosItens.length > 0) {
 
             const criar = novosItens.map(item => ({
-                itCodigo:       item.itCodigo.toUpperCase(),
-                descricao:      item.descricao.toUpperCase(),
+                itCodigo:       item.itCodigo.toUpperCase().trim(),
+                descricao:      item.descricao.toUpperCase().trim(),
                 unit:           unit.find( u => u.unidade.toString().toUpperCase() === item.unidade.toString().trim().toUpperCase()),
                 situacao:       'ATIVO',
                 usuarioCriacao: user ? user._id : null,
@@ -263,8 +275,8 @@ const ImportGComEstoqueComponent = () => {
 
               const novoStock = {
                 item:         idItem ? idItem._id : null,
-                itCodigo:     item.itCodigo,
-                descricao:    item.descricao,
+                itCodigo:     item.itCodigo.trim().toUpperCase(),
+                descricao:    item.descricao.trim().toUpperCase(),
                 unidade:      item.unidade,
                 gcomEstoque:  item.quantidade,
                 empresa:      empresaSelecionada,
@@ -297,8 +309,8 @@ const ImportGComEstoqueComponent = () => {
 
                                 return {
                                   _id:          stock._id,
-                                  itCodigo:     stock.item.itCodigo,
-                                  descricao:    stock.item.descricao,
+                                  itCodigo:     stock.item.itCodigo.trim().toUpperCase(),
+                                  descricao:    stock.item.descricao.trim().toUpperCase(),
                                   gcomEstoque:  gcomEst ? gcomEst.quantidade : 0,                                  
                                 }
                               })
