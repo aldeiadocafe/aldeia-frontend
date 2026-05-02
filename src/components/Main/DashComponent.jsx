@@ -412,7 +412,9 @@ const DashComponent = () => {
             await getAllStockBalances().then( async response => {
 
               dadosStock = response.data
-                .filter(stock => stock.item != undefined)
+                .filter(stock => stock.item != undefined && 
+                                 stock.quantidade <> 0
+                )
                 .filter(stock => items.some(item => item._id === stock.item._id))
                 .map(item => ({
                   _id:          item._id,
