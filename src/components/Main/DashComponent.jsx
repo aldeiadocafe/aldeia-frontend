@@ -467,6 +467,8 @@ const DashComponent = () => {
                 
                 atualizarBarra(dados)
 
+                setLoading(false); //Libera a tela
+
               }              
 
             }
@@ -480,12 +482,13 @@ const DashComponent = () => {
 
       } catch (error) {
           console.error(error);
-      } finally {
+          
+      } /* finally {
 
         setLoading(false); //Libera a tela
 
       }
-
+*/
     }
 
     carregarDados()
@@ -593,7 +596,7 @@ const DashComponent = () => {
                       scroll={{ y: gcomHeight}}               
                       rowKey={(record) => record._id}
                       pagination={false}
-                      loading={loading}
+//                      loading={loading}
     /*                  
                       pagination={{
                           tabela,
@@ -637,7 +640,7 @@ const DashComponent = () => {
     //              scroll={{ y: 110 }}                
                   rowKey={(record) => record._id}
                   pagination={false}        
-                  loading={loading}
+//                  loading={loading}
 
               />
 
