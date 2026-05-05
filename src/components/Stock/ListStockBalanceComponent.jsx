@@ -16,6 +16,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { normalizarTexto } from '../../Funcoes/Utils';
 import { useAuth } from '../Login/AuthContext';
+import { getAllItems } from '../../services/ItemService';
 
 dayjs.extend(utc)
 
@@ -33,6 +34,10 @@ const ListStockBalanceComponent = () => {
     const [dadosCompleto,   setDadosCompleto]       = useState([])
     const [dados,       setDados]                   = useState([])
     const [expandedDateItem, setExpandedDateItem ]  = useState([])
+
+    const [dadosItem,       setDadosItem]           = useState([])
+    const [dadosUnit,       setDadosUnit]           = useState([])
+    const [dadosStock,      setDadosStock]          = useState([])
 
     const [searchText,      setSearchText]      = useState([])
     
@@ -335,61 +340,54 @@ const ListStockBalanceComponent = () => {
 
             }
 
-            setDados([])            
+            setDados([])                        
 
-            let unit
             //Unidade
-            await getAllUnits().then((response) => {
-                unit = response.data
+            setDadosUnit([])
+            await getAllUnits().then( async (response) => {
+
+                setDadosUnit(response.data)
 
             })
 
-            await getAllDatesItem().then((response) => {
+            setDadosItem([])
+            await getAllItems().then( async (response) => {
 
-                const dadosAux = response.data.map(item => ({
-                    key:            item._id,
-                    empresa:        item.empresa,
-                    idItem:         item.item._id,
-                    dataValidade:   item.dataValidade,
-                    quantidade:     item.quantidade,
-                }))
+                const itemsAux = response.data
+                const items = itemsAux.filter(item => item.situacao === "ATIVO")
 
-                setExpandedDateItem(dadosAux);                
+                setDadosItem(items)
+                await getAllDatesItem().then( async (response) => {
 
-            })
+                    const dadosDates = response.data
+                        .filter(dates => items.some(item => item._id === dates.item._id))
+                        .map(item => ({
+                            key:            item._id,
+                            empresa:        item.empresa,
+                            idItem:         item.item._id,
+                            dataValidade:   item.dataValidade,
+                            quantidade:     item.quantidade,
+                        }))
 
-            setDadosGCom([])
+                    setExpandedDateItem(dadosDates);                
 
-            await getAllStockBalances().then(response => {
+                    setDadosGCom([])
+                    setDadosStock(await getAllStockBalances().then( async response => response.data))
 
-                const dadosAux = response.data.map(item => ({
-                    key:            item._id,
-                    idItem:         item.item._id,
-                    itCodigo:       item.item.itCodigo,
-                    descricao:      item.item.descricao,
-                    qtde:           item.quantidade,                
-                    unit:           item.item.unit,
-                    unidade:        (unit.find(unit => unit._id === item.item.unit).unidade),
-                    gcomEstoque:    item.gcomEstoque,
-                    diferenca:      item.quantidade - item.gcomEstoque,
-                    dataInventario: item.dataInventario,
-                    dataGCom:       item.dataGCom,
-                    empresa:        item.empresa,
-                    nomeEmpresa:    item.empresa.nome,
-                }))
-
-                setDadosCompleto(dadosAux);
-                setDados(dadosAux);
+                })
 
             })
 
         } catch (error) {
-            console.error(error);
-        } finally {
+            console.error(error);            
+        } 
+/*        
+        finally {
 
             setLoading(false);
 
         }
+*/            
     }
 
     const expandedRowRender = (record) => {
@@ -427,14 +425,22 @@ const ListStockBalanceComponent = () => {
     }
 
     // 2. Função para expandir todas as linhas
-    const expandAll = () => {
+    const expandAll = async () => {
+
+        setLoading(true)
         const allKeys = dados.map((record) => record.key);
         setExpandedRowKeys(allKeys);
+        setLoading(false)
+
     };
 
     // 3. Função para recolher todas as linhas
-    const collapseAll = () => {
+    const collapseAll = async () => {
+
+        setLoading(true)
         setExpandedRowKeys([]);
+        setLoading(false)
+
     };
 
     const handleOnChageEmpresa = async (value) => {
@@ -451,11 +457,49 @@ const ListStockBalanceComponent = () => {
     }
 
 
-
     useEffect(() => {
         carregarDados()
     }, [])
 
+    useEffect(() => {
+
+        if (dadosStock.length > 0) {
+
+            const dadosAux = dadosStock
+                .filter(stock => stock.item != null)
+                .map(stock => {
+
+                    if (dadosItem.some(item => item._id === stock.item._id)) {
+
+                        return ({
+                            key:            stock._id,                                        
+                            idItem:         stock.item._id,
+                            itCodigo:       stock.item.itCodigo,
+                            descricao:      stock.item.descricao,
+                            qtde:           stock.quantidade,                
+                            unit:           stock.item.unit,
+                            unidade:        (dadosUnit.find(unit => unit._id === stock.item.unit).unidade),
+                            gcomEstoque:    stock.gcomEstoque,
+                            diferenca:      stock.quantidade - stock.gcomEstoque,
+                            dataInventario: stock.dataInventario,
+                            dataGCom:       stock.dataGCom,
+                            empresa:        stock.empresa,
+                            nomeEmpresa:    stock.empresa.nome,
+                        })
+
+                    }
+
+                })
+            const dadosFinal = dadosAux.filter(dados => dados != undefined)
+
+            setDadosCompleto(dadosFinal);
+            setDados(dadosFinal);
+
+            setLoading(false);
+
+        }
+
+    }, [dadosStock])
 
   return (
 
