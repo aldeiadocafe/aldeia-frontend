@@ -357,6 +357,7 @@ const ListStockBalanceComponent = () => {
                 const items = itemsAux.filter(item => item.situacao === "ATIVO")
 
                 setDadosItem(items)
+
                 await getAllDatesItem().then( async (response) => {
 
                     const dadosDates = response.data
@@ -376,6 +377,8 @@ const ListStockBalanceComponent = () => {
 
                 })
 
+            }).catch(error => {
+                setLoading(false);
             })
 
         } catch (error) {

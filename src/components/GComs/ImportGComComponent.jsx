@@ -84,12 +84,19 @@ const ImportGComEstoqueComponent = () => {
       record[dataIndex].toString().toUpperCase().includes(value.toUpperCase()),
   });
 
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        // Note: The actual data filtering happens internally via the 'onFilter' prop, 
+        // but you can manage a state here if needed for other components.
+    };
+
   const colunas = [
     {
         title: 'Item', 
         dataIndex: 'itCodigo', 
         key: 'itCodigo',
-        sorter: (a, b) => a.itcodigo.localeCompare(b.itcodigo),
+        sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('itCodigo'),
         ellipsis: true,
@@ -204,6 +211,8 @@ const ImportGComEstoqueComponent = () => {
       const bstr = evt.target.result;
       const wb = XLSX.read(bstr, { type: 'binary' });
 
+      setLoading(true)
+
       try {
 
         setTimeout( async () => {
@@ -221,16 +230,20 @@ const ImportGComEstoqueComponent = () => {
           });
 
           const unit  = await getAllUnits().then(response => response.data)
-          let items = await getAllItems().then(response => response.data)
+          let items = await getAllItems().then(response => response.data) 
+
           let dadosStockCompleto = await getAllStockBalances().then(response => response.data)
+
           let dadosStock = dadosStockCompleto.filter(stock => stock.empresa._id === empresaSelecionada)
+
 
           // Carregar itens com quantidade <> 0 e diferente de "Total"
           const itemExcelAux = jsonData.filter(item => item.quantidade != 0 
-                                                && ! item.itCodigo.toUpperCase().trim().startsWith("TOTAL"))
+                                               && ! item.itCodigo.toUpperCase().trim().startsWith("TOTAL"))
 
           // Array com Descricao Unica
           const uniqueDescricao = new Set()
+
           const itemExcel = itemExcelAux.filter( item => {
             if (uniqueDescricao.has(item.descricao)) {
               return false
@@ -244,7 +257,7 @@ const ImportGComEstoqueComponent = () => {
           const novosItens = itemExcel
                               .filter(excel => !items.some(item => item.itCodigo.trim().toUpperCase() === excel.itCodigo.trim().toUpperCase()))
                               .filter(excel => unit.some(unid => unid.unidade.toUpperCase().trim() === excel.unidade.toUpperCase().trim()))
-                              
+
           if (novosItens.length > 0) {
 
             const criar = novosItens.map(item => ({
@@ -260,6 +273,7 @@ const ImportGComEstoqueComponent = () => {
             items = await getAllItems().then(response => response.data)
 
           }
+          
           // Criar registro na Stock para os itens que não tem
           let stockCriar = []
           itemExcel
@@ -320,31 +334,38 @@ const ImportGComEstoqueComponent = () => {
             updateGComEstoque(atualizStock).then(response => {
 
               message.success(`Atualizado ${atualizStock.length} linhas com sucesso.`);
-/*
+
               const dadosAux = items.map(item => {
 
-                const stock = dadosStock.find( stock => stock._id === item._id)
+                const stock = dadosStock.find( stock => stock.item._id === item._id)
 
-                return {
-                  _id:          item._id,
-                  itCodigo:     stock.itCodigo,
-                  descricao:    stock.descricao,
-                  gcomEstoque:  item.gcomEstoque
+                if (stock) {
+
+                  return {
+                    _id:          item._id,
+                    itCodigo:     item.itCodigo,
+                    descricao:    item.descricao,
+                    gcomEstoque:  item.gcomEstoque
+                  }
                 }
 
               })
-*/
-              setDados(atualizStock)
+
+              setDados(atualizStock)              
               setExibirTabela(true)
+
+              setProgress(100)
+              setFileList([]); // Limpa o estado quando o arquivo é removido
+              setLoading(false)              
 
         //      openNotification()
             })
 
           } else {
             message.error('Nenhuma linha atualizada! Verificar arquivo!');
+            setFileList([]); // Limpa o estado quando o arquivo é removido
+            setLoading(false)              
           }
-            
-          setProgress(100)
           
         }, 2000)  // Atraso para visualizacao da barra
 
@@ -356,10 +377,12 @@ const ImportGComEstoqueComponent = () => {
               message.error('Erro ao criar!');
           }
 
-      } finally {
+          setLoading(false)              
+
+      } /*finally {
           setFileList([]); // Limpa o estado quando o arquivo é removido
           setLoading(false)
-      }
+      } */
 
     }
 

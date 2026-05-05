@@ -27,7 +27,6 @@ const ItemComponent = () => {
 
     const [isEditing,   setIsEditing]   = useState(true);
     const [idItem,      setIdItem]      = useState();
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
     
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
@@ -238,7 +237,6 @@ const ItemComponent = () => {
     const handleCancel = () => {        
         setFormModal(false);
         setDeleteModal(false);
-        setIsPopupOpen(false);
         form.resetFields(); //Limpa os campos ao fechar
         carregarDados();
     };
@@ -286,15 +284,17 @@ const ItemComponent = () => {
 
                 setDados(dadosAux);
 
+                setSelectedRowKeys([]);
+                setLoading(false);
+
             });
 
 
         } catch (error) {
             console.error(error);
+            setLoading(false);
         } finally {
 
-            setSelectedRowKeys([]);
-            setLoading(false);
     
         }
 
@@ -405,11 +405,10 @@ const ItemComponent = () => {
 
             return await deleteItem(form.getFieldValue('_id')).then((response) => {
 
-                setDeleteModal(false); // Fecha o Modal principal                
                 message.success('Registro eliminado com sucesso!')
-
                 form.resetFields(); //Limpa os campos ao fechar
                 carregarDados();
+                setDeleteModal(false); // Fecha o Modal principal
 
             }).catch((error)=> {
 
@@ -421,29 +420,25 @@ const ItemComponent = () => {
                 }
             });
         }
-            
-    };
 
-    // Chamado se o usuário cancelar na Popconfirm
-    const handlePopupCancel = () => {
-        setIsPopupOpen(false); // Apenas fecha o Popconfirm e mantém o Modal aberto
     };
 
 
   return (
     <div>
 
+        <div style={{ textAlign: 'center' }}>
+            <Title level={2}
+                style={{ color: 'var(--primary-color)'}}
+            >Item</Title>
+        </div>
+
         <Spin 
-        spinning={loading} 
-        size='large' 
-        tip="Carregando..."
+            spinning={loading} 
+            size='large' 
+            tip="Carregando..."
         >
 
-            <div style={{ textAlign: 'center' }}>
-                <Title level={2}
-                    style={{ color: 'var(--primary-color)'}}
-                >Item</Title>
-            </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button 
@@ -461,7 +456,7 @@ const ItemComponent = () => {
                 columns={colunas}
                 dataSource={dados}      
                 showSorterTooltip={true}
-                tableLayout='auto'
+//                tableLayout='auto'
                 size={'small'}
                 scroll={{ y: 'calc(80vh - 90px)' }}                
                 rowKey={(record) => record._id}
@@ -564,7 +559,27 @@ const ItemComponent = () => {
                 open={deleteModal}
                 confirmLoading={confirmLoading}
                 onCancel={handleCancel}        
-                onOk={() => setIsPopupOpen(true)}
+//                onOk={() => setIsPopupOpen(true)}
+
+                footer = {[
+                    <Button key="cancela" onClick={handleCancel}>
+                        Cancelar
+                    </Button>,
+                    <Popconfirm
+                        key="submit"
+                        title="Confirma a exclusão do registro?"
+                        description="Ao confirmar o registro será elimado permanentemente."
+                        onConfirm={handlePopupConfirm}  
+                        okText="Sim"
+                        cancelText="Não"            
+                        placement='topLeft'
+                        >
+                        <Button type="primary" loading={confirmLoading}>
+                            OK
+                        </Button>
+                    </Popconfirm>,
+                ]}
+
             >
                 
                 <Form
@@ -639,25 +654,7 @@ const ItemComponent = () => {
                             <Option value="OBSOLETO">OBSOLETO</Option>
                         </Select>
                     </Item>
-                </Form>
-
-                {/* Modal de Eliminar */}
-                <div style={{ 
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center', 
-                    }}>
-                    <Popconfirm
-                        title="Confirma a exclusão do registro?"
-                        description="Ao confirmar o registro será elimando permanentemente."
-                        open={isPopupOpen}
-                        onConfirm={handlePopupConfirm}
-                        onCancel={handlePopupCancel}
-                        okText="Sim"
-                        cancelText="Não"            
-                    />
-                </div>
-                
+                </Form>                
 
             </Modal>
 
