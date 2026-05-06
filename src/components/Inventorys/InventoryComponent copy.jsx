@@ -8,12 +8,6 @@ import utc from 'dayjs/plugin/utc'
 import { createInventory, deleteInventory, endInventory, getAllInventorys, updateInventory } from '../../services/InventoryService';
 import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
-import { getItemsInventory } from '../../services/ItemInventoryService';
-import { getAllUnits } from '../../services/UnitService';
-import { getAllDatesItem } from '../../services/DatesItemBalanceService';
-import { getAllPlacesInventory } from '../../services/PlacesInventoryService';
-import { getAllCountPlaces } from '../../services/CountPlacesService';
-import { getAllItems } from '../../services/ItemService';
 
 dayjs.extend(utc)
 
@@ -27,13 +21,6 @@ const InventoryComponent = () => {
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
 
-    const [expandedItem,    setExpandedItem]    = useState([])
-    const [expandedDate,    setExpandedDate]    = useState([])
-
-    // 1. Estado para armazenar as chaves (keys) das linhas expandidas
-    const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-    const [expandedRowKeysItem, setExpandedRowKeysItem] = useState([]);
-
     const [deleteModal,     setDeleteModal]     = useState(false);
     const [formModal,       setFormModal]       = useState(false);
     const [confirmLoading,  setConfirmLoading]  = useState(false);
@@ -44,11 +31,6 @@ const InventoryComponent = () => {
 
     const [isEditing, setIsEditing]                 = useState(true);
     const [idInventory, setIdInventory]             = useState();
-
-    const formatter = new Intl.NumberFormat('pt-BR', {
-        style: 'decimal',
-        minimumFractionDigits: 3,
-    });
 
     let listarFinalizado = false
 
@@ -154,7 +136,6 @@ const InventoryComponent = () => {
         {
             dataIndex:  "dataInventario",
             title:      "Data Inventário",
-            key:        "dataInventario",
             sorter: (a, b) => new Date(a.dataInventario).getTime() - new Date(b.dataInventario).getTime(),
             // Optional: set a default sort order
             defaultSortOrder: 'descend', 
@@ -166,7 +147,6 @@ const InventoryComponent = () => {
         {
             dataIndex:  "descricao",
             title:      "Descrição",
-            key:        "descricao",
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricao'),
@@ -175,7 +155,6 @@ const InventoryComponent = () => {
         {
             dataIndex:  "tipoInventario",
             title:      "Tipo",
-            key:        "tipoInventario",
             sorter: (a, b) => a.tipoInventario.localeCompare(b.tipoInventario),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('tipoInventario'),
@@ -184,7 +163,6 @@ const InventoryComponent = () => {
         {
             dataIndex:  "situacao",
             title:      "Situação",
-            key:        "situacao",
             sorter: (a, b) => a.situacao.localeCompare(b.situacao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('situacao'),
@@ -216,88 +194,6 @@ const InventoryComponent = () => {
                 </Space>
             ),
         },        
-    ]
-
-    const colunasItem = [
-        {
-            title: 'Item', 
-            dataIndex: 'itCodigo', 
-            key: 'itCodigo',
-            sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('itCodigo'),
-            ellipsis: true,
-        },
-        {
-            title: 'Descrição', 
-            dataIndex: 'itemDescricao', 
-            key: 'itemDescricao',
-            sorter: (a, b) => a.itemDescricao.localeCompare(b.itemDescricao),
-            defaultSortOrder: 'ascend', 
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('descricao'),
-            ellipsis: true,
-        },
-        {
-            title: 'Unid', 
-            dataIndex: 'unidade', 
-            key: 'unidade',
-            sorter: (a, b) => a.unidade.localeCompare(b.unidade),
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('unidade'),
-            ellipsis: true,
-        },
-        {
-            title: 'Quantidade',
-            dataIndex: 'quantidade',
-            key: 'quantidade',
-            align: 'right',
-            sorter: (a, b) => a.quantidade - b.quantidade,
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            render: (value) => formatter.format(value),
-        },
-    ]
-
-    const colunasContagem = [
-        {
-            dataIndex:  "dataValidade",
-            title:      "Dt Validade",
-            key:        "dataValidade",
-            sorter: (a, b) => new Date(a.dataValidade).getTime() - new Date(b.dataValidade).getTime(),
-            // Optional: set a default sort order
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ellipsis: true,
-            render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
-            defaultSortOrder: 'ascend', 
-        },
-        {
-            title: 'Quantidade',
-            dataIndex: 'countQuantidade',
-            key: 'countQuantidade',
-            align: 'right',
-            sorter: (a, b) => a.countQuantidade - b.countQuantidade,
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            render: (value) => formatter.format(value),
-        },
-        {
-            title: 'Usuário', 
-            dataIndex: 'usuarioNome', 
-            key: 'usuarioNome',
-            sorter: (a, b) => a.usuarioNome.localeCompare(b.usuarioNome),
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('usuarioNome'),
-            ellipsis: true,
-        },
-        {
-            dataIndex:  "dataContagem",
-            key:        "dataContagem",
-            title:      "Dt Contagem",
-            sorter: (a, b) => new Date(a.dataContagem).getTime() - new Date(b.dataContagem).getTime(),
-            // Optional: set a default sort order
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ellipsis: true,
-            render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
-        },
     ]
 
     const gravarDados = async (values) => {
@@ -413,12 +309,8 @@ const InventoryComponent = () => {
 
             }
 
-            const dadosItemsInv = await getItemsInventory().then(response => response.data)
-            const dadosPlaces   = await getAllPlacesInventory().then(response => response.data)
-            const dadosCount    = await getAllCountPlaces().then(response => response.data)
-
             setDados([])        
-            await getAllInventorys().then( async (response) => {
+            await getAllInventorys().then((response) => {
 
                 const ids = user.empresas.map(usuario => usuario._id)
 
@@ -427,7 +319,6 @@ const InventoryComponent = () => {
                     .filter(item => (listarFinalizado) ||
                                     (item.situacao.toUpperCase() !== 'FINALIZADO' && !listarFinalizado) )
                     .map(item => ({
-                        key:            item._id,
                         _id:            item._id,
                         empresa:        item.empresa,
                         empresaNome:    item.empresa?.nome,
@@ -439,44 +330,6 @@ const InventoryComponent = () => {
                 }))
                 setDados(dadosAux);
 
-                //Unidade
-                const unit = await getAllUnits().then( async (response) => response.data)
-
-                const itemsAux = dadosItemsInv
-                    .filter(itemsInv => dadosAux.some(item => item._id === itemsInv.inventory._id))
-                    .map( item => ({
-                        key:                item._id,
-                        id:                 item._id,
-                        inventoryId:        item.inventory._id,
-                        itemInventoryId:    item._id,
-                        itCodigo:           item.item.itCodigo,
-                        itemDescricao:      item.item.descricao,
-                        unidade:            item.item.unit ? unit.find(unit => unit._id === item.item.unit).unidade : "",
-                        quantidade:         item.quantidade
-
-                }))
-
-                setExpandedItem(itemsAux)
-
-                const placesAux = dadosPlaces.filter(places => dadosAux.some( item => item._id === places.inventory._id))
-                const countAux  = dadosCount
-                        .filter(count => placesAux.some(places => places._id === count.placesInventory._id))
-                        .map( count => {
-
-                            const places = placesAux.find(p => p._id === count.placesInventory._id)
-
-                            return {
-                                key:                count._id,
-                                id:                 count._id,
-                                dataValidade:       count.dataValidade,
-                                dataContagem:       count.dataCriacao,
-                                usuarioNome:        count.usuarioCriacao ? count.usuarioCriacao.nome : '',
-                                countQuantidade:    count.quantidade,
-                                inventory:          places ? places.inventory._id: null
-                            }                            
-                        })
-
-                setExpandedDate(countAux)                        
             })
 
         } catch (error) {
@@ -626,112 +479,6 @@ const InventoryComponent = () => {
         await carregarDados()
     }
 
-    const expandedRowRenderDate = (record) => {
-
-        //Filtrar dados da filha
-        const filterItem = expandedDate.filter((item) => 
-                item.inventory === record.inventoryId
-        )
-
-        return (
-            <div style={{ width: '60%',  }}> {/* margin: '0 auto' Container reduzido */}
-                <Table 
-                    key={"tableItem"}
-                    columns={colunasContagem} 
-                    dataSource={filterItem} 
-                    size={'small'}
-                    showSorterTooltip={true}
-                    tableLayout='auto'
-                    pagination={false}
-
-                    title={() => (
-                        <Title level={4}
-                            style={{ 
-                                color: 'var(--primary-color)',
-                                padding: '0px',
-                                margin: '0px',
-                            }}
-                        >
-                            Contagem
-                        </Title>
-                    )} // <--- Título aqui
-
-                />
-            </div>
-        )
-
-    }
-
-    const expandedRowRenderItem = (record) => {
-
-        //Filtrar dados da filha
-        const filterItem = expandedItem.filter((item) => 
-                item.inventoryId === record._id 
-        )
-//bispo
-        return (
-            <div style={{ width: '60%',  }}> {/* margin: '0 auto' Container reduzido */}
-                <Table 
-                    key={"tableDate"}
-                    columns={colunasItem} 
-                    dataSource={filterItem} 
-                    size={'small'}
-                    showSorterTooltip={true}
-                    tableLayout='auto'
-                    pagination={false}
-
-                    title={() => (
-                        <Title level={4}
-                            style={{ 
-                                color: 'var(--primary-color)',
-                                padding: '0px',
-                                margin: '0px',
-                            }}
-                        >
-                            Item
-                        </Title>
-                    )} // <--- Título aqui
-
-                    expandable={{ 
-                        expandedRowRender: expandedRowRenderDate,
-                        // 4. Conectar o estado controlado
-                        expandedRowKeys: expandedRowKeysItem,
-                        // 5. Atualizar o estado quando o usuário clicar manualmente
-                        onExpand: (expanded, record) => {
-
-                            const keys = expanded
-                            ? [...expandedRowKeysItem, record.key] // Adiciona se expandir
-                            : expandedRowKeysItem.filter((key) => key !== record.key); // Remove se fechar
-
-                            setExpandedRowKeysItem(keys);
-                        },                
-                    }}
-
-                />
-            </div>
-        )
-
-    }
-
-    // 2. Função para expandir todas as linhas
-    const expandAll = async () => {
-
-        setLoading(true)
-        const allKeys = dados.map((record) => record.key);
-        setExpandedRowKeys(allKeys);
-        setLoading(false)
-
-    };
-
-    // 3. Função para recolher todas as linhas
-    const collapseAll = async () => {
-
-        setLoading(true)
-        setExpandedRowKeys([]);
-        setLoading(false)
-
-    };
-
   return (
     <div>
 
@@ -770,25 +517,9 @@ const InventoryComponent = () => {
                 columns={colunas}
                 dataSource={dados}      
                 showSorterTooltip={true}
-//                tableLayout='auto'
                 size={'small'}
                 scroll={{ y: 'calc(80vh - 90px)' }}                
                 rowKey={(record) => record._id}
-
-                expandable={{ 
-                    expandedRowRender: expandedRowRenderItem,
-                    // 4. Conectar o estado controlado
-                    expandedRowKeys: expandedRowKeys,
-                    // 5. Atualizar o estado quando o usuário clicar manualmente
-                    onExpand: (expanded, record) => {
-                        const keys = expanded
-                        ? [...expandedRowKeys, record.key] // Adiciona se expandir
-                        : expandedRowKeys.filter((key) => key !== record.key); // Remove se fechar
-                        setExpandedRowKeys(keys);
-                    },                
-                }}
-
-
                 pagination={false}
             />
 
