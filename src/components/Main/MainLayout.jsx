@@ -103,7 +103,9 @@ const MainLayout = () => {
     };
 
     return (
-        <Layout style={{height: customHeight}}>
+        <Layout style={{height: customHeight,
+                        overflow: 'hidden'
+        }}>
             
             <Sider 
                 collapsedWidth='40px'
@@ -172,7 +174,9 @@ const MainLayout = () => {
             <Content
                 style={{
                     padding: '10px',
-                    height: '100vh',
+//                    height: '100vh',
+                    height: '100%',
+                    overflow: "auto"
                     }}
                 >
 
