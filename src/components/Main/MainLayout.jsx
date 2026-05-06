@@ -104,7 +104,7 @@ const MainLayout = () => {
 
     return (
         <Layout style={{height: customHeight,
-                        overflow: 'hidden'
+//                        overflow: 'hidden'
         }}>
             
             <Sider 
