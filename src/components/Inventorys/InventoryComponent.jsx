@@ -443,6 +443,8 @@ const InventoryComponent = () => {
                 const unit = await getAllUnits().then( async (response) => response.data)
 
                 const itemsAux = dadosItemsInv
+                    .filter(itemsInv => itemsInv.item !== null)
+                    .filter(itemsInv => itemsInv.inventory !== null)
                     .filter(itemsInv => dadosAux.some(item => item._id === itemsInv.inventory._id))
                     .map( item => ({
                         key:                item._id,
@@ -460,6 +462,7 @@ const InventoryComponent = () => {
 
                 const placesAux = dadosPlaces.filter(places => dadosAux.some( item => item._id === places.inventory._id))
                 const countAux  = dadosCount
+                        .filter(count => count.placesInventory !== null)
                         .filter(count => placesAux.some(places => places._id === count.placesInventory._id))
                         .map( count => {
 
@@ -477,6 +480,7 @@ const InventoryComponent = () => {
                         })
 
                 setExpandedDate(countAux)                        
+                
             })
 
         } catch (error) {
