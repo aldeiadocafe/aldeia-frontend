@@ -514,7 +514,7 @@ const ListStockBalanceComponent = () => {
 
             setDadosCompleto(dadosFinal);
 //            setDados(dadosFinal)
-            setDados(dadosCompleto.filter(item => item.qtde != undefined));
+            setDados(dadosFinal.filter(item => item.qtde != undefined));
 
             setLoading(false);
 
