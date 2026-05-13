@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Table, Spin, Input, Space, Button, Row, Col, Select, Form } from 'antd';
+import { Table, Spin, Input, Space, Button, Row, Col, Select, Form, Checkbox } from 'antd';
 import { DownloadOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
 
@@ -51,6 +51,8 @@ const ListStockBalanceComponent = () => {
     const [loading, setLoading] = useState(false);
 
     const [tabela,      setTabela]      = useState(1);
+
+    const [listar, setListar] = useState(false)
 
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
@@ -449,8 +451,10 @@ const ListStockBalanceComponent = () => {
     const handleOnChageEmpresa = async (value) => {
 
         try {
-            
-            const dadosAux = dadosCompleto.filter(dados => value.includes(dados.empresa._id))            
+
+            const dadosAux = dadosCompleto
+                                .filter(dados => value.includes(dados.empresa._id))
+                                .filter(dados => listar ? true : dados.qtde != undefined)
             setDados(dadosAux)
 
 
@@ -459,6 +463,19 @@ const ListStockBalanceComponent = () => {
         }
     }
 
+    const handleListarItensNaoContados = async (e) => {
+
+        setListar(e.target.checked)
+
+        const empSelecionadas = form.getFieldsValue("empresas")
+        const idSelec = empSelecionadas.empresas.map(emp => emp)
+
+        const dadosAux = dadosCompleto
+                            .filter(dados => idSelec.includes(dados.empresa._id))
+                            .filter(dados => e.target.checked ? true : dados.qtde != undefined)
+        setDados(dadosAux)
+
+    }
 
     useEffect(() => {
         carregarDados()
@@ -496,7 +513,8 @@ const ListStockBalanceComponent = () => {
             const dadosFinal = dadosAux.filter(dados => dados != undefined)
 
             setDadosCompleto(dadosFinal);
-            setDados(dadosFinal);
+//            setDados(dadosFinal)
+            setDados(dadosCompleto.filter(item => item.qtde != undefined));
 
             setLoading(false);
 
@@ -522,7 +540,7 @@ const ListStockBalanceComponent = () => {
 
             <Row gutter={[16, 16]}>
 
-                <Col span={12}>
+                <Col span={10}>
 
                     <Form
                         form={form}
@@ -531,7 +549,7 @@ const ListStockBalanceComponent = () => {
                         <Item
                             name={"empresas"}
                             key={"empresas"}
-                            label={"Selecionar Empresa"}
+                            label={"Selecionar"}
                             rules={[{required: true, 
                                     message: 'Informar Empresa'}]}
                             >
@@ -558,15 +576,20 @@ const ListStockBalanceComponent = () => {
                     }}
                     >
                         <Space style={{ marginBottom: 16 }}>
-                            <Button onClick={expandAll}>Expandir Tudo</Button>
-                            <Button onClick={collapseAll}>Recolher Tudo</Button>
+                            <Button onClick={expandAll}>Expandir</Button>
+                            <Button onClick={collapseAll}>Recolher</Button>
                             <Button 
                                 type="primary" 
                                 icon={<DownloadOutlined />} 
                                 onClick={exportToExcel}
                             >
-                                Exportar para Excel
+                                Excel
                             </Button>                
+                            <Checkbox
+                                onChange={handleListarItensNaoContados}
+                            >
+                                Itens Não Contados
+                            </Checkbox>
                         </Space>
                     </div>
                 </Col>
