@@ -156,15 +156,6 @@ const DashComponent = () => {
           ellipsis: true,
       },
       {
-          dataIndex:  "unidade",
-          key:        'unidade',
-          title:      "Unid",
-          sorter: (a, b) => a.unidade.localeCompare(b.unidade),
-          showSorterTooltip: { target: 'sorter-icon' }, 
-          ...getColumnSearchProps('unidade'),
-          ellipsis: true,
-      },
-      {
           dataIndex:  "dataValidade",
           key:        'dataValidade',
           title:      "Dt Valid",
@@ -182,6 +173,15 @@ const DashComponent = () => {
           sorter: (a, b) => a.quantidade - b.quantidade,
           showSorterTooltip: { target: 'sorter-icon' }, 
           render: (value) => formatter.format(value)
+      },
+      {
+          dataIndex:  "unidade",
+          key:        'unidade',
+          title:      "Unid",
+          sorter: (a, b) => a.unidade.localeCompare(b.unidade),
+          showSorterTooltip: { target: 'sorter-icon' }, 
+          ...getColumnSearchProps('unidade'),
+          ellipsis: true,
       },
   ]
 
@@ -216,15 +216,6 @@ const DashComponent = () => {
         ellipsis: true,
     },
     {
-        title:      "Unid",
-        dataIndex:  "unidade",
-        key:  "unidadeGCom",
-        sorter: (a, b) => a.unidade.localeCompare(b.unidade),
-        showSorterTooltip: { target: 'sorter-icon' }, 
-        ...getColumnSearchProps('unidade'),
-        ellipsis: true,
-    },
-    {
         title: 'Qtde', 
         dataIndex: 'quantidade', 
         key: 'quantidadeGCom',
@@ -232,6 +223,15 @@ const DashComponent = () => {
         sorter: (a, b) => a.quantidade - b.quantidade,
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
+    },
+    {
+        title:      "Unid",
+        dataIndex:  "unidade",
+        key:  "unidadeGCom",
+        sorter: (a, b) => a.unidade.localeCompare(b.unidade),
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ...getColumnSearchProps('unidade'),
+        ellipsis: true,
     },
     {
         title: 'GCom Estoq', 
