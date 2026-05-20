@@ -36,7 +36,8 @@ const LoginComponent = () => {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+    <div className="container d-flex justify-content-center align-items-center min-vh-100"
+      style={{ marginTop: '-60px' }}>
       <Card className="shadow-lg" style={{ width: 400 }}>
         <div className="text-center mb-4">
           <Title 
