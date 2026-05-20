@@ -225,15 +225,6 @@ const DashComponent = () => {
         render: (value) => formatter.format(value),
     },
     {
-        title:      "Unid",
-        dataIndex:  "unidade",
-        key:  "unidadeGCom",
-        sorter: (a, b) => a.unidade.localeCompare(b.unidade),
-        showSorterTooltip: { target: 'sorter-icon' }, 
-        ...getColumnSearchProps('unidade'),
-        ellipsis: true,
-    },
-    {
         title: 'GCom Estoq', 
         dataIndex: 'gcomEstoque', 
         key: 'gcomEstoque',
@@ -250,6 +241,15 @@ const DashComponent = () => {
         sorter: (a, b) => a.diferenca - b.diferenca,
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
+    },
+    {
+        title:      "Unid",
+        dataIndex:  "unidade",
+        key:  "unidadeGCom",
+        sorter: (a, b) => a.unidade.localeCompare(b.unidade),
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        ...getColumnSearchProps('unidade'),
+        ellipsis: true,
     },
   ];
 
