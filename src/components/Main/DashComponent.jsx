@@ -137,7 +137,7 @@ const DashComponent = () => {
           ...getColumnSearchProps('nomeEmpresa'),
           ellipsis: true,
       },
-      {
+/*      {
           dataIndex:  'itCodigo',
           key:  'itCodigo',
           title: 'Item',
@@ -146,7 +146,7 @@ const DashComponent = () => {
           ...getColumnSearchProps('itCodigo'),
           ellipsis: true,
       },
-      {
+*/      {
           dataIndex:  'descricao',
           key:  'descricao',
           title: 'Descrição',
@@ -196,7 +196,7 @@ const DashComponent = () => {
         ...getColumnSearchProps('nomeEmpresa'),
         ellipsis: true,
     },
-    {
+/*    {
         title: 'Item', 
         dataIndex: 'itCodigo', 
         key: 'itCodigoGCom',
@@ -205,7 +205,7 @@ const DashComponent = () => {
         onFilter: (value, record) => record.itCodigo.indexOf(value) === 0,      
         ellipsis: true,
     },
-    {
+*/    {
         title: 'Descrição', 
         dataIndex: 'descricao', 
         key: 'descricaoGCom',
