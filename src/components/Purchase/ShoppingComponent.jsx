@@ -60,7 +60,7 @@ const ShoppingComponent = () => {
                 empresas:           values.empresas,
                 nomesEmpresa:       nomesAux,
                 itCodigo:           values.itCodigo.toUpperCase(),
-                quantidade:         values.quantidade || 1,
+                quantidade:         values.quantidade || 0,
                 comprado:           false,
                 usuarioSolicitacao: user,
                 dataSolicitacao:    Date.now(),
