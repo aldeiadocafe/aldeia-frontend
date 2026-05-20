@@ -177,7 +177,7 @@ const MenuList = () => {
 // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
 */        
         // Este item só aparece em telas grandes (lg ou superior)
-        screens.xs &&
+//        screens.xs &&
         { 
             key: 'sistema',
             icon: <SettingOutlined />,
