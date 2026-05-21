@@ -411,6 +411,7 @@ const DashComponent = () => {
 
             await getAllStockBalances().then( async response => {
 
+              //Filtrar por Empresa do usuário
               dadosStock = response.data
                 .filter(stock => stock.item != undefined && 
                                  stock.quantidade != 0
