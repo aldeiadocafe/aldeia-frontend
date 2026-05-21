@@ -416,6 +416,7 @@ const DashComponent = () => {
                                  stock.quantidade != 0
                 )
                 .filter(stock => items.some(item => item._id === stock.item._id))
+                .filter(stock => user.empresas.some(empresa => empresa._id === stock.empresa._id))
                 .map(item => ({
                   _id:          item._id,
                   idItem:       item.item._id,
