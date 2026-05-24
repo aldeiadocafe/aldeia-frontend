@@ -1,23 +1,19 @@
 import React from 'react';
-import { Grid, Typography } from 'antd';
-
-const { useBreakpoint } = Grid;
-const { Text } = Typography;
+import { Button } from 'antd';
 
 const Teste = () => {
-  // Pega o estado atual da tela (ex: { xs: true, sm: true, md: false, lg: false })
-  const screens = useBreakpoint();
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
-  // Tablet ou Computador (md, lg, xl, xxl)
-  const isDesktopOrTablet = screens.md;
+  // Detecta se é Android
+  const isAndroid = /android/i.test(userAgent);
+
+  // Detecta se é Windows (Desktop)
+  const isWindows = /windows nt/i.test(userAgent);
 
   return (
     <div>
-      {isDesktopOrTablet ? (
-        <Text type="success">Você está usando um Computador ou Tablet!</Text>
-      ) : (
-        <Text type="warning">Você está usando um Smartphone!</Text>
-      )}
+      {isAndroid && <Button type="primary">Você está no Android</Button>}
+      {isWindows && <Button type="default">Você está no Windows</Button>}
     </div>
   );
 };

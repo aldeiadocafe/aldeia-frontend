@@ -18,12 +18,19 @@ const MainLayout = () => {
 
     const { logout } = useAuth()
 
-    const navigator = useNavigate()
+    const nav = useNavigate()
 
     const [collapsed, setCollapsed] = useState(true);
 
     const { user } = useAuth();
     
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    // Detecta se é Android
+    const isAndroid = /android/i.test(userAgent);
+    // Detecta se é Windows (Desktop)
+    const isWindows = /windows nt/i.test(userAgent);
+
+
     const screens = useBreakpoint()
 
   // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
@@ -46,10 +53,13 @@ const MainLayout = () => {
     Deitado >>  Largura:  747 px
                 Altura:   198 px
 */  
-    const customHeight = screens.xl ? '100vh' : 
+
+    const customHeight = 
+                    isWindows ? '100vh' :
+                    (screens.xl ? '100vh' : 
                     screens.xs ? 'calc(100vh - 60px)' :
                     //screens.sm ? 'calc(100vh - 100px)' : 
-                        'calc(100vh - 100px)'
+                        'calc(100vh - 100px)')
 
     // 1. Defina os itens do menu como um objeto de configuração
     const items = [
@@ -77,7 +87,7 @@ const MainLayout = () => {
 */
 
         if (key === '1')
-            navigator('/profiles') 
+            nav('/profiles') 
 
         if (key === '3')
             handleLogout()
