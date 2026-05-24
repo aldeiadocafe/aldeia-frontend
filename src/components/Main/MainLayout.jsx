@@ -45,7 +45,6 @@ const MainLayout = () => {
 
     Deitado >>  Largura:  747 px
                 Altura:   198 px
-
 */  
     const customHeight = screens.xl ? '100vh' : 
                     screens.xs ? 'calc(100vh - 60px)' :

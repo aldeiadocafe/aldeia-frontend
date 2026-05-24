@@ -22,6 +22,7 @@ const InventoryComponent = () => {
     const { user } = useAuth();
 
     const [dados,           setDados]           = useState([]);
+    const [filterEmpresas,  setFilterEmpresas]  = useState([])
     const [selectEmpresas,  setSelectEmpresas]  = useState([]);
     const [empresa,         setEmpresa]         = useState(null)
     const [searchText,      setSearchText]      = useState('');
@@ -146,9 +147,15 @@ const InventoryComponent = () => {
             dataIndex:  "empresaNome",
             key:        "empresaNome",
             title:      "Empresa",
+            filters: filterEmpresas,
+            // Método de filtragem
+            onFilter: (value, record) => {
+//console.log(value)                
+                return record.empresaNome.includes(value)
+            },
             sorter: (a, b) => a.empresaNome.localeCompare(b.empresaNome),
             showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('empresaNome'),
+//            ...getColumnSearchProps('empresaNome'),
             ellipsis: true,
         },
         {
@@ -410,6 +417,13 @@ const InventoryComponent = () => {
                     label: company.nome
                 }))
                 setSelectEmpresas(formatarDados)
+
+                // Empresa
+                const formatarFilter = user.empresas.map((company) => ({
+                    value: company.nome,
+                    text: company.nome,
+                }))
+                setFilterEmpresas(formatarFilter)
 
             }
 

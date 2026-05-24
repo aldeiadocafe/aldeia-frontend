@@ -25,6 +25,7 @@ const ListDatesItemBalanceComponent = () => {
     const [ form ] = Form.useForm()
     const { Item } = Form
 
+    const [filterEmpresas,  setFilterEmpresas]  = useState([])
     const [selectEmpresas,  setSelectEmpresas]  = useState([]);
     const [empresa,         setEmpresa]         = useState([])
 
@@ -107,9 +108,15 @@ const ListDatesItemBalanceComponent = () => {
             title: 'Empresa', 
             dataIndex: 'nomeEmpresa', 
             key: 'empresa',
+            filters: filterEmpresas,
+            // Método de filtragem
+            onFilter: (value, record) => {
+//console.log(value)                
+                return record.nomeEmpresa.includes(value)
+            },
             sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
             showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('nomeEmpresa'),
+//            ...getColumnSearchProps('nomeEmpresa'),
             ellipsis: true,
         },
         {
@@ -208,6 +215,13 @@ const ListDatesItemBalanceComponent = () => {
                     label: company.nome
                 }))
                 setSelectEmpresas(formatarDados)
+
+                // Empresa
+                const formatarFilter = user.empresas.map((company) => ({
+                    value: company.nome,
+                    text: company.nome,
+                }))
+                setFilterEmpresas(formatarFilter)
 
                 form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
 

@@ -33,6 +33,7 @@ const DashComponent = () => {
   const [dadosGCom,       setDadosGCom]       = useState([])
   const [searchText,      setSearchText]      = useState('');
 
+  const [filterEmpresas,  setFilterEmpresas]  = useState([])
   const [selectEmpresas,  setSelectEmpresas]  = useState([]);
   const [empresa,         setEmpresa]         = useState([])
 
@@ -132,9 +133,16 @@ const DashComponent = () => {
           dataIndex:  'nomeEmpresa',
           key:  'nomeEmpresa',
           title: 'Empresa',
+          filters: filterEmpresas,
+          // Método de filtragem
+          onFilter: (value, record) => {
+//console.log(value)                
+//console.log(record)                
+              return record.empresa.nome.includes(value)
+          },
           sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
           showSorterTooltip: { target: 'sorter-icon' }, 
-          ...getColumnSearchProps('nomeEmpresa'),
+//          ...getColumnSearchProps('nomeEmpresa'),
           ellipsis: true,
       },
 /*      {
@@ -191,9 +199,16 @@ const DashComponent = () => {
         dataIndex:  'nomeEmpresa',
         key:  'nomeEmpresaGCom',
         title: 'Empresa',
+        filters: filterEmpresas,
+        // Método de filtragem
+        onFilter: (value, record) => {
+//console.log(value)                
+//console.log(record)                
+            return record.empresa.nome.includes(value)
+        },
         sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
         showSorterTooltip: { target: 'sorter-icon' }, 
-        ...getColumnSearchProps('nomeEmpresa'),
+//        ...getColumnSearchProps('nomeEmpresa'),
         ellipsis: true,
     },
 /*    {
@@ -388,6 +403,13 @@ const DashComponent = () => {
                 label: company.nome
             }))
             setSelectEmpresas(formatarDados)
+
+            // Empresa
+            const formatarFilter = user.empresas.map((company) => ({
+                value: company.nome,
+                text: company.nome,
+            }))
+            setFilterEmpresas(formatarFilter)
 
             form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
 

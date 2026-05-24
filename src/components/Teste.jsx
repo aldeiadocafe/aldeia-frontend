@@ -1,41 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Typography, Card } from 'antd';
+import React from 'react';
+import { Grid, Typography } from 'antd';
 
-const { Content } = Layout;
-const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
+const { Text } = Typography;
 
 const Teste = () => {
-  // 1. Estado para armazenar as dimensões
-  const [dimensoes, setDimensoes] = useState({
-    largura: window.innerWidth,
-    altura: window.innerHeight,
-  });
+  // Pega o estado atual da tela (ex: { xs: true, sm: true, md: false, lg: false })
+  const screens = useBreakpoint();
 
-  // 2. Efeito para atualizar as dimensões quando a tela for redimensionada
-  useEffect(() => {
-    const handleResize = () => {
-      setDimensoes({
-        largura: window.innerWidth,
-        altura: window.innerHeight,
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-    
-    // Limpa o listener ao desmontar o componente
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Tablet ou Computador (md, lg, xl, xxl)
+  const isDesktopOrTablet = screens.md;
 
   return (
-    <Layout style={{ padding: '24px', minHeight: '100vh' }}>
-      <Content>
-        <Card title="Dimensões da Tela (Ant Design)">
-          <Title level={4}>Largura: <Text type="success">{dimensoes.largura}px</Text></Title>
-          <Title level={4}>Altura: <Text type="success">{dimensoes.altura}px</Text></Title>
-          <p>Redimensione a janela para ver os valores mudarem.</p>
-        </Card>
-      </Content>
-    </Layout>
+    <div>
+      {isDesktopOrTablet ? (
+        <Text type="success">Você está usando um Computador ou Tablet!</Text>
+      ) : (
+        <Text type="warning">Você está usando um Smartphone!</Text>
+      )}
+    </div>
   );
 };
 
