@@ -263,6 +263,7 @@ const InventoryComponent = () => {
             showSorterTooltip: { target: 'sorter-icon' }, 
             render: (value) => formatter.format(value),
         },
+/*        
         {
             title: 'Usuário', 
             dataIndex: 'usuarioNome', 
@@ -272,6 +273,7 @@ const InventoryComponent = () => {
             ...getColumnSearchProps('usuarioNome'),
             ellipsis: true,
         },
+*/        
     ]
 
     const colunasContagem = [
