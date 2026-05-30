@@ -716,7 +716,7 @@ const InventoryComponent = () => {
                                 margin: '0px',
                             }}
                         >
-                            Item
+                            Contagem de Itens
                         </Title>
                     )} // <--- Título aqui
 
