@@ -242,7 +242,7 @@ const InventoryComponent = () => {
             sorter: (a, b) => a.itemDescricao.localeCompare(b.itemDescricao),
             defaultSortOrder: 'ascend', 
             showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('descricao'),
+            ...getColumnSearchProps('itemDescricao'),
             ellipsis: true,
         },
         {
@@ -262,6 +262,15 @@ const InventoryComponent = () => {
             sorter: (a, b) => a.quantidade - b.quantidade,
             showSorterTooltip: { target: 'sorter-icon' }, 
             render: (value) => formatter.format(value),
+        },
+        {
+            title: 'Usuário', 
+            dataIndex: 'usuarioNome', 
+            key: 'usuarioNome',
+            sorter: (a, b) => a.usuarioNome.localeCompare(b.usuarioNome),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            ...getColumnSearchProps('usuarioNome'),
+            ellipsis: true,
         },
     ]
 
@@ -468,8 +477,8 @@ const InventoryComponent = () => {
                         itCodigo:           item.item.itCodigo,
                         itemDescricao:      item.item.descricao,
                         unidade:            item.item.unit ? unit.find(unit => unit._id === item.item.unit).unidade : "",
-                        quantidade:         item.quantidade
-
+                        quantidade:         item.quantidade,
+                        usuarioNome:        item.usuarioCriacao ? item.usuarioCriacao.nome : '',
                 }))
 
                 setExpandedItem(itemsAux)
@@ -686,6 +695,7 @@ const InventoryComponent = () => {
         const filterItem = expandedItem.filter((item) => 
                 item.inventoryId === record._id 
         )
+
 //bispo
         return (
             <div style={{ width: '60%',  }}> {/* margin: '0 auto' Container reduzido */}
