@@ -476,6 +476,7 @@ const InventoryComponent = () => {
                         id:                 item._id,
                         inventoryId:        item.inventory._id,
                         itemInventoryId:    item._id,
+                        item:               item.item,
                         itCodigo:           item.item.itCodigo,
                         itemDescricao:      item.item.descricao,
                         unidade:            item.item.unit ? unit.find(unit => unit._id === item.item.unit).unidade : "",
@@ -500,6 +501,7 @@ const InventoryComponent = () => {
                                 dataContagem:       count.dataCriacao,
                                 usuarioNome:        count.usuarioCriacao ? count.usuarioCriacao.nome : '',
                                 countQuantidade:    count.quantidade,
+                                itemId:             count.item ? count.item._id : null,        
                                 inventory:          places ? places.inventory._id: null
                             }                            
                         })
@@ -659,9 +661,11 @@ const InventoryComponent = () => {
 
         //Filtrar dados da filha
         const filterItem = expandedDate.filter((item) => 
-                item.inventory === record.inventoryId
+                item.inventory === record.inventoryId 
+             && item.itemId === record.item._id
         )
 
+//bispo
         return (
             <div style={{ width: '60%',  }}> {/* margin: '0 auto' Container reduzido */}
                 <Table 
@@ -698,7 +702,6 @@ const InventoryComponent = () => {
                 item.inventoryId === record._id 
         )
 
-//bispo
         return (
             <div style={{ width: '60%',  }}> {/* margin: '0 auto' Container reduzido */}
                 <Table 
