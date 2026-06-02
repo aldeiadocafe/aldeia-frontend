@@ -120,17 +120,6 @@ const ItemConfComponent = () => {
     const colunas = 
     [
         {
-            dataIndex:  "_id",
-            sorter: (a, b) => a._id.localeCompare(b._id),
-            // Optional: set a default sort order
-            defaultSortOrder: 'descend', 
-
-            //Ocultando coluna
-            render: () => null,
-            onHeaderCell: () => ({style: { display: 'none'}}),
-            onCell: () => ({ style: {display: 'none'}})            
-        },
-        {
             title: 'Ação',
             key: 'action',
 //            width: 130,
@@ -157,6 +146,19 @@ const ItemConfComponent = () => {
                 </Space>
             ),
         },        
+        {
+            dataIndex:  "_id",
+            title:      "ID",
+            sorter: (a, b) => a._id.localeCompare(b._id),
+            ellipsis: true,
+            // Optional: set a default sort order
+            defaultSortOrder: 'descend', 
+
+            //Ocultando coluna
+//            render: () => null,
+//            onHeaderCell: () => ({style: { display: 'none'}}),
+//            onCell: () => ({ style: {display: 'none'}})            
+        },
         {
             dataIndex:  "descricao",
             title:      "Item",
@@ -190,7 +192,7 @@ const ItemConfComponent = () => {
 
     // onSearch é acionado quando o usuário digita no input
     const onSearchDescricao = (value) => {
-console.log(value)        
+
         let res = []
         if (!value) {
             res = []
