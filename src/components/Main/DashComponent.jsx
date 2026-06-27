@@ -53,7 +53,7 @@ const DashComponent = () => {
   // Define a altura baseada no breakpoint xs
   // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
   const gcomHeight = screens.xl ? 130 : 70
-  const validadeHeight = screens.xl ? 180 : 140;
+  const validadeHeight = screens.xl ? 180 : 130;
 
   const cardBarra = screens.xl ? '220px' : screens.xs ? '90px' : '100px'
   const plotHeight = screens.xl ? 200 : 90
