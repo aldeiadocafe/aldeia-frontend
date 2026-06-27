@@ -533,7 +533,8 @@ const DashComponent = () => {
 
             <Card 
               size='small'
-              style={{ height: heightCardEmpresa()}}
+                style={{ height: '100%'}}
+//              style={{ height: heightCardEmpresa()}}
               >
               <Row gutter={[16, 16]}>
                 {(screens.md || screens.sm) &&
@@ -660,8 +661,8 @@ const DashComponent = () => {
                   showSorterTooltip={true}
                   size={'small'}
                   tableLayout="auto"
-                  scroll={{ y: validadeHeight }}
-    //              scroll={{ y: 110 }}                
+                  scroll={{ y: "calc(100vh - 450px)" }}                
+//                  scroll={{ y: validadeHeight }}
                   rowKey={(record) => record._id}
                   pagination={false}        
 //                  loading={loading}
