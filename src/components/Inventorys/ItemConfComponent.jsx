@@ -521,7 +521,7 @@ const ItemConfComponent = () => {
             <Spin 
             spinning={loading} 
             size='large' 
-            tip="Carregando..."
+            description="Carregando..."
             >
 
 

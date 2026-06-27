@@ -221,7 +221,7 @@ const ConferenceComponent = () => {
             <Spin 
                 spinning={loading} 
                 size='large' 
-                tip="Carregando..."
+                description="Carregando..."
                 >
 
 

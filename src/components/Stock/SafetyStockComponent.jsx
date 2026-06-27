@@ -1,19 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AppstoreAddOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, InputNumber, Row, Col} from 'antd'
+import { Table, Input, Button, Space, Modal, message, Tooltip, Popconfirm, Spin, Select, Form, InputNumber, Row, Col, AutoComplete} from 'antd'
 import Title from 'antd/es/typography/Title';
 
-import { createItem, deleteItem, getAllItems, updateItem } from '../../services/ItemService';
-import { getAllUnits } from '../../services/UnitService';
+import { deleteSafety, getAllSafetys } from '../../services/SafetyStockService';
+import { getAllItems } from '../../services/ItemService';
 import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
 
-const ItemComponent = () => {
+const SafetyStockComponent = () => {
 
     const { user } = useAuth();
-
+    
     const [dados,           setDados]           = useState([]);
-    const [selectUnits,     setSelectUnits]     = useState([]);
+
+    const [filterEmpresas,  setFilterEmpresas]  = useState([])
+    const [selectEmpresas,  setSelectEmpresas]  = useState([])
+    const [dadosEmpresa,    setDadosEmpresa]    = useState([])
+
+    const [dadosItem,       setDadosItem]       = useState([]);
+    const [selectItems,     setSelectItems]     = useState([])
+    const [dadosDescricao,  setDadosDescricao]  = useState([]);
+    const [optDescricao,    setOptDescricao]    = useState([]);    
+    const [itemId,          setItemId]          = useState('');
+
+
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
 
@@ -22,11 +33,13 @@ const ItemComponent = () => {
     const [confirmLoading,  setConfirmLoading]  = useState(false);
     const [loading,         setLoading]         = useState(false);
     
-    const [form]    = Form.useForm();
+    const [ form ]  = Form.useForm();
     const { Item }  = Form;
 
     const [isEditing,   setIsEditing]   = useState(true);
     const [idItem,      setIdItem]      = useState();
+
+    const refDescricao      = useRef(null)
     
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
@@ -135,20 +148,36 @@ const ItemComponent = () => {
 
                 </Space>
             ),
-        },        
+        },                
         {
-            dataIndex:  "itCodigo",
-            title:      "Item",
-            key:        "itCodigo",
+            title: 'Empresa', 
+            dataIndex: 'nomeEmpresa', 
+            key: 'empresa',
+            filters: filterEmpresas,
+            // Método de filtragem
+            onFilter: (value, record) => {
+//    console.log(value)                
+                return record.nomeEmpresa.includes(value)
+            },
+
+            sorter: (a, b) => a.nomeEmpresa.localeCompare(b.nomeEmpresa),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+    //        ...getColumnSearchProps('nomeEmpresa'),
+            ellipsis: true,
+        },
+        {
+            title: 'Item', 
+            dataIndex: 'itCodigo', 
+            key: 'itCodigo',
             sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('itCodigo'),
             ellipsis: true,
         },
         {
-            dataIndex:  "descricao",
-            title:      "Descrição",
-            key:        'descricao',
+            title: 'Descrição', 
+            dataIndex: 'descricao', 
+            key: 'descricao',
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             defaultSortOrder: 'ascend', 
             showSorterTooltip: { target: 'sorter-icon' }, 
@@ -156,33 +185,74 @@ const ItemComponent = () => {
             ellipsis: true,
         },
         {
-            dataIndex:  "unitDescricao",
-            title:      "Unidade Medida",
-            sorter: (a, b) => a.unitDescricao.localeCompare(b.unitDescricao),
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('unitDescricao'),
-            ellipsis: true,
-        },
-        {
-            dataIndex:  "quantidadeMinima",
-            title:      "Qtde Mínima",
+            title: 'Qde Mínima', 
+            dataIndex: 'quantidadeMinima', 
+            key: 'quantidadeMinima',
+            align: 'right',
             sorter: (a, b) => a.quantidadeMinima - b.quantidadeMinima,
             showSorterTooltip: { target: 'sorter-icon' }, 
-            align: 'right',
-            render: (value) => formatter.format(value)
-        },
-        {
-            dataIndex:  "situacao",
-            title:      "Situação",
-            sorter: (a, b) => a.situacao.localeCompare(b.situacao),
-            showSorterTooltip: { target: 'sorter-icon' }, 
-            ...getColumnSearchProps('situacao'),
-            ellipsis: true,
+            render: (value) => formatter.format(value),
         },
     ]
 
-    const gravarDados = (values) => {
+    // onSearch é acionado quando o usuário digita no input
+    const onSearchDescricao = (value) => {
 
+        let res = []
+        if (!value) {
+            res = []
+        } else {
+
+            res = dadosItem
+                .filter((item) =>
+                    normalizarTexto(item.itCodigo + ' - ' + item.descricao).toUpperCase().includes(normalizarTexto(value).toUpperCase())
+                )
+                .map((item) => ({
+                    // 'value' é o que preenche o input quando selecionado
+                    value: item.itCodigo + ' - ' + item.descricao, 
+                    // 'label' é o que aparece no dropdown
+                    label: (
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>{item.itCodigo} - {item.descricao}</span>
+                        </div>
+                    ),
+                    _idItem:    item?._id,
+                    itCodigo:   item?.itCodigo,
+                    unit:       item?.unit,
+                    unidade:    item?.unit?.unidade,
+                    // Guardamos o id original na opção para uso no onSelect
+                    dataId: item?._id, 
+            }));
+                
+        }
+
+        setOptDescricao(res)
+
+    };
+
+    // onSelect é acionado quando o usuário seleciona uma opção do dropdown
+    const onSelectDescricao = (value, option) => {
+
+        setItemId(option.id)
+console.log(option)
+        //Atribuir valores para os campos invisiveis
+        form.setFieldsValue({
+            _idItem:    option._idItem,
+            itCodigo:   option.itCodigo,
+            unidade:    option.unidade
+        })
+
+    }
+
+    //Mostra todas as opções quando o campo é focado
+    const onFocusDescricao = () => {        
+        setOptDescricao(dadosDescricao)
+    }
+
+    const onFinishForm = async (values) => {
+
+console.log("onFinishForm", values)        
+/*
         const item = {
             _id:                values._id,
             itCodigo:           values.itCodigo.toUpperCase(),
@@ -231,7 +301,7 @@ const ItemComponent = () => {
             
         }        
         setLoading(false);    
- 
+ */
     };
 
     const handleCancel = () => {        
@@ -268,62 +338,85 @@ const ItemComponent = () => {
 
             setLoading(true);
 
+            setDadosEmpresa([])
+            if (user.empresas) {
+
+                // Empresa
+                const formatarDados = user.empresas.map((company) => ({
+                    value: company._id,
+                    label: company.nome
+                }))
+                setSelectEmpresas(formatarDados)
+
+                // Empresa
+                const formatarFilter = user.empresas.map((company) => ({
+                    value: company.nome,
+                    text: company.nome,
+                }))
+                setFilterEmpresas(formatarFilter)
+
+                form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
+
+                setDadosEmpresa(user.empresas)
+
+            }
+
+            //Items
+            setDadosItem([])
+            await getAllItems().then(async (response) => {
+
+                const dados = response.data
+                                .filter( item => item.situacao === 'ATIVO')
+                                .map(item => {
+
+                        return {
+                            key:        item._id,
+                            _idItem:    item._id,
+                            itCodigo:   item.itCodigo,
+                            unit:       item.unit,
+                            unidade:    item.unit?.unidade,
+                            value:      item.descricao,
+                            label:      item.itCodigo + " - " + item.descricao
+                        }
+                })
+
+                setDadosDescricao(dados)
+                setOptDescricao(dados)
+
+                setDadosItem(response.data)
+            })
+
             setDados([])
-            await getAllItems().then((response) => {
+
+            await getAllSafetys().then((response) => {
 
                 // Ler Array
-                const dadosAux = response.data.map(item => ({
-                    _id:                item._id,
-                    itCodigo:           item.itCodigo,
-                    descricao:          item.descricao,
-                    unit:               item.unit,
-                    unitDescricao:      item.unit?.descricao,
-                    situacao:           item.situacao,
-                    quantidadeMinima:   item.quantidadeMinima
+                const dadosAux = response.data.map(safety => ({
+                    _id:                safety._id,
+                    idEmpresa:          safety.empresa._id,
+                    idItem:             safety.item._id,
+                    nomeEmpresa:        safety.empresa.nome,
+                    itCodigo:           safety.item.itCodigo,
+                    descricao:          safety.item.descricao,
+                    quantidadeMinima:   safety.quantidadeMinima,
                 }))
 
                 setDados(dadosAux);
 
-                setSelectedRowKeys([]);
-                setLoading(false);
-
             });
 
+            setSelectedRowKeys([]);
+            setLoading(false);
 
         } catch (error) {
             console.error(error);
             setLoading(false);
-        } finally {
-
-    
+        } finally {    
         }
 
     }
 
-    const carregarSelectUnit = async () => {
-
-        setLoading(true)
-
-        await getAllUnits().then((response) => {
-
-            // Formatar os dados
-            const formatarDados = response.data.map((unit) => ({
-                value: unit._id,
-                label: unit.descricao
-            }))
-
-            setSelectUnits(formatarDados)
-
-        }).catch((error) => {
-            console.error(error)
-        })
-
-        setLoading(false)
-        
-    }
-
     useEffect(() => {
-        carregarSelectUnit()
         carregarDados();
     },[]);
 
@@ -403,7 +496,7 @@ const ItemComponent = () => {
 
         if(form.getFieldValue('_id')){
 
-            return await deleteItem(form.getFieldValue('_id')).then((response) => {
+            return await deleteSafety(form.getFieldValue('_id')).then((response) => {
 
                 message.success('Registro eliminado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
@@ -425,20 +518,21 @@ const ItemComponent = () => {
 
 
   return (
+    
     <div>
+
 
         <div style={{ textAlign: 'center' }}>
             <Title level={2}
                 style={{ color: 'var(--primary-color)'}}
-            >Item</Title>
+            >Estoque de Segurança</Title>
         </div>
 
         <Spin 
             spinning={loading} 
             size='large' 
             description="Carregando..."
-        >
-
+        >            
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button 
@@ -465,18 +559,17 @@ const ItemComponent = () => {
 
             {/* Modal de Form */}
             <Modal
-                title={ "Cadastro de Item"}
+                title={ "Manutenção Cadastro Estoque de Segurança"}
                 open={formModal}
                 confirmLoading={confirmLoading}
                 onCancel={handleCancel}        
                 onOk={handleOk}
+
             >        
                 <Form
                     form={form}
                     layout='vertical'
-                    initialValues={{situacao: 'ATIVO',
-                                    quantidadeMinima: 0
-                                }}
+                    onFinish={onFinishForm}
                     >
                     <Item
                         name={"_id"}
@@ -485,81 +578,65 @@ const ItemComponent = () => {
                         <Input />
                     </Item>
                     <Item
-                        name={"itCodigo"}
-                        label="Item"
-                        rules={[{required: true, message: 'Informar o Código do Item'}]}
-                        >
-                        <Input 
-                            disabled={!isEditing || idItem}
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder='Ex: Código 60000639'/>
-                    </Item>
-                    <Item
-                        name={"descricao"}
-                        label="Descrição"
-                        rules={[{required: true, message: 'Informar Descrição'}]}
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder='Ex: Coca Cola'/>
-                    </Item>
-                    <Row gutter={[16, 16]}>
-                        <Col span={12}>
-                            <Item
-                                name="unit"
-                                label="Unidade Medida"
-                                rules={[{required: true, 
-                                        message: 'Informar Unidade de Medida'}]}
-                                >
-                                <Select
-                                    disabled={!isEditing}
-                                    placeholder="Selecionar Unid Medida"
-                                    allowClear  //Permite limpar seleção
-                                    loading={loading}   // Mostrar ícone de carregamento
-                                    options={selectUnits}
-                                >
-                                </Select>
-                            </Item>
-                        </Col>
-                        <Col span={12}>
-                            <Item
-                                name={"quantidadeMinima"}
-                                key={"quantidadeMinima"}
-                                label="Qtde Mínima"
-                                >
-                                <InputNumber 
-                                    disabled={!isEditing}
-                                    placeholder='Quantidade mínima de estoque'
-                                    decimalSeparator=','
-                                    />
-                            </Item>
-                        </Col>
-                    </Row>
-                    <Item
-                        name={"situacao"}
-                        label="Situação"
-                        rules={[{required: true, message: 'Selecionar Situação'}]}
+                        name="empresas"
+                        title="Empresas"
+                        label="Empresas"
+                        rules={[{required: true, 
+                                message: 'Informar Empresa'}]}
                         >
                         <Select
+//                            prefix="Empresas"
                             disabled={!isEditing}
-                            placeholder="Selecionar uma situação"
+//                            dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
+                            placeholder="Selecionar Empresa"
+//                            mode="multiple"
                             allowClear  //Permite limpar seleção
+                            loading={loading}   // Mostrar ícone de carregamento
+                            options={selectEmpresas}
                         >
-                            <Option value="ATIVO">ATIVO</Option>
-                            <Option value="OBSOLETO">OBSOLETO</Option>
                         </Select>
                     </Item>
+                    <Item
+                        name = "descricao"
+                        label="Descrição"
+                        required
+                        rules={[{required: true, 
+                                message: 'Informar Descrição do Item'}]}
+                    >
+                        <AutoComplete
+                            allowClear      // Enable the clear button
+//                                value={valueDescricao}    // Controlled component value
+                            options={optDescricao}   // // O array de sugestões {value, label}
+                            onSelect={onSelectDescricao}
+                            onSearch={onSearchDescricao}
+                            onFocus={onFocusDescricao}
+                            ref={refDescricao}
+//                                onChange={onChangeDescricao}
+                            //onBlur={onBlurDescricao}     // Leave do campo
+
+                            // --- Props de Comportamento ---
+                            style={{ minWidth: 260 }}
+                            placeholder="Descrição do Item"
+//                                allowClear // Mostra ícone para limpar o input
+//                                filterOption={false} // Desabilita filtro automático (filtramos no handleSearch)
+
+                            // --- Customização ---
+                            notFoundContent="Nenhum resultado encontrado"
+                        >
+                        </AutoComplete>                        
+
+                    </Item>
+
                 </Form>
 
             </Modal>
 
             <Modal
-                title={ "Eliminar Item"}
+                title={ "Eliminar Unidade de Medida"}
                 open={deleteModal}
                 confirmLoading={confirmLoading}
                 onCancel={handleCancel}        
-//                onOk={() => setIsPopupOpen(true)}
+        //        onOk={() => setIsPopupOpen(true)}
 
                 footer = {[
                     <Button key="cancela" onClick={handleCancel}>
@@ -593,15 +670,6 @@ const ItemComponent = () => {
                         <Input />
                     </Item>
                     <Item
-                        name={"itCodigo"}
-                        label="Item"
-                        >
-                        <Input 
-                            disabled={!isEditing || idItem}
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder='Ex: Código 60000639'/>                    
-                    </Item>
-                    <Item
                         name={"descricao"}
                         label="Descrição"
                         rules={[{required: true, message: 'Informar Descrição'}]}
@@ -609,52 +677,23 @@ const ItemComponent = () => {
                         <Input 
                             disabled={!isEditing}
                             style={{ textTransform: 'uppercase' }}
-                            placeholder='Ex: Coca Cola'/>
+                            placeholder='Ex: Estoque, Loja'/>
                     </Item>
                     <Item
-                        name="unit"
-                        label="Unidade Medida"
-                        rules={[{required: true, 
-                                message: 'Informar Unidade de Medida'}]}
+                        name={"tipoInventario"}
+                        label="Tipo"
+                        rules={[{required: true, message: 'Selecionar Tipo'}]}
                         >
                         <Select
                             disabled={!isEditing}
-                            placeholder="Selecionar Unid Medida"
-                            allowClear  //Permite limpar seleção
-                            loading={loading}   // Mostrar ícone de carregamento
-                            options={selectUnits}
-                        >
-                        </Select>
-                    </Item>
-                    <Col>
-                        <Item
-                            name={"quantidadeMinima"}
-                            key={"quantidadeMinima"}
-                            label="Qtde Mínima"
-                            >
-                            <InputNumber 
-                                disabled={!isEditing}
-                                placeholder='Quantidade mínima de estoque'
-                                decimalSeparator=','
-                                />
-                        </Item>
-                    </Col>
-                    <Item
-                        name={"situacao"}
-                        key={"situacao"}
-                        label="Situação"
-                        rules={[{required: true, message: 'Selecionar Situação'}]}
-                        >
-                        <Select
-                            disabled={!isEditing}
-                            placeholder="Selecionar uma situação"
+                            placeholder="Selecionar um Tipo"
                             allowClear  //Permite limpar seleção
                         >
-                            <Option value="ATIVO">ATIVO</Option>
-                            <Option value="OBSOLETO">OBSOLETO</Option>
+                            <Option value="TOTAL">TOTAL</Option>
+                            <Option value="PARCIAL">PARCIAL</Option>
                         </Select>
                     </Item>
-                </Form>                
+                </Form>
 
             </Modal>
 
@@ -665,4 +704,4 @@ const ItemComponent = () => {
   )
 }
 
-export default ItemComponent
+export default SafetyStockComponent

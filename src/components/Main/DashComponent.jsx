@@ -53,7 +53,7 @@ const DashComponent = () => {
   // Define a altura baseada no breakpoint xs
   // XS < 576px; SM >= 576PX; MD >= 768px; LG >= 992px; XL >= 1200px; XXL >= 1600px
   const gcomHeight = screens.xl ? 130 : 70
-  const validadeHeight = screens.xl ? 180 : 100;
+  const validadeHeight = screens.xl ? 180 : 140;
 
   const cardBarra = screens.xl ? '220px' : screens.xs ? '90px' : '100px'
   const plotHeight = screens.xl ? 200 : 90
@@ -350,7 +350,7 @@ const DashComponent = () => {
         fill: '#f7f5f5',
       },
     },
-    height: plotHeight, // Optional: set a fixed height
+//    height: plotHeight, // Optional: set a fixed height
     // Opcional: animação ao carregar
     animation: {
       appear: {
@@ -524,7 +524,7 @@ const DashComponent = () => {
     <Spin 
       spinning={loading} 
       size='large' 
-      tip="Carregando..."
+      description="Carregando..."
       >
 
       <div>
@@ -570,12 +570,27 @@ const DashComponent = () => {
 
             </Card>
 
+                <Card
+                  title="Total de Produtos à Vencer"
+                  style={{marginTop: '5px'}}
+                  styles={{
+                    body:{ 
+                        height: "27vh",
+                        overflow: 'hidden',
+                        padding: 5,
+                      },
+                  }}
+                >            
+                  <Column {...config} />
+                </Card>
+
+{/*
             <Row 
               style={{ marginTop: '5px' }}
               gutter={[16, 16]}>
 
-              {/* xs={24} para celular (1 card por linha) */}
-              {/* md={12} para desktop (2 cards por linha) */}
+              {/ * xs={24} para celular (1 card por linha) * /}
+              {/ * md={12} para desktop (2 cards por linha) * /}
               <Col 
                 xs={24}
                 md={8}
@@ -602,6 +617,7 @@ const DashComponent = () => {
                 md={16}
                 span={16}
                 >
+
                 <Card
                   title="Aldeia X GCom"                  
                   styles={{
@@ -621,30 +637,14 @@ const DashComponent = () => {
                       rowKey={(record) => record._id}
                       pagination={false}
 //                      loading={loading}
-    /*                  
-                      pagination={{
-                          tabela,
-                          // The available options for items per page
-                          pageSizeOptions: ['5', '10', '20', '30'], 
-                          // Display the size changer
-                          showSizeChanger: true, 
-                          // Set the default page size
-                  //        defaultPageSize: 5,
-                          // Optional: show total items count
-                          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
-                          // Optional: update tabela page state on change
-                          onChange: (page) => {
-                          setTabela(page);
-                          },
-                      }}        
-    */                      
                   />
 
                 </Card>
+
               </Col>
 
             </Row>
-
+*/}
             <Card 
               title="Produtos por Data de Validade" 
               style={{marginTop: '5px'}}
@@ -660,7 +660,7 @@ const DashComponent = () => {
                   showSorterTooltip={true}
                   size={'small'}
                   tableLayout="auto"
-                  scroll={{ y: validadeHeight }}                
+                  scroll={{ y: validadeHeight }}
     //              scroll={{ y: 110 }}                
                   rowKey={(record) => record._id}
                   pagination={false}        

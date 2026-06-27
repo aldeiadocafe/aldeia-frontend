@@ -563,7 +563,7 @@ const ShoppingComponent = () => {
             <Spin 
                 spinning={loading} 
                 size='large' 
-                tip="Carregando..."
+                description="Carregando..."
                 >
 
                 <Title level={2} style={{ color: 'var(--primary-color)'}}>

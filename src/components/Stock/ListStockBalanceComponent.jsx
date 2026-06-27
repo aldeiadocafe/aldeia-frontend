@@ -544,7 +544,7 @@ const ListStockBalanceComponent = () => {
         <Spin 
         spinning={loading} 
         size='large' 
-        tip="Carregando..."
+        description="Carregando..."
         >
 
             <div style={{ textAlign: 'center' }}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertOutlined, AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { AlertOutlined, AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, SafetyOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 
 import { Menu, ConfigProvider, Grid } from 'antd';
 import { Link } from 'react-router-dom';
@@ -40,6 +40,14 @@ const MenuList = () => {
                             label: 
                                 <Link to="/items">
                                     Item
+                                </Link>,
+                        },
+                        {
+                            key: 'safetyStock',
+                            icon: <SafetyOutlined />,
+                            label: 
+                                <Link to="/safetystocks">
+                                    Est Segurança
                                 </Link>,
                         },
 /*                        

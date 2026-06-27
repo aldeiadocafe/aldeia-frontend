@@ -457,7 +457,7 @@ const ListInventoryComponent = () => {
         <Spin 
             spinning={loading} 
             size='large' 
-            tip="Carregando..."
+            description="Carregando..."
         >
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

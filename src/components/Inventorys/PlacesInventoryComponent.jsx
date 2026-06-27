@@ -423,7 +423,7 @@ const PlacesInventoryComponent = () => {
       <Spin 
         spinning={loading} 
         size='large' 
-        tip="Carregando..."
+        description="Carregando..."
         >
 
             <div style={{ textAlign: 'center' }}>

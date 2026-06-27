@@ -37,6 +37,7 @@ import RecoverComponent from './components/Login/RecoverComponent';
 import PasswordsComponent from './components/Login/PasswordsComponent';
 import Teste from './components/Teste';
 import ShoppingComponent from './components/Purchase/ShoppingComponent';
+import SafetyStockComponent from './components/Stock/SafetyStockComponent';
 
 
 // 3. Definir o locale do dayjs globalmente
@@ -138,6 +139,14 @@ function App() {
                     element={
                       <PrivateRoute>
                         <ConversationsComponent/>
+                      </PrivateRoute>
+                    }/>
+
+                  {/* http://localhost:5173/safetystocks */}
+                  <Route path='/safetystocks'    
+                    element={
+                      <PrivateRoute>
+                        <SafetyStockComponent/>
                       </PrivateRoute>
                     }/>
 

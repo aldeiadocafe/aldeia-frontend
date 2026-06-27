@@ -486,7 +486,7 @@ const CompanysComponent = () => {
         <Spin 
             spinning={loading} 
             size='large' 
-            tip="Carregando..."
+            description="Carregando..."
 //            fullscreen
             >
 
