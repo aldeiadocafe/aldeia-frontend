@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { AppstoreAddOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, message, Tooltip, Popconfirm, Spin, Select, Form, InputNumber, Row, Col, AutoComplete} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, InputNumber, Row, Col, AutoComplete} from 'antd'
 import Title from 'antd/es/typography/Title';
 
-import { deleteSafety, getAllSafetys } from '../../services/SafetyStockService';
+import { createSafety, deleteSafety, getAllSafetys, updateSafety } from '../../services/SafetyStockService';
 import { getAllItems } from '../../services/ItemService';
 import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
@@ -116,16 +116,6 @@ const SafetyStockComponent = () => {
             render: (text, record) => (
                 <Space size="small">
 
-                    <Tooltip title="Visualizar">
-                        <Button
-                            type="primary"
-                            shape='circle'
-                            className={'rotate-icon'}
-                            icon={<EyeOutlined rotate={0} />}
-                            onClick={() => btnVisualizar(record)}
-                        />
-                    </Tooltip>       
-
                     <Tooltip title="Editar">
                         <Button
                             type="primary"
@@ -216,10 +206,6 @@ const SafetyStockComponent = () => {
                             <span>{item.itCodigo} - {item.descricao}</span>
                         </div>
                     ),
-                    _idItem:    item?._id,
-                    itCodigo:   item?.itCodigo,
-                    unit:       item?.unit,
-                    unidade:    item?.unit?.unidade,
                     // Guardamos o id original na opção para uso no onSelect
                     dataId: item?._id, 
             }));
@@ -233,15 +219,8 @@ const SafetyStockComponent = () => {
     // onSelect é acionado quando o usuário seleciona uma opção do dropdown
     const onSelectDescricao = (value, option) => {
 
-        setItemId(option.id)
-console.log(option)
-        //Atribuir valores para os campos invisiveis
-        form.setFieldsValue({
-            _idItem:    option._idItem,
-            itCodigo:   option.itCodigo,
-            unidade:    option.unidade
-        })
-
+        setItemId(option._idItem)
+        
     }
 
     //Mostra todas as opções quando o campo é focado
@@ -249,16 +228,43 @@ console.log(option)
         setOptDescricao(dadosDescricao)
     }
 
-    const onFinishForm = async (values) => {
+    const handleCancel = () => {        
+        setFormModal(false);
+        setDeleteModal(false);
+        form.resetFields(); //Limpa os campos ao fechar
+        carregarDados();
+    };
 
-console.log("onFinishForm", values)        
-/*
-        const item = {
+    const handleOk = async () => {
+
+
+        if (isEditing) {
+
+            try {
+
+                const valores = await form.validateFields()
+
+                //Prossiga com a acao
+                gravarDados(valores);
+
+            } catch (errorInfo) {
+
+                message.info('Verificar campo(s)!');
+                console.error('Erro de validação:', errorInfo.errorFields);
+            }
+
+
+        } else {
+            setFormModal(false)
+        }
+    }
+
+    const gravarDados = (values) => {
+
+        const safety = {
             _id:                values._id,
-            itCodigo:           values.itCodigo.toUpperCase(),
-            descricao:          values.descricao.toUpperCase(),
-            unit:               values.unit,
-            situacao:           values.situacao.toUpperCase(),
+            empresa:            values.empresas,
+            item:               itemId,
             quantidadeMinima:   values.quantidadeMinima,
             usuarioCriacao:     user ? user._id : null,
             usuarioAlteracao:   user ? user._id : null,
@@ -268,10 +274,11 @@ console.log("onFinishForm", values)
 
         if (!values._id) {
 
-            createItem(item).then((response) => {
+            createSafety(safety).then(async (response) => {
                 message.success('Registro criado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
-                carregarDados();
+                await carregarDados();
+                form.setFieldsValue({ empresas: null }) 
 
             }).catch((error)=> {
 
@@ -283,7 +290,7 @@ console.log("onFinishForm", values)
             });
         } else {
 
-            updateItem(values._id, item).then((response) => {
+            updateSafety(values._id, safety).then((response) => {
 
                 message.success('Registro atualizado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
@@ -300,37 +307,10 @@ console.log("onFinishForm", values)
             });
             
         }        
+            
         setLoading(false);    
- */
+
     };
-
-    const handleCancel = () => {        
-        setFormModal(false);
-        setDeleteModal(false);
-        form.resetFields(); //Limpa os campos ao fechar
-        carregarDados();
-    };
-
-    const handleOk = async () => {
-
-        if (isEditing) {
-
-            try {
-
-                const values = await form.validateFields();
-
-                //Prossiga com a acao
-                gravarDados(values);
-
-            } catch (errorInfo) {
-
-                message.info('Verificar campo(s)!');
-            }
-
-        } else {
-            setFormModal(false)
-        }
-    }
 
     const carregarDados = async () => {
 
@@ -375,7 +355,7 @@ console.log("onFinishForm", values)
                             itCodigo:   item.itCodigo,
                             unit:       item.unit,
                             unidade:    item.unit?.unidade,
-                            value:      item.descricao,
+                            value:      item.itCodigo + " - " + item.descricao,
                             label:      item.itCodigo + " - " + item.descricao
                         }
                 })
@@ -439,7 +419,6 @@ console.log("onFinishForm", values)
             setIdItem(value._id)
             form.setFieldsValue({
                 _id:                value._id,
-                itCodigo:           value.itCodigo,
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
@@ -458,14 +437,12 @@ console.log("onFinishForm", values)
         setFormModal(true);
 
         if(value) {
-
-            setIdItem(value._id)
+            setItemId(value.idItem)
             form.setFieldsValue({
                 _id:                value._id,
-                itCodigo:           value.itCodigo,
-                descricao:          value.descricao,
-                unit:               value.unit._id,
-                situacao:           value.situacao,
+                nomeEmpresa:        value.nomeEmpresa,
+                empresas:           value.idEmpresa,
+                descricao:          value.itCodigo + ' - ' + value.descricao,
                 quantidadeMinima:   value.quantidadeMinima
             })
 
@@ -482,10 +459,9 @@ console.log("onFinishForm", values)
 
             form.setFieldsValue({
                 _id:                value._id,
-                itCodigo:           value.itCodigo,
-                descricao:          value.descricao,
-                unit:               value.unit._id,
-                situacao:           value.situacao,
+                nomeEmpresa:        value.nomeEmpresa,
+                empresas:           value.idEmpresa,
+                descricao:          value.itCodigo + ' - ' + value.descricao,
                 quantidadeMinima:   value.quantidadeMinima
             })
         }
@@ -569,10 +545,9 @@ console.log("onFinishForm", values)
                 <Form
                     form={form}
                     layout='vertical'
-                    onFinish={onFinishForm}
                     >
                     <Item
-                        name={"_id"}
+                        name="_id"
                         style={{ display: 'none'}}
                     >
                         <Input />
@@ -586,7 +561,7 @@ console.log("onFinishForm", values)
                         >
                         <Select
 //                            prefix="Empresas"
-                            disabled={!isEditing}
+                            disabled={!isEditing || idItem}
 //                            dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
                             placeholder="Selecionar Empresa"
 //                            mode="multiple"
@@ -599,7 +574,6 @@ console.log("onFinishForm", values)
                     <Item
                         name = "descricao"
                         label="Descrição"
-                        required
                         rules={[{required: true, 
                                 message: 'Informar Descrição do Item'}]}
                     >
@@ -611,6 +585,8 @@ console.log("onFinishForm", values)
                             onSearch={onSearchDescricao}
                             onFocus={onFocusDescricao}
                             ref={refDescricao}
+                            disabled={!isEditing || idItem}
+
 //                                onChange={onChangeDescricao}
                             //onBlur={onBlurDescricao}     // Leave do campo
 
@@ -625,6 +601,19 @@ console.log("onFinishForm", values)
                         >
                         </AutoComplete>                        
 
+                    </Item>
+                    <Item
+                        name="quantidadeMinima"
+                        key="quantidadeMinima"
+                        label="Qtde Mínima"
+                        rules={[{required: true, 
+                                 message: 'Informar Quantidade Mínima'}]}
+                        >
+                        <InputNumber 
+                            placeholder='Quantidade mínima de estoque'
+                            decimalSeparator=','
+                            style={{ width: '50%' }}
+                            />
                     </Item>
 
                 </Form>
@@ -664,35 +653,76 @@ console.log("onFinishForm", values)
                     layout='vertical'
                     >
                     <Item
-                        name={"_id"}
+                        name="_id"
                         style={{ display: 'none'}}
                     >
                         <Input />
                     </Item>
                     <Item
-                        name={"descricao"}
-                        label="Descrição"
-                        rules={[{required: true, message: 'Informar Descrição'}]}
-                        >
-                        <Input 
-                            disabled={!isEditing}
-                            style={{ textTransform: 'uppercase' }}
-                            placeholder='Ex: Estoque, Loja'/>
-                    </Item>
-                    <Item
-                        name={"tipoInventario"}
-                        label="Tipo"
-                        rules={[{required: true, message: 'Selecionar Tipo'}]}
+                        name="empresas"
+                        title="Empresas"
+                        label="Empresas"
+                        rules={[{required: true, 
+                                message: 'Informar Empresa'}]}
                         >
                         <Select
+//                            prefix="Empresas"
                             disabled={!isEditing}
-                            placeholder="Selecionar um Tipo"
+//                            dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
+                            placeholder="Selecionar Empresa"
+//                            mode="multiple"
                             allowClear  //Permite limpar seleção
+                            loading={loading}   // Mostrar ícone de carregamento
+                            options={selectEmpresas}
                         >
-                            <Option value="TOTAL">TOTAL</Option>
-                            <Option value="PARCIAL">PARCIAL</Option>
                         </Select>
                     </Item>
+                    <Item
+                        name = "descricao"
+                        label="Descrição"
+                        required
+                        rules={[{required: true, 
+                                message: 'Informar Descrição do Item'}]}
+                    >
+                        <AutoComplete
+                            allowClear      // Enable the clear button
+//                                value={valueDescricao}    // Controlled component value
+                            options={optDescricao}   // // O array de sugestões {value, label}
+                            onSelect={onSelectDescricao}
+                            onSearch={onSearchDescricao}
+                            onFocus={onFocusDescricao}
+                            ref={refDescricao}
+                            disabled={!isEditing}
+
+//                                onChange={onChangeDescricao}
+                            //onBlur={onBlurDescricao}     // Leave do campo
+
+                            // --- Props de Comportamento ---
+                            style={{ minWidth: 260 }}
+                            placeholder="Descrição do Item"
+//                                allowClear // Mostra ícone para limpar o input
+//                                filterOption={false} // Desabilita filtro automático (filtramos no handleSearch)
+
+                            // --- Customização ---
+                            notFoundContent="Nenhum resultado encontrado"
+                        >
+                        </AutoComplete>                        
+
+                    </Item>
+                    <Item
+                        name="quantidadeMinima"
+                        key="quantidadeMinima"
+                        label="Qtde Mínima"
+                        rules={[{required: true, 
+                                 message: 'Informar Quantidade Mínima'}]}
+                        >
+                        <InputNumber 
+                            placeholder='Quantidade mínima de estoque'
+                            decimalSeparator=','
+                            style={{ width: '30%' }}
+                            />
+                    </Item>
+
                 </Form>
 
             </Modal>

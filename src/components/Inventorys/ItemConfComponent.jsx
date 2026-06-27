@@ -524,7 +524,6 @@ const ItemConfComponent = () => {
             description="Carregando..."
             >
 
-
                 <div style={{ textAlign: 'center' }}>
                     <Title level={2}
                         style={{ color: 'var(--primary-color)'}}
