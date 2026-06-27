@@ -661,7 +661,7 @@ const DashComponent = () => {
                   showSorterTooltip={true}
                   size={'small'}
                   tableLayout="auto"
-                  scroll={{ y: "calc(100vh - 440px)" }}                
+                  scroll={{ y: "calc(100vh - 460px)" }}                
 //                  scroll={{ y: validadeHeight }}
                   rowKey={(record) => record._id}
                   pagination={false}        
