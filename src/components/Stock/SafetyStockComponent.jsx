@@ -208,6 +208,7 @@ const SafetyStockComponent = () => {
                     ),
                     // Guardamos o id original na opção para uso no onSelect
                     dataId: item?._id, 
+                    _idItem: item?._id,
             }));
                 
         }
@@ -271,7 +272,8 @@ const SafetyStockComponent = () => {
         };
 
         setLoading(true);    
-
+console.log('safety', safety)
+console.log('values', values)
         if (!values._id) {
 
             createSafety(safety).then(async (response) => {
