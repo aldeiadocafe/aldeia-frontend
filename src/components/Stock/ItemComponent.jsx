@@ -163,6 +163,7 @@ const ItemComponent = () => {
             ...getColumnSearchProps('unitDescricao'),
             ellipsis: true,
         },
+/*        
         {
             dataIndex:  "quantidadeMinima",
             title:      "Qtde Mínima",
@@ -171,6 +172,7 @@ const ItemComponent = () => {
             align: 'right',
             render: (value) => formatter.format(value)
         },
+*/        
         {
             dataIndex:  "situacao",
             title:      "Situação",
@@ -189,7 +191,7 @@ const ItemComponent = () => {
             descricao:          values.descricao.toUpperCase(),
             unit:               values.unit,
             situacao:           values.situacao.toUpperCase(),
-            quantidadeMinima:   values.quantidadeMinima,
+//            quantidadeMinima:   values.quantidadeMinima,
             usuarioCriacao:     user ? user._id : null,
             usuarioAlteracao:   user ? user._id : null,
         };
@@ -279,7 +281,7 @@ const ItemComponent = () => {
                     unit:               item.unit,
                     unitDescricao:      item.unit?.descricao,
                     situacao:           item.situacao,
-                    quantidadeMinima:   item.quantidadeMinima
+//                    quantidadeMinima:   item.quantidadeMinima
                 }))
 
                 setDados(dadosAux);
@@ -350,7 +352,7 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
-                quantidadeMinima:   value.quantidadeMinima
+//                quantidadeMinima:   value.quantidadeMinima
             })
 
             setFormModal(true);
@@ -373,7 +375,7 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
-                quantidadeMinima:   value.quantidadeMinima
+//                quantidadeMinima:   value.quantidadeMinima
             })
 
         }
@@ -393,7 +395,7 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
-                quantidadeMinima:   value.quantidadeMinima
+//                quantidadeMinima:   value.quantidadeMinima
             })
         }
     }
@@ -475,7 +477,7 @@ const ItemComponent = () => {
                     form={form}
                     layout='vertical'
                     initialValues={{situacao: 'ATIVO',
-                                    quantidadeMinima: 0
+//                                    quantidadeMinima: 0
                                 }}
                     >
                     <Item
@@ -522,6 +524,7 @@ const ItemComponent = () => {
                                 </Select>
                             </Item>
                         </Col>
+{/*                        
                         <Col span={12}>
                             <Item
                                 name={"quantidadeMinima"}
@@ -535,6 +538,7 @@ const ItemComponent = () => {
                                     />
                             </Item>
                         </Col>
+*/}                        
                     </Row>
                     <Item
                         name={"situacao"}
@@ -626,6 +630,7 @@ const ItemComponent = () => {
                         >
                         </Select>
                     </Item>
+{/*                    
                     <Col>
                         <Item
                             name={"quantidadeMinima"}
@@ -639,6 +644,7 @@ const ItemComponent = () => {
                                 />
                         </Item>
                     </Col>
+*/}                    
                     <Item
                         name={"situacao"}
                         key={"situacao"}

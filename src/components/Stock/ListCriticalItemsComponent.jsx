@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Table, Spin, Input, Space, Button, Row, Col, Select, Form } from 'antd';
+import { Table, Spin, Input, Space, Button, Row, Col, Select, Form, InputNumber, Flex } from 'antd';
 import { DownloadOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
 
@@ -17,6 +17,8 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import { normalizarTexto } from '../../Funcoes/Utils';
 import { useAuth } from '../Login/AuthContext';
+import { LuRefreshCcw } from 'react-icons/lu';
+import { getAllSafetys } from '../../services/SafetyStockService';
 
 dayjs.extend(utc)
 
@@ -28,9 +30,10 @@ const ListCriticalItemsComponent = () => {
     const [ form ]  = Form.useForm();
     const { Item }  = Form;
 
-    const [filterEmpresas,  setFilterEmpresas]  = useState([])
-    const [selectEmpresas,  setSelectEmpresas]  = useState([]);
-    const [empresa,         setEmpresa]         = useState([])
+    const [filterEmpresas,          setFilterEmpresas]      = useState([])
+    const [selectEmpresas,          setSelectEmpresas]      = useState([])
+    const [usuarioEmpresas,         setUsuarioEmpresas]     = useState([])
+    const [empresasSelecionadas,    setEmpresasSelecionadas]= useState([])
 
     const [dadosCompleto,   setDadosCompleto]       = useState([])
     const [dados,       setDados]                   = useState([])
@@ -49,29 +52,18 @@ const ListCriticalItemsComponent = () => {
     const exportToExcel = () => {
 
         const dadosExcel = dados.map(item => ({
-            Empresa:            item.nomeEmpresa,
-            Item:               item.itCodigo,
-            Descrição:          item.descricao,
-            Unid:               item.unidade,
-            "Qtde Mínima":      formatter.format(item.quantidadeMinima),
-            Quantidade:         formatter.format(item.qtde),
-            GCom:               formatter.format(item.gcomEstoque),
-            "Mínima - GCOM":    formatter.format(item.diferenca),
-            "Data Inventário":  item.dataInventario,
-            "Data GCom":        item.dataGCom
+            Empresa:                item.nomeEmpresa,
+            Item:                   item.itCodigo,
+            Descrição:              item.descricao,
+            Unid:                   item.unidade,
+            "Qtde Mínima":          formatter.format(item.quantidadeMinima),
+            "Qtde Estoque":         formatter.format(item.quantidadeEstoque),
+            "Vencido / À Vencer":   formatter.format(item.quantidadeAVencer),
+            "Qtde Disponível":      formatter.format(item.quantidadeDisponivel),
         }))
 
         // Cria worksheet / Converte os dados (JSON) em worksheet
         const ws = XLSX.utils.json_to_sheet(dadosExcel)
-
-/*
-        // Fórmulas de multiplicação nas linhas 2 e 3
-        ws['D2'] = { t: 'n', f: 'B2*C2' };
-        ws['D3'] = { t: 'n', f: 'B3*C3' };
-        
-        // Fórmula de soma no final
-        ws['D4'] = { t: 'n', f: 'SUM(D2:D3)', s: { font: { bold: true } } }; // Com estilo negrito
-*/
 
         // Definir Estilos (Header)
         const headerStyle = {
@@ -98,21 +90,17 @@ const ListCriticalItemsComponent = () => {
         if (ws['F1']) ws['F1'].s = headerStyle;
         if (ws['G1']) ws['G1'].s = headerStyle;
         if (ws['H1']) ws['H1'].s = headerStyle;
-        if (ws['I1']) ws['I1'].s = headerStyle;
-        if (ws['J1']) ws['J1'].s = headerStyle;
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
             { wch: 20 }, // Largura da Coluna A
             { wch: 30 }, // Largura da Coluna B
             { wch: 50 }, // Largura da Coluna C
-            { wch: 5  }, // Largura da Coluna D
+            { wch: 9  }, // Largura da Coluna D
             { wch: 15 }, // Largura da Coluna E
             { wch: 15 }, // Largura da Coluna F
             { wch: 15 }, // Largura da Coluna G
             { wch: 15 }, // Largura da Coluna H
-            { wch: 15 }, // Largura da Coluna I
-            { wch: 15 }, // Largura da Coluna J
         ]
 
         // Obtém o total de linhas (exclui o cabeçalho se json_to_sheet for usado sem customização)
@@ -128,13 +116,6 @@ const ListCriticalItemsComponent = () => {
             ws['F' + i].s = rightAlignStyle; // Aplica o estilo
             ws['G' + i].s = rightAlignStyle; // Aplica o estilo
             ws['H' + i].s = rightAlignStyle; // Aplica o estilo
-
-            //Formatar em data
-            ws['I' + i].z = 'dd/mm/yyyy'
-            ws['I' + i].t = 'd' // Define o tipo como Data
-
-            ws['J' + i].z = 'dd/mm/yyyy'
-            ws['J' + i].t = 'd' // Define o tipo como Data
         }
 
         // Cria um novo workbook
@@ -258,54 +239,137 @@ const ListCriticalItemsComponent = () => {
         render: (value) => formatter.format(value),
     },
     {
-        title: 'Quantidade', 
-        dataIndex: 'qtde', 
-        key: 'qtde',
+        title: 'Qtde Estoque', 
+        dataIndex: 'quantidadeEstoque', 
+        key: 'quantidadeEstoque',
         align: 'right',
-        sorter: (a, b) => a.qtde - b.qtde,
+        sorter: (a, b) => a.quantidadeEstoque - b.quantidadeEstoque,
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
     },
     {
-        title: 'GCom Estoq', 
-        dataIndex: 'gcomEstoque', 
-        key: 'gcomEstoque',
+        title: 'Vencido / À Vencer', 
+        dataIndex: 'quantidadeAVencer', 
+        key: 'quantidadeAVencer',
         align: 'right',
-        sorter: (a, b) => a.gcomEstoque - b.gcomEstoque,
+        sorter: (a, b) => a.quantidadeAVencer - b.quantidadeAVencer,
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
     },
     {
-        title: 'Mínima - GCom', 
-        dataIndex: 'diferenca', 
-        key: 'diferenca',
+        title: 'Qtde Disponível', 
+        dataIndex: 'quantidadeDisponivel', 
+        key: 'quantidadeDisponivel',
         align: 'right',
-        sorter: (a, b) => a.diferenca - b.diferenca,
+        sorter: (a, b) => a.quantidadeDisponivel - b.quantidadeDisponivel,
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
-    },
-    {
-        dataIndex:  "dataInventario",
-        title:      "Dt Inventário",
-        sorter: (a, b) => new Date(a.dataInventario).getTime() - new Date(b.dataInventario).getTime(),
-        // Optional: set a default sort order
-        showSorterTooltip: { target: 'sorter-icon' }, 
-        ellipsis: true,
-        render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
-    },
-    {
-        dataIndex:  "dataGCom",
-        title:      "Dt GCom",
-        sorter: (a, b) => new Date(a.dataGCom).getTime() - new Date(b.dataGCom).getTime(),
-        // Optional: set a default sort order
-        showSorterTooltip: { target: 'sorter-icon' }, 
-        ellipsis: true,
-        render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
     },
   ];
 
-    const carregarDados = async () => {
- 
+    const handleOnChageEmpresa = async (value) => {
+
+        await setEmpresasSelecionadas(value)
+
+    }
+
+    const carregarItens = async () => {
+        setDadosCompleto([])
+    }
+
+    const CarregarDadosCompleto = async () => {
+
+        const dias = form.getFieldValue('diasAVencer') || 0
+        const hoje = dayjs(new Date().toISOString().split('T')[0])
+
+        try {
+            
+            setLoading(true);
+
+            //Unidade
+            const units = await getAllUnits().then((res) => res.data)
+
+            //Items
+            const items = await getAllItems().then((res) => res.data)
+
+            //Safety Stock
+            const safetys = await getAllSafetys().then((res) => res.data)
+            const safetysEmp = safetys.filter((safety) => empresasSelecionadas.includes(safety.empresa._id))
+
+            //Stock Balance
+            const stockBalances = await getAllStockBalances().then((res) => res.data);
+            const stockEmp = stockBalances.filter((stock) => empresasSelecionadas.includes(stock.empresa._id))
+
+
+            //Dates Item Balance
+            const datesItemBalance = await getAllDatesItem().then((res) => res.data);
+            const datesEmp = datesItemBalance.filter((date) => empresasSelecionadas.includes(date.empresa._id))
+
+            let dadosAux = []
+
+            safetysEmp.map((safety) => {
+
+                stockEmp.filter((stock) => stock.empresa._id === safety.empresa._id 
+                                        && stock.item._id === safety.item._id)
+                        .map((stock) => {
+
+                    let qtdeAux = 0
+
+                    if (dias > 0) {
+
+                        const datesEmpAux = datesEmp.filter((date) => date.empresa._id === safety.empresa._id
+                                                                   && date.item._id === safety.item._id)
+
+                        if (datesEmpAux.length != 0) {
+
+                            qtdeAux = datesEmpAux
+                                    .filter(dates => dayjs(new Date(dates.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= dias)
+                                    .reduce((sum, dates) => sum + dates.quantidade, 0)
+
+                        }
+                    } else {
+
+                        const datesEmpAux = datesEmp.filter((date) => date.empresa._id === safety.empresa._id
+                                                                   && date.item._id === safety.item._id)
+
+                        if (datesEmpAux.length != 0) {
+
+                            qtdeAux = datesEmpAux
+                                    .filter(dates => dayjs(new Date(dates.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') < 0)
+                                    .reduce((sum, dates) => sum + dates.quantidade, 0)
+
+                        }
+
+                    }
+
+                    dadosAux = [...(dadosAux || []), {
+                        nomeEmpresa:            safety.empresa.nome,
+                        itCodigo:               safety.item.itCodigo,       
+                        descricao:              safety.item.descricao,
+                        unidade:                units.find(unit => unit._id === safety.item.unit)? units.find(unit => unit._id === safety.item.unit).descricao : '',
+                        quantidadeMinima:       safety.quantidadeMinima,
+                        quantidadeEstoque:      stock.quantidade ? stock.quantidade : 0,
+                        quantidadeAVencer:      qtdeAux,
+                        quantidadeDisponivel:   stock.quantidade ? stock.quantidade - qtdeAux : 0 - qtdeAux,
+                    }]
+
+                })
+
+            })
+
+            setDados(dadosAux.flat().filter((item) => item.quantidadeDisponivel <= item.quantidadeMinima))
+
+            setLoading(false);
+
+        } catch (error) {
+            console.error(error);
+            setLoading(false);
+        }
+
+    }
+
+    const carregarInicial = async () => {
+
         try {
 
             setLoading(true);
@@ -315,7 +379,7 @@ const ListCriticalItemsComponent = () => {
                     nome:   company.nome
                 }))
 
-            setEmpresa([])
+            setUsuarioEmpresas([])
             if (user.empresas) {
 
                 // Empresa
@@ -334,81 +398,13 @@ const ListCriticalItemsComponent = () => {
 
                 form.setFieldsValue({ empresas: user.empresas.map(empresa => empresa._id)})
 
-                setEmpresa(user.empresas)
+                setUsuarioEmpresas(user.empresas)
+
+                setEmpresasSelecionadas(user.empresas.map(empresa => empresa._id))
 
             }
 
             setDados([])            
-
-            //Unidade
-            const unit = await getAllUnits().then((response) => response.data)
-
-            const itemsAux = await getAllItems().then((response) => response.data)
-            const items = itemsAux.filter(item => item.quantidadeMinima > 0)
-
-            const stockCompleto = await getAllStockBalances().then(response => response.data)
-
-            let dadosAux = []
-
-            items.map(item => {
-
-                empresasUsuario.map(empresa => {
-
-                    //Caso não encontre o item Stock                
-                    const stockAux = stockCompleto.filter ( stock => stock.item._id     === item._id &&
-                                                                     stock.empresa._id  === empresa._id
-                    )
-                    if (stockAux.length === 0) {
-
-                        dadosAux = [...(dadosAux || []), {
-                            key:                crypto.randomUUID(),
-                            idItem:             item._id,
-                            itCodigo:           item.itCodigo,
-                            descricao:          item.descricao,
-                            qtde:               null, 
-                            quantidadeMinima:   item.quantidadeMinima,
-                            unit:               item.unit,
-                            unidade:            item.unit.descricao,
-                            gcomEstoque:        null,
-                            diferenca:          item.quantidadeMinima * -1,
-                            empresa:            empresa,
-                            nomeEmpresa:        empresa.nome,
-                        }]  
-
-                    } else {
-
-                        //Verifica se saldo é menor que QuantidadeMinima
-                        stockCompleto.filter(stock => stock.empresa._id === empresa._id &&
-                                                      stock.item._id === item._id &&
-                                                    ( stock.gcomEstoque < item.quantidadeMinima ||
-                                                      stock.gcomEstoque === undefined))
-                                    .map(stock => {
-                                        dadosAux = [...(dadosAux || []), {
-                                            key:                crypto.randomUUID(),
-                                            idItem:             item._id,
-                                            itCodigo:           item.itCodigo,
-                                            descricao:          item.descricao,
-                                            qtde:               stock.quantidade, 
-                                            quantidadeMinima:   item.quantidadeMinima,
-                                            unit:               item.unit,
-                                            unidade:            item.unit.unidade,
-                                            gcomEstoque:        stock.gcomEstoque,
-                                            diferenca:          (stock.gcomEstoque ? stock.gcomEstoque : 0)  - item.quantidadeMinima,
-                                            dataInventario:     stock.dataInventario,
-                                            dataGCom:           stock.dataGCom,
-                                            empresa:            stock.empresa,
-                                            nomeEmpresa:        stock.empresa.nome,
-                                        }]  
-                                    })
-
-                    }
-
-                })
-
-            })
-
-            setDadosCompleto(dadosAux);
-            setDados(dadosAux);
 
         } catch (error) {
             console.error(error);
@@ -419,21 +415,12 @@ const ListCriticalItemsComponent = () => {
         }
     }
 
-    const handleOnChageEmpresa = async (value) => {
-
-        try {
-            
-            const dadosAux = dadosCompleto.filter(dados => value.includes(dados.empresa._id))            
-            setDados(dadosAux)
-
-
-        } catch {
-            console.log("Erro")
-        }
-    }
+    useEffect(() => {
+        CarregarDadosCompleto()
+    }, [dadosCompleto])
 
     useEffect(() => {
-        carregarDados()
+        carregarInicial()
     }, [])
 
 
@@ -453,13 +440,15 @@ const ListCriticalItemsComponent = () => {
                 >Consultar Itens Críticos</Title>
             </div>
 
-            <Row gutter={[16, 16]}>
+            <Form
+                form={form}
+                size='small'
+                style={{ marginBottom: '0' }}
+                initialValues={{"diasAVencer": 0}}
+            >
+                <Row gutter={[16, 16]}>
 
-                <Col span={12}>
-
-                    <Form
-                        form={form}
-                    >
+                    <Col span={12}>
 
                         <Item
                             name={"empresas"}
@@ -470,7 +459,7 @@ const ListCriticalItemsComponent = () => {
                             >
 
                             <Select
-                                disabled={empresa.length === 1}
+                                disabled={usuarioEmpresas.length === 1}
                                 placeholder="Selecionar Empresa"
                                 allowClear  //Permite limpar seleção
                                 mode="multiple"
@@ -481,29 +470,49 @@ const ListCriticalItemsComponent = () => {
 
                         </Item>
 
-                    </Form>
-                </Col>
+                    </Col>     
 
-                <Col span={12}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end'
-                    }}
-                    >
-                        <Space style={{ marginBottom: 16 }}>
-                            <Button 
-                                disabled={ dados.length === 0}
-                                type="primary" 
-                                icon={<DownloadOutlined />} 
-                                onClick={exportToExcel}
+                    <Col span={12}>
+                        <Item
+                            name="diasAVencer"
+                            key="diasAVencer"
+                            label="Dias à Vencer"
+                            rules={[{required: true, 
+                                        message: 'Informar quantidade de Dias à Vencer'}]}
                             >
-                                Exportar para Excel
-                            </Button>                
-                        </Space>
-                    </div>
-                </Col>
+                            <InputNumber 
+                                placeholder='Dias à Vencer'
+                                style={{ width: '40%' }}
+                                />
+                        </Item>
 
-            </Row>
+                    </Col>
+                </Row>
+
+            </Form>
+
+            <div style={{ padding: '5px' }}>
+                <Flex align="center" gap="small">
+                    <Button 
+                        type="primary" 
+                        icon={<LuRefreshCcw />} 
+                        onClick={carregarItens}
+                        disabled={empresasSelecionadas.length === 0}
+                    >
+                        Carregar Itens Críticos
+                    </Button>                
+                    <span></span>
+                    <Button 
+                        disabled={ dados.length === 0}
+                        type="primary" 
+                        icon={<DownloadOutlined />} 
+                        onClick={exportToExcel}
+                    >
+                        Exportar para Excel
+                    </Button>                
+                </Flex>
+
+            </div>
 
             <Table
                 columns={colunas}
