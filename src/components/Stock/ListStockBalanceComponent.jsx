@@ -115,9 +115,9 @@ const ListStockBalanceComponent = () => {
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
-            { wch: 20 }, // Largura da Coluna A
-            { wch: 30 }, // Largura da Coluna B
-            { wch: 50 }, // Largura da Coluna C
+            { wch: 15 }, // Largura da Coluna A
+            { wch: 10 }, // Largura da Coluna B
+            { wch: 45 }, // Largura da Coluna C
             { wch: 5  }, // Largura da Coluna D
             { wch: 15 }, // Largura da Coluna E
             { wch: 15 }, // Largura da Coluna F
@@ -135,6 +135,7 @@ const ListStockBalanceComponent = () => {
         for (let i = 2; i <= (range.e.r + 1); i++) {
 //            const cellAddress = 'D' + i;
             if (!ws['E' + i]) continue; // Pular se a célula estiver vazia
+            ws['E' + i].s = rightAlignStyle; // Aplica o estilo
             ws['F' + i].s = rightAlignStyle; // Aplica o estilo
             ws['G' + i].s = rightAlignStyle; // Aplica o estilo
             ws['H' + i].s = rightAlignStyle; // Aplica o estilo

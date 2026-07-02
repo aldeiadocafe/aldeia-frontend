@@ -93,9 +93,9 @@ const ListCriticalItemsComponent = () => {
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
-            { wch: 20 }, // Largura da Coluna A
-            { wch: 30 }, // Largura da Coluna B
-            { wch: 50 }, // Largura da Coluna C
+            { wch: 15 }, // Largura da Coluna A
+            { wch: 10 }, // Largura da Coluna B
+            { wch: 45 }, // Largura da Coluna C
             { wch: 9  }, // Largura da Coluna D
             { wch: 15 }, // Largura da Coluna E
             { wch: 15 }, // Largura da Coluna F
