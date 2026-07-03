@@ -272,8 +272,7 @@ const SafetyStockComponent = () => {
         };
 
         setLoading(true);    
-console.log('safety', safety)
-console.log('values', values)
+
         if (!values._id) {
 
             createSafety(safety).then(async (response) => {
@@ -547,6 +546,7 @@ console.log('values', values)
                 <Form
                     form={form}
                     layout='vertical'
+                    onsubmit={handleOk}
                     >
                     <Item
                         name="_id"
