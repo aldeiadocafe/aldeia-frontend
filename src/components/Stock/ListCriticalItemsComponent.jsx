@@ -306,14 +306,16 @@ const ListCriticalItemsComponent = () => {
             const datesEmp = datesItemBalance.filter((date) => empresasSelecionadas.includes(date.empresa._id))
 
             let dadosAux = []
-
             safetysEmp.map((safety) => {
 
+
+                let achou = false
                 stockEmp.filter((stock) => stock.empresa._id === safety.empresa._id 
                                         && stock.item._id === safety.item._id)
                         .map((stock) => {
 
-                    let qtdeAux = 0
+                    achou = true                            
+                    let qtdeAux = 0                            
 
                     if (dias > 0) {
 
@@ -342,23 +344,40 @@ const ListCriticalItemsComponent = () => {
 
                     }
 
+                    if ((stock.quantidade - qtdeAux) < safety.quantidadeMinima) {
+
+                        dadosAux = [...(dadosAux || []), {
+                            key:                    safety._id,
+                            nomeEmpresa:            safety.empresa.nome,
+                            itCodigo:               safety.item.itCodigo,       
+                            descricao:              safety.item.descricao,
+                            unidade:                units.find(unit => unit._id === safety.item.unit)? units.find(unit => unit._id === safety.item.unit).descricao : '',
+                            quantidadeMinima:       safety.quantidadeMinima,
+                            quantidadeEstoque:      stock.quantidade,
+                            quantidadeAVencer:      qtdeAux,
+                            quantidadeDisponivel:   stock.quantidade - qtdeAux,
+                        }]
+                    }
+                })
+
+                if (!achou) {
                     dadosAux = [...(dadosAux || []), {
+                        key:                    safety._id,
                         nomeEmpresa:            safety.empresa.nome,
                         itCodigo:               safety.item.itCodigo,       
                         descricao:              safety.item.descricao,
                         unidade:                units.find(unit => unit._id === safety.item.unit)? units.find(unit => unit._id === safety.item.unit).descricao : '',
                         quantidadeMinima:       safety.quantidadeMinima,
-                        quantidadeEstoque:      stock.quantidade ? stock.quantidade : 0,
-                        quantidadeAVencer:      qtdeAux,
-                        quantidadeDisponivel:   stock.quantidade ? stock.quantidade - qtdeAux : 0 - qtdeAux,
                     }]
-
-                })
+                }
 
             })
+/*
+            setDados(dadosAux.flat().filter((item) => item.quantidadeDisponivel <= item.quantidadeMinima ||
+                                                      item.quantidadeEstoque === undefined))
+*/
 
-            setDados(dadosAux.flat().filter((item) => item.quantidadeDisponivel <= item.quantidadeMinima))
-
+            setDados(dadosAux)
             setLoading(false);
 
         } catch (error) {
@@ -521,7 +540,7 @@ const ListCriticalItemsComponent = () => {
                 showSorterTooltip={true}
                 tableLayout='auto'
     //            onChange={onChange}
-                scroll={{ y: 'calc(80vh - 50px)' }}
+                scroll={{ y: 'calc(70vh - 50px)' }}
                 pagination={false}
 
             />
