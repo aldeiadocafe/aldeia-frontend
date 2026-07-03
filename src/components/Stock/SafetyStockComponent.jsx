@@ -546,7 +546,7 @@ const SafetyStockComponent = () => {
                 <Form
                     form={form}
                     layout='vertical'
-                    onsubmit={handleOk}
+                    onSubmit={handleOk}
                     >
                     <Item
                         name="_id"
