@@ -485,7 +485,7 @@ const ItemConfComponent = () => {
 
                     setDadosDescricao(dados)
                     setOptDescricao(dados)
-                    setItems(response.data)
+                    setItems(response.data.filter( item => item.situacao === 'ATIVO'))
 
                 }).catch((error)=> {
                     console.error(error);
