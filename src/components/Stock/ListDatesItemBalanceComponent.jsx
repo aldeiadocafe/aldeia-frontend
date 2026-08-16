@@ -278,7 +278,8 @@ const ListDatesItemBalanceComponent = () => {
             descricao:      item.descricao,
             unidade:        item.unidade,
             dataValidade:   dayjs.utc(item.dataValidade).format('DD/MM/YYYY'),
-            quantidade:     formatter.format(item.quantidade)
+            //quantidade:     formatter.format(item.quantidade)
+            quantidade:     item.quantidade
         }))
 
         // Cria worksheet / Converte os dados (JSON) em worksheet
@@ -315,6 +316,9 @@ const ListDatesItemBalanceComponent = () => {
         ws['D1'].v = "Unid"
         ws['E1'].v = "Dt Validade"
         ws['F1'].v = "Quantidade"
+
+        // Opcional: Forçar tipo numérico explicitamente em uma célula específica se preciso
+        // worksheet['B2'].t = 'n'; 
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
