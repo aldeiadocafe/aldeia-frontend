@@ -256,13 +256,15 @@ const ListDatesItemBalanceComponent = () => {
                 setDadosCompleto(dadosAux)
                 setDados(dadosAux);
 
+                setLoading(false);
+                
             })
 
         } catch (error) {
             console.error(error);
         } finally {
 
-            setLoading(false);
+//            setLoading(false);
 
         }
 
