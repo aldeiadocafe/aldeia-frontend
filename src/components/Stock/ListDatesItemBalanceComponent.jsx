@@ -257,7 +257,7 @@ const ListDatesItemBalanceComponent = () => {
                 setDados(dadosAux);
 
                 setLoading(false);
-                
+
             })
 
         } catch (error) {
@@ -281,7 +281,7 @@ const ListDatesItemBalanceComponent = () => {
             unidade:        item.unidade,
             dataValidade:   dayjs.utc(item.dataValidade).format('DD/MM/YYYY'),
             //quantidade:     formatter.format(item.quantidade)
-            quantidade:     item.quantidade
+            quantidade:     Number(item.quantidade)
         }))
 
         // Cria worksheet / Converte os dados (JSON) em worksheet
