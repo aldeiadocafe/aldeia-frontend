@@ -4,7 +4,8 @@ import { AlertOutlined, AppstoreAddOutlined, AppstoreOutlined, BookOutlined, Cal
 import { Menu, ConfigProvider, Grid } from 'antd';
 import { Link } from 'react-router-dom';
 import { BiBox, BiBuilding, BiUnite } from 'react-icons/bi';
-import { BsArrowLeftRight, BsBoxSeam, BsCashStack, BsReceiptCutoff, BsCart2, BsListTask } from 'react-icons/bs';
+import { BsArrowLeftRight, BsBoxSeam, BsCashStack, BsReceiptCutoff, BsCart2, BsListTask, BsCalendar2Range, BsCalendar3, BsCalendar2Week } from 'react-icons/bs';
+import { AiFillCalendar } from 'react-icons/ai';
 
 const { useBreakpoint } = Grid
 
@@ -150,6 +151,32 @@ const MenuList = () => {
                 },                
             ]
         },
+/*        
+        { 
+            key: 'mnuSchedule',
+            icon: <BsCalendar3 />,
+            label: "Agenda",            
+            children: [
+                {
+                    key: 'activeSchedule',
+                    icon: <BsCalendar2Range />,
+                    label: 
+                        <Link to="/activeSchedule">
+                            Ativo
+                        </Link>,
+                },                
+                {
+                    key: 'maintenanceSchedule',
+                    icon: <BsCalendar2Week />,
+                    label: 
+                        <Link to="/maintenanceSchedule">
+                            Manutenção
+                        </Link>,
+                },                
+            ]
+
+        },
+*/        
         { 
             key: 'gcom',
             icon: <BsCashStack/>,

@@ -1,1 +1,17 @@
 
+/* FontAwesome is not built-in, but used for icons */
+@use "@bryntum/calendar/fontawesome/css/fontawesome.css";
+@use "@bryntum/calendar/fontawesome/css/solid.css";
+
+/* Bryntum structural CSS */
+@use "@bryntum/calendar/calendar.css";
+
+/* Bryntum theme is included in index.html to enable runtime theme switching, but it could instead be included here if you want to use a single theme */
+/* @use "@bryntum/calendar/svalbard-light.css"; */
+
+/* Bryntum shared demo styling, not needed in your app */
+@use "@bryntum/demo-resources/scss/example.scss";
+
+.b-sch-event-wrap .b-event-time {
+    font-size : 0.7em;
+}

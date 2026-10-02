@@ -12,6 +12,9 @@
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@ant-design/plots": "^2.6.8",
+    "@bryntum/calendar": "npm:@bryntum/calendar-trial@7.3.4",
+    "@bryntum/calendar-react": "7.3.4",
+    "@bryntum/demo-resources": "7.3.4",
     "@emailjs/browser": "^4.4.1",
     "antd": "^6.3.2",
     "axios": "^1.13.2",

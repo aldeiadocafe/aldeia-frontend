@@ -10,10 +10,12 @@ import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
 import { getItemsInventory } from '../../services/ItemInventoryService';
 import { getAllUnits } from '../../services/UnitService';
-import { getAllDatesItem } from '../../services/DatesItemBalanceService';
 import { getAllPlacesInventory } from '../../services/PlacesInventoryService';
 import { getAllCountPlaces } from '../../services/CountPlacesService';
-import { getAllItems } from '../../services/ItemService';
+import { AiOutlineFileExcel } from 'react-icons/ai';
+
+import * as XLSX from 'xlsx-js-style'
+import { saveAs } from 'file-saver';
 
 dayjs.extend(utc)
 
@@ -54,6 +56,88 @@ const InventoryComponent = () => {
     let listarFinalizado = false
 
     const { Option, OptGroup } = Select;
+
+    const ExcelGCOM = (value) => {
+
+        const dadosExcel = expandedItem.filter(item => item.inventoryId === value._id)
+
+        if (dadosExcel.length === 0) {
+            message.info('Não existem itens para gerar o Excel GCOM!')
+            return
+        }
+
+        const dadosAux = dadosExcel.map(item => {
+            
+            const valorOriginal = formatter.format(item.quantidade)
+            // Usa regex para remover pontos (.) e hifens (-)
+            const valorLimpo = valorOriginal.replace(/[.-]/g, '');
+
+            return { 
+                Local:          "LOJA",
+                Tipo:           "LOJA - TIPO",
+                "CÓDIGO":       item.itCodigo,
+                "PRODUTO":      item.itemDescricao,
+                "UN. MED.":     item.unidDescricao,
+                "QTD. BRUTA":   valorLimpo
+            }
+        })
+
+        // Cria worksheet / Converte os dados (JSON) em worksheet
+        const ws = XLSX.utils.json_to_sheet(dadosAux)
+
+        const rightAlignStyle = {
+            alignment: {
+                horizontal: 'right', // Opções: 'left', 'center', 'right'
+            },
+        }
+
+        // Ajustar largura das colunas
+        ws['!cols'] = [
+            { wch: 12 }, // Largura da Coluna A
+            { wch: 10 }, // Largura da Coluna B
+            { wch: 10 }, // Largura da Coluna C
+            { wch: 40 }, // Largura da Coluna D
+            { wch: 12 }, // Largura da Coluna E
+            { wch: 10 }, // Largura da Coluna F
+        ]
+
+        // Descobrir o alcance (range) da planilha para iterar sobre as células
+        const range = XLSX.utils.decode_range(ws['!ref']);
+
+        // Percorrer as linhas e aplicar o estilo na coluna desejada
+        // Lembra que o index das colunas começa em 0 (0 = A, 1 = B, 2 = C...)
+        const colunaAlvo = 5; // Coluna F (Valores)
+
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+
+            // Ignora a primeira linha (R === 0) se você não quiser alinhar o cabeçalho
+            if (R === 0) continue; 
+
+            // Gera o endereço da célula (ex: "F2", "F3", etc.)
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: colunaAlvo });
+            
+            // Verifica se a célula existe antes de aplicar o estilo
+            if (ws[cellAddress]) {
+                ws[cellAddress].s = rightAlignStyle;
+            }
+
+        }
+
+        // Cria um novo workbook
+        const wb = XLSX.utils.book_new()
+
+        // Adiciona a worksheet ao workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Dados')
+
+        // Gera o arquivo binário e força o download
+//        XLSX.writeFile(wb, 'TabelaDados.xlsx')
+
+        // 5. Gerar arquivo e baixar
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(data, 'inventario_gcom.xlsx');
+
+    }
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -198,6 +282,45 @@ const InventoryComponent = () => {
             ellipsis: true,
         },
         {
+            title: 'Funções',
+            key: 'funcoes',
+            width: 130,
+            align: 'center',
+            render: (_, record) => (
+                <Space size="small">
+
+                    <Tooltip title="Finalizar">
+                        <Popconfirm
+                            title="Deseja realmente Finalizar o Inventário?"
+                            description="Ao confirmar o inventário será considerado como FINALIZADO, não sendo possível reabrir."
+                            onConfirm={() =>  handlePopupConfirmFinaliz(record)}
+                            okText="Sim"
+                            cancelText="Não"            
+                        >
+                            <Button
+                                type="primary"
+                                shape='circle'
+                                className={'rotate-icon'}
+                                icon={<CheckSquareOutlined rotate={0} />}
+                                disabled = {record.situacao === 'FINALIZADO'}
+                            />
+                        </Popconfirm>                    
+                    </Tooltip>
+
+                    <Tooltip title = "Inventário GCOM">
+                        <Button
+                            shape='circle'
+                            className={'rotate-icon'}
+                            icon={<AiOutlineFileExcel rotate={0} />}
+                            onClick={() => ExcelGCOM(record)}
+                        />
+                    </Tooltip>
+
+                </Space>
+            ),
+        },
+/*        
+        {
             title: 'Finalizar',
             key: 'finalizar',
             width: 130,
@@ -223,6 +346,7 @@ const InventoryComponent = () => {
                 </Space>
             ),
         },        
+*/        
     ]
 
     const colunasItem = [
@@ -480,6 +604,7 @@ const InventoryComponent = () => {
                         itCodigo:           item.item.itCodigo,
                         itemDescricao:      item.item.descricao,
                         unidade:            item.item.unit ? unit.find(unit => unit._id === item.item.unit).unidade : "",
+                        unidDescricao:      item.item.unit ? unit.find(unit => unit._id === item.item.unit).descricao : "",
                         quantidade:         item.quantidade,
                         usuarioNome:        item.usuarioCriacao ? item.usuarioCriacao.nome : '',
                 }))

@@ -39,6 +39,16 @@ import Teste from './components/Teste';
 import ShoppingComponent from './components/Purchase/ShoppingComponent';
 import SafetyStockComponent from './components/Stock/SafetyStockComponent';
 
+import './App.css';
+
+
+import { LocaleManager } from '@bryntum/calendar';
+
+import '@bryntum/calendar/locales/calendar.locale.PtBr.js'
+
+// Define o idioma para Português do Brasil
+LocaleManager.locale = 'PtBr';
+
 
 // 3. Definir o locale do dayjs globalmente
 dayjs.locale('pt-br');
@@ -94,7 +104,7 @@ function App() {
                   }
                   />
 
-                  {/* http://localhost:5173/companys */}
+                  {/* http://localhost:5173/profiles */}
                   <Route path='/profiles'    
                     element={
                       <PrivateRoute>
