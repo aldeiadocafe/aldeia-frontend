@@ -93,7 +93,7 @@ const InventoryComponent = () => {
 
         // Ajustar largura das colunas
         ws['!cols'] = [
-            { wch: 12 }, // Largura da Coluna A
+            { wch: 4  }, // Largura da Coluna A
             { wch: 10 }, // Largura da Coluna B
             { wch: 10 }, // Largura da Coluna C
             { wch: 40 }, // Largura da Coluna D
