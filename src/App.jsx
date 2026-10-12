@@ -31,13 +31,15 @@ import ConferenceComponent from './components/Inventorys/ConferenceComponent';
 import ItemConfComponent from './components/Inventorys/ItemConfComponent';
 import ImportInvoicesComponent from './components/Receipts/ImportInvoicesComponent';
 import UnitsComponent from './components/Stock/UnitComponent';
-import Email from './components/Email';
+import Email from './components/Main/Email';
 import ProfilesComponent from './components/Profile/ProfilesComponent';
 import RecoverComponent from './components/Login/RecoverComponent';
 import PasswordsComponent from './components/Login/PasswordsComponent';
 import Teste from './components/Teste';
 import ShoppingComponent from './components/Purchase/ShoppingComponent';
 import SafetyStockComponent from './components/Stock/SafetyStockComponent';
+import ScheduleComponent from './components/Schedule/ScheduleComponent';
+import DraftScheduleComponent from './components/Schedule/DraftScheduleComponent';
 
 import './App.css';
 
@@ -239,6 +241,22 @@ function App() {
                         {/*<ImportInvoicesComponent/> */}
                       </PrivateRoute>
                     }/>
+
+                  {/* http://localhost:5173/schedules */}
+                  <Route path='/activeSchedule'    
+                    element={
+                      <PrivateRoute>
+                        {<ScheduleComponent/>}
+                      </PrivateRoute>
+                    }/>
+
+                  {/* http://localhost:5173/draftSchedules */}
+                  <Route path='/draftSchedules'    
+                    element={
+                      <PrivateRoute>
+                        {<DraftScheduleComponent/>}
+                      </PrivateRoute>
+                    }/>                    
 
               </Route>
               

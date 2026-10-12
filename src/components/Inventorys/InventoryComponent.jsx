@@ -24,9 +24,9 @@ const InventoryComponent = () => {
     const { user } = useAuth();
 
     const [dados,           setDados]           = useState([]);
+    const [empresa,         setEmpresa]         = useState(null)
     const [filterEmpresas,  setFilterEmpresas]  = useState([])
     const [selectEmpresas,  setSelectEmpresas]  = useState([]);
-    const [empresa,         setEmpresa]         = useState(null)
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
 

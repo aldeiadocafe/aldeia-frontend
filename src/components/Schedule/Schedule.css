@@ -1,0 +1,81 @@
+/* Alvo: O botão de rádio que está selecionado */
+.fumaca-radio .ant-radio-button-wrapper-checked {
+    opacity: 0.5 !important;    
+  border-color: #1890ff !important; /* Cor da borda principal */
+  
+  /* Efeito do box-shadow sobrepostos para criar a fumaça espessa */
+  box-shadow: 
+    0 0 8px rgba(24, 144, 255, 0.6),  /* Fumaça interna/próxima */
+    0 0 20px rgba(24, 144, 255, 0.4), /* Fumaça média */
+    0 0 35px rgba(24, 144, 255, 0.2); /* Fumaça externa e suave */
+    
+  transition: all 0.3s ease; /* Transição suave ao selecionar */
+}
+
+/* Opcional: Efeito de fumaça ao passar o mouse (Hover) */
+.fumaca-radio .ant-radio-button-wrapper:hover {
+  box-shadow: 0 0 12px rgba(24, 144, 255, 0.3);
+}
+
+@media print {
+
+    /* Força o navegador a imprimir cores de fundo e bordas */
+    body * {
+        visibility: hidden;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    #root, #root * {
+        visibility: visible;
+    } 
+
+    /* Esconde o Side Bar */
+    .ant-layout-sider, .ant-layout-header, .ant-layout-footer {
+        display: none !important;
+    }
+
+    .ant-picker-calendar,
+    .ant-picker-cell,
+    .ant-badge,
+    .ant-badge-status-dot {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .ant-picker-cell-inner {
+        height: 150px !important; /* Defina a altura desejada */
+        line-height: 150px !important; /* Alinha o texto verticalmente se necessário */
+        background-color: transparent !important;
+        color: inherit !important;
+    }
+
+    /* Força a tabela do calendário a se ajustar a um espaço fixo */
+    .ant-picker-content {
+        table-layout: fixed;
+        height: 100%;
+    }
+
+    /* Se o mês tiver 6 linhas, esconde a sexta linha para manter apenas 5 */
+    .ant-picker-content tbody tr:nth-child(6) {
+        display: none !important;
+    }
+
+    /* No seu arquivo CSS global ou Styled Component */
+    .ant-picker-cell-inner {
+        height: 190px !important; /* Defina a altura desejada */
+        line-height: 190px  !important; /* Alinha o texto verticalmente se necessário */
+    }
+
+    .ocultar-objetos {
+        display: none !important;
+    }
+
+    /* Ajusta o tamanho da página se necessário */
+    @page {
+        size: A4 portrait; /* Opções: A3, A4, A5, letter, legal, portrait, landscape */
+        margin: 0;
+    }
+    
+}

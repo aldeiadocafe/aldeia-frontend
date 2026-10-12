@@ -17,6 +17,7 @@
     "@bryntum/demo-resources": "7.3.4",
     "@emailjs/browser": "^4.4.1",
     "antd": "^6.3.2",
+    "antd-style": "^4.1.0",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",

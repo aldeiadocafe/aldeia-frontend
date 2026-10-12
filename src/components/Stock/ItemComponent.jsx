@@ -102,7 +102,7 @@ const ItemComponent = () => {
             align: 'center',
             render: (text, record) => (
                 <Space size="small">
-
+{/*
                     <Tooltip title="Visualizar">
                         <Button
                             type="primary"
@@ -112,7 +112,7 @@ const ItemComponent = () => {
                             onClick={() => btnVisualizar(record)}
                         />
                     </Tooltip>       
-
+*/}
                     <Tooltip title="Editar">
                         <Button
                             type="primary"
