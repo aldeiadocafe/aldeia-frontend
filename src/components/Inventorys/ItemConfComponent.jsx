@@ -61,7 +61,7 @@ const ItemConfComponent = () => {
     const [zerar, setZerar] = useState(false)
 
     const customHeight      = screens.xs ? '355px' : '260px'
-    const larguraDescricao  = screens.xs ? '300px' : '400px'
+    const larguraDescricao  = screens.xs ? '300px' : '370px'
 
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
@@ -688,7 +688,7 @@ const ItemConfComponent = () => {
         //                                readOnly={true}
                                         disabled 
                                         size='small'
-                                        style={{ width: 50 }}
+                                        style={{ width: 45 }}
                                         />
                                     
                                 </Item>
