@@ -1,7 +1,7 @@
 import Title from 'antd/es/typography/Title'
 import { useEffect, useRef, useState }  from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { AutoComplete, Button, Grid, Card, Checkbox,Popconfirm, DatePicker, Form, Input, InputNumber, message, Row, Space, Spin, Table, Modal } from 'antd';
+import { AutoComplete, Button, Grid, Card, Checkbox,Popconfirm, DatePicker, Form, Input, InputNumber, message, Row, Space, Spin, Table, Modal, Col } from 'antd';
 import { CameraOutlined, DeleteOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
@@ -60,7 +60,8 @@ const ItemConfComponent = () => {
 
     const [zerar, setZerar] = useState(false)
 
-    const customHeight = screens.xs ? '355px' : '230px'
+    const customHeight      = screens.xs ? '355px' : '260px'
+    const larguraDescricao  = screens.xs ? '300px' : '420px'
 
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
@@ -594,25 +595,27 @@ const ItemConfComponent = () => {
                         boxShadow: '0 2px 8px #d4b8ab',
                         borderRadius: 8,
                         padding: '0px',
-                        height: customHeight,
+//                        height: customHeight,
         //                height: '310px'
         //                height: 'calc(50vh)' 
                         transition: 'customHeight 0.3s ease' // 3. Adicionar transição suave
 
                     }}
                 >
+{/*                    
                     <Button
                         onClick={onClickCamera}
                         icon={<CameraOutlined />}
                         size="small"
                         shape="circle"
                     />
-
+*/}
                     <Form
                         form={formCountPlaces}
-                        layout='horizontal'
+                        layout='inline'
                         size='small'
                         onFinish={onFinishFormItems}
+                        style={{ gap: '16px'}}
         //                onFinishFailed={onFinishFailedFormItems}
                     >
                         <Item
@@ -634,14 +637,17 @@ const ItemConfComponent = () => {
                             <Input />
                         </Item>
 
-                        <Row>
-                            <Space>
+                        <Row gutter={[1, 5]} 
+                            style={{ width: '100%'}}>
+                            <Col>
                                 <Item
                                     name="chDescricao"
                                     valuePropName="checked"
                                 >
                                     <Checkbox/>                        
                                 </Item>
+                            </Col>
+                            <Col>
                                 <Item
                                     name = "descricao"
                                     label="Descrição"
@@ -661,7 +667,7 @@ const ItemConfComponent = () => {
                                         //onBlur={onBlurDescricao}     // Leave do campo
 
                                         // --- Props de Comportamento ---
-                                        style={{ minWidth: 260 }}
+                                        style={{ minWidth: larguraDescricao }}
                                         placeholder="Descrição do Item"
         //                                allowClear // Mostra ícone para limpar o input
         //                                filterOption={false} // Desabilita filtro automático (filtramos no handleSearch)
@@ -672,7 +678,8 @@ const ItemConfComponent = () => {
                                     </AutoComplete>                        
 
                                 </Item>
-
+                            </Col>
+                            <Col>
                                 <Item
                                     name = "unidade"
                                     label="UN"
@@ -681,20 +688,23 @@ const ItemConfComponent = () => {
         //                                readOnly={true}
                                         disabled 
                                         size='small'
-                                        style={{ width: 40 }}
+                                        style={{ width: 50 }}
                                         />
                                     
                                 </Item>
-                            </Space>
+                            </Col>
                         </Row>
-                        <Row>
-                            <Space>
+                        <Row gutter={[1, 5]}
+                            style={{ width: '100%'}}>
+                            <Col>
                                 <Item
                                     name="chDataValidade"
                                     valuePropName="checked"
                                 >
-                                    <Checkbox/>                        
+                                    <Checkbox />
                                 </Item>
+                            </Col>
+                            <Col>
                                 <Item
                                     name={"dataValidade"}
                                     label="Dt Validade"
@@ -713,60 +723,65 @@ const ItemConfComponent = () => {
                                             format={"DD/MM/YYYY"}
                                         />
                                 </Item>
-                            </Space>
+                            </Col>
                         </Row>
 
-                        <Space size={"small"}>
-                            <Item
-                                name={"quantidade"}
-                                label="Quantidade"
-                                required = {!zerar}
-                                rules={[
-                                    {required: !zerar},
-                                    {
-                                        validator: (_, value) => 
-                                            zerar ? Promise.resolve() 
-                                                : value > 0
-                                                    ? Promise.resolve()
-                                                    : Promise.reject(new Error('A quantidade deve ser maior que zero')),                                    
-                                    }
-                                    ]}                >
-                                <InputNumber
-                                    disabled = {zerar}
-                                    style={{ width: 140 }}
-                                    step={1}
-                                    decimalSeparator=','
+                        <Row gutter={[1, 5]}
+                            style={{ width: '100%'}}>
+                            <Col>
+                                <Item
+                                    name={"quantidade"}
+                                    label="Quantidade"
+                                    required = {!zerar}
+                                    rules={[
+                                        {required: !zerar},
+                                        {
+                                            validator: (_, value) => 
+                                                zerar ? Promise.resolve() 
+                                                    : value > 0
+                                                        ? Promise.resolve()
+                                                        : Promise.reject(new Error('A quantidade deve ser maior que zero')),                                    
+                                        }
+                                        ]}                >
+                                    <InputNumber
+                                        disabled = {zerar}
+                                        style={{ width: 140 }}
+                                        step={1}
+                                        decimalSeparator=','
+                                    >
+                                    </InputNumber>
+
+                                </Item>
+                            </Col>
+                            <Col>
+                                <Item
+                                    label="Zerar Item?"
+                                    name="chZerar"
+                                    valuePropName="checked"
                                 >
-                                </InputNumber>
+                                    <Checkbox onChange={handleChZerar}/>                        
+                                </Item>
+                            </Col>
 
+                        </Row>
+
+                        <Row>
+                            <Item>
+                                <Space>
+                                    <Button onClick={handleVoltar}>
+                                        Cancelar
+                                    </Button>                                
+                                    <Button type="primary" htmlType="submit">
+                                        Gravar
+                                    </Button>
+                                    <Checkbox
+                                        onChange={()=> {setCardCount(!cardCount)}}
+                                    >
+                                        Exibir Contagem
+                                    </Checkbox>
+                                </Space>
                             </Item>
-                            <Item
-                                label="Zerar Item?"
-                                name="chZerar"
-                                valuePropName="checked"
-                            >
-                                <Checkbox onChange={handleChZerar}/>                        
-                            </Item>
-
-                        </Space>
-
-                        <Item>
-                            <Space>
-                                <Button onClick={handleVoltar}>
-                                    Cancelar
-                                </Button>
-                                <Button type="primary" htmlType="submit">
-                                    Gravar
-                                </Button>
-                                <Checkbox
-                                    onChange={()=> {setCardCount(!cardCount)}}
-                                >
-                                    Exibir Contagem
-                                </Checkbox>
-                            </Space>
-                        </Item>
-                        <Item>
-                        </Item>
+                        </Row>
                     </Form>
 
                 </Card>
