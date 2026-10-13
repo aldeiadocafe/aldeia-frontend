@@ -204,7 +204,7 @@ const allMenuItems = [
                 icon: <BsBoxSeam/>,
                 label: 
                     <Link to="/stockgcom">
-                        Atualizar stock
+                        Atualizar Estoque
                     </Link>,
 
             },

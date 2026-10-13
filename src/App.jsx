@@ -163,7 +163,7 @@ function App() {
                     }/>
 
                   {/* http://localhost:5173/estoquegcom */}
-                  <Route path='/estoquegcom'    
+                  <Route path='/stockgcom'    
                     element={
                       <PrivateRoute>
                         <ImportEstoqueGComComponent/>
