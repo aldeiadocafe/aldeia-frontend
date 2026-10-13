@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { AppstoreAddOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
+import { AppstoreAddOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined, UndoOutlined } from '@ant-design/icons';
 import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Col, Row, Checkbox} from 'antd'
 import Title from 'antd/es/typography/Title';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
-import { createInventory, deleteInventory, endInventory, getAllInventorys, updateInventory } from '../../services/InventoryService';
+import { createInventory, deleteInventory, endInventory, getAllInventorys, reOpenInventory, updateInventory } from '../../services/InventoryService';
 import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
 import { getItemsInventory } from '../../services/ItemInventoryService';
@@ -41,7 +41,13 @@ const InventoryComponent = () => {
     const [formModal,       setFormModal]       = useState(false);
     const [confirmLoading,  setConfirmLoading]  = useState(false);
     const [loading,         setLoading]         = useState(false);
-    
+
+    const [inventoryReOpen, setInventoryReOpen] = useState([])
+    const [modalReabrir,    setModalReabrir]    = useState(false)
+
+    const [inventoryEnd,    setInventoryEnd]    = useState([])
+    const [modalFinalizar,  setModalFinalizar]  = useState(false)
+
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
@@ -290,21 +296,25 @@ const InventoryComponent = () => {
                 <Space size="small">
 
                     <Tooltip title="Finalizar">
-                        <Popconfirm
-                            title="Deseja realmente Finalizar o Inventário?"
-                            description="Ao confirmar o inventário será considerado como FINALIZADO, não sendo possível reabrir."
-                            onConfirm={() =>  handlePopupConfirmFinaliz(record)}
-                            okText="Sim"
-                            cancelText="Não"            
-                        >
-                            <Button
-                                type="primary"
-                                shape='circle'
-                                className={'rotate-icon'}
-                                icon={<CheckSquareOutlined rotate={0} />}
-                                disabled = {record.situacao === 'FINALIZADO'}
-                            />
-                        </Popconfirm>                    
+                        <Button
+                            type="primary"
+                            shape='circle'
+                            className={'rotate-icon'}
+                            icon={<CheckSquareOutlined rotate={0} />}
+                            disabled = {record.situacao === 'FINALIZADO'}
+                            onClick={() =>  handlePopupConfirmFinaliz(record)}
+                        />
+                    </Tooltip>
+
+                    <Tooltip title="Reabrir">
+                        <Button
+                            type="primary"
+                            shape='circle'
+                            className={'rotate-icon'}
+                            icon={<UndoOutlined rotate={0} />}
+                            disabled = {record.situacao !== 'FINALIZADO'}
+                            onClick={() =>  handlePopupConfirmReabrir(record)}
+                        />
                     </Tooltip>
 
                     <Tooltip title = "Inventário GCOM">
@@ -733,25 +743,95 @@ const InventoryComponent = () => {
         }
     };
 
-    // Chamado se o usuário confirmar na Popconfirm
+
+    const confirmarReabrir = async () => {
+
+        setLoading(true)
+        if (inventoryReOpen) {
+
+            try {
+
+                await reOpenInventory(inventoryReOpen).then((response) => {
+
+                    message.success('Inventário reaberto com sucesso!')
+                    form.resetFields(); //Limpa os campos ao fechar
+                    carregarDados();
+
+                }).catch((error)=> {
+                    if (error.response.data.message) {
+                        message.error(error.response.data.message)
+                    } else {
+                        if (error.response) {
+                            message.error(error.response.data || 'Erro no servidor');
+                        } else {
+                            message.error('Erro ao finalizar!');
+                        }                
+                    }
+                });
+
+
+            } catch (error) {
+                if (error.response) {
+                    message.error(error.response.data.message || error.response.data || 'Erro no servidor');
+                } else {
+                    message.error('Erro ao criar!');
+                }
+
+            } finally {
+                setModalReabrir(false)
+                setLoading(false)
+            }
+
+        }
+    }
+
+    // Reabrir Inventario
+    const handlePopupConfirmReabrir = async (value) => {
+
+        const inventoryAux = {
+            _id:                value._id,
+            empresa:            value.empresa,
+            empresaNome:        value.empresaNome,
+            dataInventario:     value.dataInventario,
+            descricao:          value.descricao,
+            tipoInventario:     value.tipoInventario,
+            situacao:           value.situacao,
+            usuarioAlteracao:   user
+        }
+
+
+        setInventoryReOpen(inventoryAux)
+        setModalReabrir(true)
+
+    }
+
     const handlePopupConfirmFinaliz = async (value) => {
+
+        setModalFinalizar(true)
+
+        const inventoryAux = {
+            _id:                value._id,
+            empresa:            value.empresa,
+            empresaNome:        value.empresaNome,
+            dataInventario:     value.dataInventario,
+            descricao:          value.descricao,
+            tipoInventario:     value.tipoInventario,
+            situacao:           value.situacao,
+            usuarioAlteracao:   user
+        }
+
+        setInventoryEnd(inventoryAux)
+        
+    }
+
+    // Chamado se o usuário confirmar na Popconfirm
+    const confirmarFinalizar = async () => {
 
         setLoading(true);    
 
-        if(value){
+        if(inventoryEnd){
             
-            const inventory = {
-                _id:                value._id,
-                empresa:            value.empresa,
-                empresaNome:        value.empresaNome,
-                dataInventario:     value.dataInventario,
-                descricao:          value.descricao,
-                tipoInventario:     value.tipoInventario,
-                situacao:           value.situacao,
-                usuarioAlteracao:   user
-            }
-
-            await endInventory(inventory).then((response) => {
+            await endInventory(inventoryEnd).then((response) => {
 
                 message.success('Registro finalizado com sucesso!')
                 form.resetFields(); //Limpa os campos ao fechar
@@ -771,6 +851,7 @@ const InventoryComponent = () => {
             
         }
 
+        setModalFinalizar(false)
         setLoading(false);
         
     };
@@ -790,7 +871,7 @@ const InventoryComponent = () => {
              && item.itemId === record.item._id
         )
 
-//bispo
+
         return (
             <div style={{ width: '60%',  }}> {/* margin: '0 auto' Container reduzido */}
                 <Table 
@@ -1131,6 +1212,35 @@ const InventoryComponent = () => {
                 </Form>
 
             </Modal>
+
+          {/* 5. Modal de Confirmação do Ant Design */}
+          <Modal
+            title="Finalizar Inventário"
+            open={modalFinalizar}
+            onOk={confirmarFinalizar}
+            onCancel={() => setModalFinalizar(false)}
+            okText="Finalizar"
+            cancelText="Cancelar"
+
+          >
+            <p>Tem certeza que deseja <strong>Finalizar Inventário</strong>?</p>
+            <p>Ao confirmar o inventário será considerado como FINALIZADO.</p>
+          </Modal>
+
+
+          {/* 5. Modal de Confirmação do Ant Design */}
+          <Modal
+            title="Reabrir Inventário"
+            open={modalReabrir}
+            onOk={confirmarReabrir}
+            onCancel={() => setModalReabrir(false)}
+            okText="Reabrir"
+            cancelText="Cancelar"
+
+          >
+            <p>Tem certeza que deseja <strong>Reabrir Inventário</strong>?</p>
+          </Modal>
+
 
         </Spin>
 
