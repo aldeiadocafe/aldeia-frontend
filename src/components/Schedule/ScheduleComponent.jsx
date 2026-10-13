@@ -39,7 +39,7 @@ const ScheduleComponent = () => {
 
     // Estado para armazenar o recurso selecionado no filtro
     const [opcaoColaboradoresFiltro,  setopcaoColaboradoresFiltro]  = useState([])
-    const [filterResource,            setFilterResource]            = useState('all');
+    const [filterResource,            setFilterResource]            = useState(['ALL']);
 
     const [isModalOpen,   setIsModalOpen]   = useState(false);
     
@@ -172,7 +172,9 @@ const ScheduleComponent = () => {
                         currentDate.isBefore(event.end);
 
           })          
-          .filter((event) => filterResource === 'all' || event.userID === filterResource)
+//          .filter((event) => filterResource === 'all' || event.userID === filterResource)
+          .filter(event => filterResource.some(resource => resource === 'ALL') || 
+                           filterResource.some(resource => resource === event.userID))
           .filter(event => selectEmpresas.some(emp => emp === event.empresaID))
 
         return (
@@ -240,7 +242,7 @@ const ScheduleComponent = () => {
 
       }
 
-      setopcaoColaboradoresFiltro([{ label: 'Todos os Recursos', value: 'all' }, ...colabEmp])
+      setopcaoColaboradoresFiltro([{ label: 'Todos os Recursos', value: 'ALL' }, ...colabEmp])
       setSelectEmpresas(values)
     }
 
@@ -313,8 +315,10 @@ const ScheduleComponent = () => {
                             className="ocultar-objetos"
                             size="small"
                             title="Selecionar Colaborador"
-                            defaultValue="all"
-                            style={{ width: 200 }}
+                            placeholder="Selecionar Colaborador"
+                            defaultValue="ALL"
+                            style={{ width: 250 }}
+                            mode='multiple'
                             options={opcaoColaboradoresFiltro}
                             onChange={(value) => setFilterResource(value)}
                           />                        
@@ -430,7 +434,7 @@ const ScheduleComponent = () => {
                     userID:   usuario._id,
                 }))     
 
-                setopcaoColaboradoresFiltro([{ label: 'Todos os Recursos', value: 'all' }, ...formatarUser])
+                setopcaoColaboradoresFiltro([{ label: 'Todos os Recursos', value: 'ALL' }, ...formatarUser])
                 setColaboradores(formatarUser)    //Carrega todos os colabores
                 setListarColab(formatarUser)      //Filtrar os colaboradores por empresa
 
