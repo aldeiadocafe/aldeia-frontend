@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Table, Spin, Input, Space, Button, Row, Col, Select, Form, Checkbox } from 'antd';
-import { DownloadOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
+import { DownloadOutlined, FileSearchOutlined, ProductOutlined, SearchOutlined } from '@ant-design/icons';
 import Title from 'antd/es/typography/Title';
 
 
@@ -33,7 +33,7 @@ const ListStockBalanceComponent = () => {
     const [empresa,         setEmpresa]         = useState([])
 
     const [dadosCompleto,   setDadosCompleto]       = useState([])
-    const [dados,       setDados]                   = useState([])
+    const [dados,           setDados]               = useState([])
     const [expandedDateItem, setExpandedDateItem ]  = useState([])
 
     const [dadosItem,       setDadosItem]           = useState([])
@@ -59,6 +59,85 @@ const ListStockBalanceComponent = () => {
         style: 'decimal',
         minimumFractionDigits: 3,
     });
+
+    const exportToGCOM = () => {
+
+        if (dados.length === 0) {
+            message.info('Não existem itens para gerar o Excel GCOM!')
+            return
+        }
+        const dadosAux = dados.map(item => {
+            
+            const valorOriginal = formatter.format(item.qtde)
+            // Usa regex para remover pontos (.) e hifens (-)
+            const valorLimpo = valorOriginal.replace(/[.-]/g, '');
+
+            return { 
+                Local:          "LOJA",
+                Tipo:           "LOJA - TIPO",
+                "CÓDIGO":       item.itCodigo,
+                "PRODUTO":      item.descricao,
+                "UN. MED.":     dadosUnit ? dadosUnit.find(unit => unit._id === item.unit).descricao : "",
+                "QTD. BRUTA":   valorLimpo
+            }
+        })
+
+        // Cria worksheet / Converte os dados (JSON) em worksheet
+        const ws = XLSX.utils.json_to_sheet(dadosAux)
+
+        const rightAlignStyle = {
+            alignment: {
+                horizontal: 'right', // Opções: 'left', 'center', 'right'
+            },
+        }
+
+        // Ajustar largura das colunas
+        ws['!cols'] = [
+            { wch: 4  }, // Largura da Coluna A
+            { wch: 10 }, // Largura da Coluna B
+            { wch: 10 }, // Largura da Coluna C
+            { wch: 40 }, // Largura da Coluna D
+            { wch: 12 }, // Largura da Coluna E
+            { wch: 10 }, // Largura da Coluna F
+        ]
+
+        // Descobrir o alcance (range) da planilha para iterar sobre as células
+        const range = XLSX.utils.decode_range(ws['!ref']);
+
+        // Percorrer as linhas e aplicar o estilo na coluna desejada
+        // Lembra que o index das colunas começa em 0 (0 = A, 1 = B, 2 = C...)
+        const colunaAlvo = 5; // Coluna F (Valores)
+
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+
+            // Ignora a primeira linha (R === 0) se você não quiser alinhar o cabeçalho
+            if (R === 0) continue; 
+
+            // Gera o endereço da célula (ex: "F2", "F3", etc.)
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: colunaAlvo });
+            
+            // Verifica se a célula existe antes de aplicar o estilo
+            if (ws[cellAddress]) {
+                ws[cellAddress].s = rightAlignStyle;
+            }
+
+        }
+
+        // Cria um novo workbook
+        const wb = XLSX.utils.book_new()
+
+        // Adiciona a worksheet ao workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Dados')
+
+        // Gera o arquivo binário e força o download
+//        XLSX.writeFile(wb, 'TabelaDados.xlsx')
+
+        // 5. Gerar arquivo e baixar
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(data, 'inventario_gcom.xlsx');
+
+    }
 
     const exportToExcel = () => {
 
@@ -600,6 +679,13 @@ const ListStockBalanceComponent = () => {
                                 onClick={exportToExcel}
                             >
                                 Excel
+                            </Button>                
+                            <Button 
+                                type="primary" 
+                                icon={<ProductOutlined />} 
+                                onClick={exportToGCOM}
+                            >
+                                Inv GCOM
                             </Button>                
                             <Checkbox
                                 onChange={handleListarItensNaoContados}
