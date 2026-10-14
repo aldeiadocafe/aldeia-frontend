@@ -519,7 +519,7 @@ const DraftScheduleComponent = () => {
                     .filter(user => user.empresas.length > 0 && 
                             user.situacao === 'ATIVO'
                     )
-                    .filter(user => empAux.some(emp => emp._id === user.empresas._id))
+                    .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
               
                 const formatarUser = dadosAux.map((usuario) => ({
                     label:    usuario.nome,

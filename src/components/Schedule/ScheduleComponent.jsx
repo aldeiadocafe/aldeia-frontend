@@ -425,15 +425,15 @@ const ScheduleComponent = () => {
                     .filter(user => user.empresas.length > 0 && 
                             user.situacao === 'ATIVO'
                     )
-                    .filter(user => empAux.some(emp => emp._id === user.empresas._id))
-              
+                    .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
+
                 const formatarUser = dadosAux.map((usuario) => ({
                     label:    usuario.nome,
                     value:    usuario._id,
                     empresas: usuario.empresas,
                     userID:   usuario._id,
                 }))     
-
+                
                 setopcaoColaboradoresFiltro([{ label: 'Todos os Recursos', value: 'ALL' }, ...formatarUser])
                 setColaboradores(formatarUser)    //Carrega todos os colabores
                 setListarColab(formatarUser)      //Filtrar os colaboradores por empresa
