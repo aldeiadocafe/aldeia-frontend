@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, EyeTwoTone, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Row, Col} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Row, Col, InputNumber} from 'antd'
 import { PatternFormat } from 'react-number-format'; // Recomendado: PatternFormat para máscaras fixas
 import { cpf, cnpj } from 'cpf-cnpj-validator';
 
@@ -33,8 +33,29 @@ const UsersComponent = () => {
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
-    const [isEditing, setIsEditing]             = useState(true);
-    const [idUser, setIdUser]             = useState();
+    const [isEditing, setIsEditing]         = useState(true);
+    const [idUser, setIdUser]               = useState();
+
+    const [valeRefeicao,    setValeRefeicao]    = useState(0)
+    const [valeTransporte,  setValeTransporte]  = useState(0)
+
+    // Formata o número para o padrão pt-BR (ex: 1.234,56)
+    const brazilianFormatter = (num) => {
+        if (num === undefined || num === null || num === '') return '';
+        return new Intl.NumberFormat('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            }).format(num);
+    };
+
+    // Converte a string formatada de volta para número limpo (float)
+    const brazilianParser = (str) => {
+        if (!str) return '';
+            // Remove tudo que não for dígito, vírgula ou sinal de menos
+            const cleaned = str.replace(/[^\d,-]/g, '').replace(',', '.');
+            const parsed = parseFloat(cleaned);
+            return isNaN(parsed) ? '' : parsed;
+    };
 
     // Exemplo: Limitar para 4 linhas (4 * 32px = 128px)
     const limitHeight = 4 * 32; 
@@ -194,11 +215,13 @@ const UsersComponent = () => {
         if (senhaAux) {
 
             usuario = {
-                _id:        values._id,
-                email:      values.email.toUpperCase(),
-                nome:       values.nome.toUpperCase(),
-                telefone:   values.telefone ? values.telefone.replace(/\D/g, '') : "",
-                empresas:   values.empresas,
+                _id:            values._id,
+                email:          values.email.toUpperCase(),
+                nome:           values.nome.toUpperCase(),
+                telefone:       values.telefone ? values.telefone.replace(/\D/g, '') : "",
+                valeTransporte: values.valeTransporte,
+                valeRefeicao:   values.valeRefeicao,
+                empresas:       values.empresas,
                 usuarioCriacao:     user ? user._id : null,
                 usuarioAlteracao:   user ? user._id : null,
             };
@@ -206,11 +229,13 @@ const UsersComponent = () => {
         } else {
 
             usuario = {
-                _id:        values._id,
-                email:      values.email.toUpperCase(),
-                nome:       values.nome.toUpperCase(),
-                senha:      values.senha,
-                telefone:   values.telefone ? values.telefone.replace(/\D/g, '') : "",
+                _id:            values._id,
+                email:          values.email.toUpperCase(),
+                nome:           values.nome.toUpperCase(),
+                senha:          values.senha,
+                telefone:       values.telefone ? values.telefone.replace(/\D/g, '') : "",
+                valeTransporte: values.valeTransporte,
+                valeRefeicao:   values.valeRefeicao,
                 empresas:   values.empresas,
                 usuarioCriacao:     user ? user._id : null,
                 usuarioAlteracao:   user ? user._id : null,
@@ -322,13 +347,15 @@ const UsersComponent = () => {
             await getAllUsers().then((response) => {
 
                 const dadosAux = response.data.map(user => ({
-                    _id:        user._id,
-                    email:      user.email,
-                    nome:       user.nome,
-                    senha:      user.senha,
-                    telefone:   user.telefone,
-                    situacao:   user.situacao,
-                    empresas:   user.empresas,
+                    _id:            user._id,
+                    email:          user.email,
+                    nome:           user.nome,
+                    senha:          user.senha,
+                    telefone:       user.telefone,
+                    situacao:       user.situacao,
+                    valeTransporte: user.valeTransporte,
+                    valeRefeicao:   user.valeRefeicao,
+                    empresas:       user.empresas,
                 }))
                 setDados(dadosAux);
 
@@ -374,6 +401,8 @@ const UsersComponent = () => {
                 senha:          value.senha,
                 telefone:       value.telefone,
                 situacao:       value.situacao,
+                valeTransporte: value.valeTransporte,
+                valeRefeicao:   value.valeRefeicao,
                 empresas:       value.empresas
                                     ? value.empresas.map(empresa => empresa._id)
                                     : null
@@ -400,6 +429,8 @@ const UsersComponent = () => {
                 senha:          value.senha,
                 telefone:       value.telefone,
                 situacao:       value.situacao,
+                valeTransporte: value.valeTransporte,
+                valeRefeicao:   value.valeRefeicao,
                 empresas:       value.empresas
                                     ? value.empresas.map(empresa => empresa._id)
                                     : null
@@ -423,6 +454,8 @@ const UsersComponent = () => {
                 senha:          value.senha,
                 telefone:       value.telefone,
                 situacao:       value.situacao,
+                valeTransporte: value.valeTransporte,
+                valeRefeicao:   value.valeRefeicao,
                 empresas:       value.empresas
                                     ? value.empresas.map(empresa => empresa._id)
                                     : null
@@ -591,6 +624,43 @@ const UsersComponent = () => {
                         </Col>
                     </Row>
                     <Row gutter={[16, 16]}>
+                        <Col>
+                            <Item
+                                name="valeRefeicao"
+                                label="Vale Refeição"
+                            >
+                                <InputNumber
+                                    prefix="R$"
+                                    style={{ width: '100%' }}
+                                    step={0.01}                                    
+                                    disabled={!isEditing}
+                                    value={valeRefeicao}
+                                    formatter={brazilianFormatter}
+                                    parser={brazilianParser}
+                                    onChange={(val) => setValeRefeicao(val)}
+                                />
+                            </Item>
+                        </Col>
+                        <Col>
+                            <Item
+                                name="valeTransporte"
+                                label="Vale Transporte"
+                            >
+                                <InputNumber
+                                    prefix="R$"
+                                    style={{ width: '100%' }}
+                                    step={0.01}                                    
+                                    disabled={!isEditing}
+                                    value={valeTransporte}
+                                    formatter={brazilianFormatter}
+                                    parser={brazilianParser}
+                                    onChange={(val) => setValeTransporte(val)}
+                                />
+                            </Item>
+                        </Col>
+                                
+                    </Row>
+                    <Row gutter={[16, 16]}>
                         <Col span={18}>
                             <Item
                                 name="empresas"
@@ -731,6 +801,43 @@ const UsersComponent = () => {
                                 </Select>
                             </Item>
                         </Col>
+                    </Row>
+                    <Row gutter={[16, 16]}>
+                        <Col>
+                            <Item
+                                name="valeRefeicao"
+                                label="Vale Refeição"
+                            >
+                                <InputNumber
+                                    prefix="R$"
+                                    style={{ width: '100%' }}
+                                    step={0.01}                                    
+                                    disabled={!isEditing}
+                                    value={valeRefeicao}
+                                    formatter={brazilianFormatter}
+                                    parser={brazilianParser}
+                                    onChange={(val) => setValeRefeicao(val)}
+                                />
+                            </Item>
+                        </Col>
+                        <Col>
+                            <Item
+                                name="valeTransporte"
+                                label="Vale Transporte"
+                            >
+                                <InputNumber
+                                    prefix="R$"
+                                    style={{ width: '100%' }}
+                                    step={0.01}                                    
+                                    disabled={!isEditing}
+                                    value={valeTransporte}
+                                    formatter={brazilianFormatter}
+                                    parser={brazilianParser}
+                                    onChange={(val) => setValeTransporte(val)}
+                                />
+                            </Item>
+                        </Col>
+                                
                     </Row>
                     <Row gutter={[16, 16]}>
                         <Col span={18}>
