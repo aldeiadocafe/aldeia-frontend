@@ -462,15 +462,14 @@ const ScheduleComponent = () => {
                 empresaID:    evento.empresa._id,
                 userID:       evento.usuario._id,
                 content:      evento.usuario.nome,
-                tipoEventoID: evento.tipoEvento._id,
-                tipoEvento:   evento.tipoEvento.tipoEvento,
-                color:        evento.tipoEvento.cor,
+                tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
+                tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
+                color:        evento.tipoEvento ? evento.tipoEvento.cor         : "#DA291C",  // Caso o Tipo de Evento tenha sido eliminado
                 dia:          dayjs(evento.dia).startOf('day'),
                 start:        dayjs(evento.dia).startOf('day'),
                 end:          dayjs(evento.dia).endOf('day'),
                 type:         'success', // Define o tipo de status do Badge (success, error, warning)
               }))
-
               setEventos(dadosAux)
 
             })

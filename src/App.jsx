@@ -40,6 +40,7 @@ import ShoppingComponent from './components/Purchase/ShoppingComponent';
 import SafetyStockComponent from './components/Stock/SafetyStockComponent';
 import ScheduleComponent from './components/Schedule/ScheduleComponent';
 import DraftScheduleComponent from './components/Schedule/DraftScheduleComponent';
+import TypeEventComponent from './components/Schedule/TypeEventComponent';
 
 import './App.css';
 
@@ -257,6 +258,15 @@ function App() {
                         {<DraftScheduleComponent/>}
                       </PrivateRoute>
                     }/>                    
+
+                  {/* http://localhost:5173/eventTypes */}
+                  <Route path='/typeEvents'    
+                    element={
+                      <PrivateRoute>
+                        {<TypeEventComponent/>}
+                      </PrivateRoute>
+                    }/>                    
+
 
               </Route>
               

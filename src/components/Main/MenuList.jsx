@@ -163,6 +163,16 @@ const allMenuItems = [
                 label: 'Cadastro',
                 children: [
                     {
+                        key: 'SCHEDULEVENTTYPE',
+//                            icon: <FunnelPlotOutlined />,
+                        icon: <BookOutlined />,
+                        label: 
+                            <Link to="/typeEvents">
+                                Tipo Evento
+                            </Link>,
+
+                    },
+                    {
                         key: 'SCHEDULENEWSCHEDULE',
 //                            icon: <FunnelPlotOutlined />,
                         icon: <ScheduleOutlined />,
