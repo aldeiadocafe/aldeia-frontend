@@ -294,7 +294,6 @@ const ItemComponent = () => {
 
         } catch (error) {
             console.error(error);
-            setLoading(false);
         } finally {
             setLoading(false);
     
@@ -304,7 +303,7 @@ const ItemComponent = () => {
 
     const carregarSelectUnit = async () => {
 
-        setLoading(true)
+//        setLoading(true)
 
         await getAllUnits().then((response) => {
 
@@ -320,7 +319,7 @@ const ItemComponent = () => {
             console.error(error)
         })
 
-        setLoading(false)
+//        setLoading(false)
         
     }
 
