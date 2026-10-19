@@ -536,16 +536,19 @@ const DraftScheduleComponent = () => {
 
             }
 
+            let tipoAux = []
+
             await getAllTypeEvents().then( async (response) => {
 
-              const dadosAux = response.data.map(type => ({
+              tipoAux = response.data.filter(tipo => tipo.ativo)
+                                      .map(type => ({
                 id:     type._id,
                 label:  type.tipoEvento,
                 value:  type.tipoEvento,
                 cor:    type.cor
               }))
 
-              setTypeEvent(dadosAux)
+              setTypeEvent(tipoAux)
 
             })
 
@@ -555,7 +558,11 @@ const DraftScheduleComponent = () => {
             try {
               await getAllDrafSchedules().then( async (response) =>{
 
-                dadosEvento = response.data.map(evento => ({
+                const draftAux = response.data
+
+                dadosEvento = draftAux
+                            .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
+                            .map(evento => ({
                   id:           evento._id,
                   key:          evento._id,                
                   empresaID:    evento.empresa._id,
@@ -583,7 +590,11 @@ const DraftScheduleComponent = () => {
 
               await getAllSchedules().then( async (response) => {
 
-                dadosEvento = response.data.map(evento => ({
+                const scheduleAux = response.data
+
+                dadosEvento = scheduleAux
+                            .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
+                            .map(evento => ({
                   id:           evento._id,
                   key:          evento._id,                
                   empresaID:    evento.empresa._id,

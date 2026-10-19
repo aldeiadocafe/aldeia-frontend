@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, ColorPicker, Checkbox} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, ColorPicker, Checkbox, Row, Col} from 'antd'
 import Title from 'antd/es/typography/Title';
 
 import dayjs from 'dayjs';
@@ -144,6 +144,22 @@ const TypeEventComponent = () => {
             ),
         },
         {
+            dataIndex:  "ativo",
+            title:      "Ativo",
+            sorter: (a, b) => a.ativo.localeCompare(b.ativo),
+            showSorterTooltip: { target: 'sorter-icon' }, 
+
+            //Renderizar
+            render: (ativo, record) => (
+                <Checkbox
+                    checked={record.ativo}
+                    disabled
+                >
+                    Ativo
+                </Checkbox>
+            ),
+        },
+        {
             dataIndex:  "cor",
             title:      "Cor",
             sorter: (a, b) => a.cor.localeCompare(b.cor),
@@ -165,7 +181,8 @@ const TypeEventComponent = () => {
             _id:                values._id,
             tipoEvento:         values.tipoEvento.toUpperCase(),
             cor:                typeof values.cor === 'string' ? values.cor : values.cor.toHexString(),
-            calcularDespesa:    values.calcularDespesa
+            calcularDespesa:    values.calcularDespesa,
+            ativo:              values.ativo,
 
         };
 
@@ -287,8 +304,8 @@ const TypeEventComponent = () => {
                 _id:                value._id,
                 tipoEvento:         value.tipoEvento.toUpperCase(),
                 cor:                value.cor,
-                calcularDespesa:    value.calcularDespesa
-
+                calcularDespesa:    value.calcularDespesa,
+                ativo:              value.ativo,
             })
 
             setFormModal(true);
@@ -333,7 +350,8 @@ const TypeEventComponent = () => {
                 _id:                value._id,
                 tipoEvento:         value.tipoEvento.toUpperCase(),
                 cor:                value.cor,
-                calcularDespesa:    value.calcularDespesa
+                calcularDespesa:    value.calcularDespesa,
+                ativo:              value.ativo,
             })
 
         }
@@ -351,7 +369,8 @@ const TypeEventComponent = () => {
                 _id:                value._id,
                 tipoEvento:         value.tipoEvento.toUpperCase(),
                 cor:                value.cor,
-                calcularDespesa:    value.calcularDespesa
+                calcularDespesa:    value.calcularDespesa,
+                ativo:              value.ativo,
             })
         }
     }
@@ -481,8 +500,9 @@ const TypeEventComponent = () => {
                     form={form}
                     layout='vertical'
                     initialValues={{
-                        cor: null,
-                        calcularDespesa: false,                        
+                        cor:                null,
+                        calcularDespesa:    false,
+                        ativo:              true,
                     }}
                     >
                     <Item
@@ -501,13 +521,25 @@ const TypeEventComponent = () => {
                             style={{ textTransform: 'uppercase' }}
                             placeholder='Ex: Trabalho'/>
                     </Item>
-                    <Item
-                        name={"calcularDespesa"}
-                        valuePropName='checked'
-//                        label="Calcular Despesa"
-                    >
-                        <Checkbox>Calcular Despesas</Checkbox>
-                    </Item>
+                    <Row gutter={[16,16]}>
+                        <Col>
+                            <Item
+                                name={"calcularDespesa"}
+                                valuePropName='checked'
+        //                        label="Calcular Despesa"
+                            >
+                                <Checkbox>Calcular Despesas</Checkbox>
+                            </Item>
+                        </Col>
+                        <Col>
+                            <Item
+                                name={"ativo"}
+                                valuePropName='checked'
+                            >
+                                <Checkbox>Ativo</Checkbox>
+                            </Item>
+                        </Col>
+                    </Row>
                     <Item
                         name={"cor"}
                         label="Cor"
@@ -572,14 +604,32 @@ const TypeEventComponent = () => {
                             style={{ textTransform: 'uppercase' }}
                             placeholder='Ex: Trabalho, Folga'/>
                     </Item>
-                    <Item
-                        name={"calcularDespesa"}
-                        label="Calcular Despesa"
-                    >
-                        <Checkbox
-                            disabled={!isEditing}
-                        />
-                    </Item>
+                    <Row gutter={[16,16]}>
+                        <Col>
+                            <Item
+                                name={"calcularDespesa"}
+                                valuePropName='checked'
+                            >
+                                <Checkbox
+                                    disabled={!isEditing}
+                                >
+                                    Calcular Despesas
+                                </Checkbox>
+                            </Item>
+                        </Col>
+                        <Col>
+                            <Item
+                                name={"ativo"}
+                                valuePropName='checked'
+                            >
+                                <Checkbox
+                                    disabled={!isEditing}
+                                >
+                                    Ativo
+                                </Checkbox>
+                            </Item>
+                        </Col>
+                    </Row>
                     <Item
                         name={"cor"}
                         label="Cor"
