@@ -482,7 +482,6 @@ const ScheduleComponent = () => {
 
             })
 
-            setLoading(false);
 
         } catch (error) {
             console.error(error);
