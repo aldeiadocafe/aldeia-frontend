@@ -197,7 +197,7 @@ const PlacesInventoryComponent = () => {
             usuarioAlteracao:   user ? user._id : null,
         };
 
-        setLoading(true);    
+//        setLoading(true);    
 
         if (!values._id) {
 
@@ -312,27 +312,31 @@ const PlacesInventoryComponent = () => {
 
         const ids = user.empresas.map(usuario => usuario._id)
 
-        setLoading(true)
-        await getAllInventorys().then((response) => {
+        try {
+            setLoading(true)
+            await getAllInventorys().then((response) => {
 
-            // EXIBIR OS LOCAIS COM SITUACAO DIFERENTES DE FINALIZADO
-            const dados = response.data
-                .filter(inventory => inventory.situacao != 'FINALIZADO')
-                .filter(item => ids.includes(item.empresa._id))
+                // EXIBIR OS LOCAIS COM SITUACAO DIFERENTES DE FINALIZADO
+                const dados = response.data
+                    .filter(inventory => inventory.situacao != 'FINALIZADO')
+                    .filter(item => ids.includes(item.empresa._id))
 
-            // Formatar os dados
-            const formatarDados = dados.map((inventario) => ({
-                value: inventario._id,
-                label: inventario.empresa.nome + ' - ' + dayjs.utc(inventario.dataInventario).format('DD/MM/YYYY') + ' - ' + inventario.descricao
-            }))
+                // Formatar os dados
+                const formatarDados = dados.map((inventario) => ({
+                    value: inventario._id,
+                    label: inventario.empresa.nome + ' - ' + dayjs.utc(inventario.dataInventario).format('DD/MM/YYYY') + ' - ' + inventario.descricao
+                }))
 
-            setSelectInventory(formatarDados)
+                setSelectInventory(formatarDados)
 
-        }).catch((error) => {
-            console.error(error)
-        })
-
-        setLoading(false)
+            }).catch((error) => {
+                console.error(error)
+            })
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
         
     }
 
@@ -354,7 +358,7 @@ const PlacesInventoryComponent = () => {
 
     const btnFinalizar = async (value) => {
 
-        setLoading(true);    
+//        setLoading(true);    
 
         const finalizar = {
             _id:                value._id,  

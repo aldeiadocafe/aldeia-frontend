@@ -256,7 +256,7 @@ const ListDatesItemBalanceComponent = () => {
                 setDadosCompleto(dadosAux)
                 setDados(dadosAux);
 
-                setLoading(false);
+//                setLoading(false);
 
             })
 
@@ -264,7 +264,7 @@ const ListDatesItemBalanceComponent = () => {
             console.error(error);
         } finally {
 
-//            setLoading(false);
+            setLoading(false);
 
         }
 

@@ -271,7 +271,7 @@ const SafetyStockComponent = () => {
             usuarioAlteracao:   user ? user._id : null,
         };
 
-        setLoading(true);    
+//        setLoading(true);    
 
         if (!values._id) {
 
@@ -309,7 +309,7 @@ const SafetyStockComponent = () => {
             
         }        
             
-        setLoading(false);    
+//        setLoading(false);    
 
     };
 
@@ -387,12 +387,12 @@ const SafetyStockComponent = () => {
             });
 
             setSelectedRowKeys([]);
-            setLoading(false);
 
         } catch (error) {
             console.error(error);
             setLoading(false);
         } finally {    
+            setLoading(false);
         }
 
     }

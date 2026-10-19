@@ -467,7 +467,7 @@ const InventoryComponent = () => {
 
         try {
 
-            setLoading(true);    
+//            setLoading(true);    
 
             if (!values._id) {
 
@@ -746,7 +746,7 @@ const InventoryComponent = () => {
 
     const confirmarReabrir = async () => {
 
-        setLoading(true)
+//        setLoading(true)
         if (inventoryReOpen) {
 
             try {
@@ -827,7 +827,7 @@ const InventoryComponent = () => {
     // Chamado se o usuário confirmar na Popconfirm
     const confirmarFinalizar = async () => {
 
-        setLoading(true);    
+//        setLoading(true);    
 
         if(inventoryEnd){
             
@@ -852,7 +852,7 @@ const InventoryComponent = () => {
         }
 
         setModalFinalizar(false)
-        setLoading(false);
+//        setLoading(false);
         
     };
 

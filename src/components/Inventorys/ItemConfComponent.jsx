@@ -295,7 +295,7 @@ const ItemConfComponent = () => {
                     message.error('Erro ao finalizar!');
                 }                
             }
-        });
+        }) 
 
         setLoading(false);
 
@@ -312,7 +312,7 @@ const ItemConfComponent = () => {
 
     const btnEliminar = (value) => {
 
-        setLoading(true)
+//        setLoading(true)
         if (value) {
 
             deleteCountPlaces(value._id).then((response) => {

@@ -475,19 +475,20 @@ const ListStockBalanceComponent = () => {
                 })
 
             }).catch(error => {
-                setLoading(false);
+                console.error(error);            
+//                setLoading(false);
             })
 
         } catch (error) {
             console.error(error);            
         } 
-/*        
+        
         finally {
 
             setLoading(false);
 
         }
-*/            
+                    
     }
 
     const expandedRowRender = (record) => {
@@ -580,38 +581,44 @@ const ListStockBalanceComponent = () => {
 
         if (dadosStock.length > 0) {
 
-            const dadosAux = dadosStock
-                .filter(stock => stock.item != null)
-                .map(stock => {
+            try {
 
-                    if (dadosItem.some(item => item._id === stock.item._id)) {
+                const dadosAux = dadosStock
+                    .filter(stock => stock.item != null)
+                    .map(stock => {
 
-                        return ({
-                            key:            stock._id,                                        
-                            idItem:         stock.item._id,
-                            itCodigo:       stock.item.itCodigo,
-                            descricao:      stock.item.descricao,
-                            qtde:           stock.quantidade,                
-                            unit:           stock.item.unit,
-                            unidade:        (dadosUnit.find(unit => unit._id === stock.item.unit).unidade),
-                            gcomEstoque:    stock.gcomEstoque,
-                            diferenca:      stock.quantidade - stock.gcomEstoque,
-                            dataInventario: stock.dataInventario,
-                            dataGCom:       stock.dataGCom,
-                            empresa:        stock.empresa,
-                            nomeEmpresa:    stock.empresa.nome,
-                        })
+                        if (dadosItem.some(item => item._id === stock.item._id)) {
 
-                    }
+                            return ({
+                                key:            stock._id,                                        
+                                idItem:         stock.item._id,
+                                itCodigo:       stock.item.itCodigo,
+                                descricao:      stock.item.descricao,
+                                qtde:           stock.quantidade,                
+                                unit:           stock.item.unit,
+                                unidade:        (dadosUnit.find(unit => unit._id === stock.item.unit).unidade),
+                                gcomEstoque:    stock.gcomEstoque,
+                                diferenca:      stock.quantidade - stock.gcomEstoque,
+                                dataInventario: stock.dataInventario,
+                                dataGCom:       stock.dataGCom,
+                                empresa:        stock.empresa,
+                                nomeEmpresa:    stock.empresa.nome,
+                            })
 
-                })
-            const dadosFinal = dadosAux.filter(dados => dados != undefined)
+                        }
 
-            setDadosCompleto(dadosFinal);
-//            setDados(dadosFinal)
-            setDados(dadosFinal.filter(item => item.qtde != undefined));
+                    })
+                const dadosFinal = dadosAux.filter(dados => dados != undefined)
 
-            setLoading(false);
+                setDadosCompleto(dadosFinal);
+    //            setDados(dadosFinal)
+                setDados(dadosFinal.filter(item => item.qtde != undefined));
+
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
 
         }
 

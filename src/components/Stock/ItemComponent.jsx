@@ -296,7 +296,6 @@ const ItemComponent = () => {
             console.error(error);
         } finally {
             setLoading(false);
-    
         }
 
     }
