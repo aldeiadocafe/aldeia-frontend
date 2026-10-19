@@ -287,7 +287,7 @@ const ItemComponent = () => {
                 setDados(dadosAux);
 
                 setSelectedRowKeys([]);
-                setLoading(false);
+//                setLoading(false);
 
             });
 
@@ -296,7 +296,7 @@ const ItemComponent = () => {
             console.error(error);
             setLoading(false);
         } finally {
-
+            setLoading(false);
     
         }
 

@@ -482,7 +482,6 @@ const ScheduleComponent = () => {
 
             })
 
-
         } catch (error) {
             console.error(error);
         } finally {

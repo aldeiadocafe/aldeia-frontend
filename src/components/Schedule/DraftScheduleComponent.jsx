@@ -616,8 +616,6 @@ const DraftScheduleComponent = () => {
 
             }
 
-            setLoading(false);
-
         } catch (error) {
             console.error(error);
         } finally {
