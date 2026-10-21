@@ -1,3 +1,26 @@
+
+/* Se quiser colar o conteúdo na borda esquerda, escondendo ou movendo o ícone switcher */
+.ant-tree .ant-tree-switcher {
+  width: 0 !important; /* Diminui a largura do container do ícone de expansão */
+}
+
+/* Aumenta o espaçamento vertical entre cada linha */
+.ant-tree-treenode {
+  padding-top: 5px !important;
+/*  padding-bottom: 8px !important;*/
+}
+
+/* Remove ou reduz o espaçamento do bloco de indentação padrão * /
+.ant-tree .ant-tree-indent-unit {
+  width: 4px !important; /* Ajuste o valor como desejar (padrão é maior) * /
+}
+
+/* Caso queira sumir completamente com o espaço da esquerda do primeiro nível * /
+.ant-tree .ant-tree-treenode {
+  padding-left: 0 !important;
+}
+*/
+
 /* Alvo: O botão de rádio que está selecionado */
 .fumaca-radio .ant-radio-button-wrapper-checked {
     opacity: 0.5 !important;    

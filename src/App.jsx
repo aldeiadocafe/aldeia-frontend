@@ -48,6 +48,7 @@ import './App.css';
 import { LocaleManager } from '@bryntum/calendar';
 
 import '@bryntum/calendar/locales/calendar.locale.PtBr.js'
+import VersionScheduleComponent from './components/Schedule/VersionScheduleComponent';
 
 // Define o idioma para Português do Brasil
 LocaleManager.locale = 'PtBr';
@@ -264,6 +265,14 @@ function App() {
                     element={
                       <PrivateRoute>
                         {<TypeEventComponent/>}
+                      </PrivateRoute>
+                    }/>                    
+
+                  {/* http://localhost:5173/versionsSchedule */}
+                  <Route path='/versionsSchedule'    
+                    element={
+                      <PrivateRoute>
+                        <VersionScheduleComponent/>
                       </PrivateRoute>
                     }/>                    
 

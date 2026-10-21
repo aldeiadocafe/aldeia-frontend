@@ -244,35 +244,34 @@ const DraftScheduleComponent = () => {
                             onClick={(e) => abrirConfirmacaoDelecao(e, item)}
                             style={{ cursor: 'pointer', display: 'block' }}
                         >                
-                          <Tooltip title={item.content}>
 
-                              {/* Div customizada para servir de container com o background desejado */}
-                              <div style={{ 
-                                  backgroundColor: item.color,
-                                  borderRadius: '4px', 
-                                  overflow: 'hidden',
-                                  margin: '1px'
-                              }}>
-                                  <Badge
-                                      status={item.type} 
-                                      color={item.color}
-  //                                    text={item.content}
-                                  >
-                                    <span style={{ padding: '5px', cursor: 'pointer' }}>
-                                      <Text 
-                                        style={{ 
-                                          maxWidth: 100,
-                                          color: '#ffffff',
-                                        }} // Define o limite de largura para o texto
-                                        ellipsis={true}
-                                //        ellipsis={{ tooltip: { title: item.content } }} // Ativa as reticências e o tooltip opcional
-                                      >
-                                        { item.content }
-                                      </Text>
-                                    </span>
-                                  </Badge>
-                              </div>
-                          </Tooltip>                                      
+                            {/* Div customizada para servir de container com o background desejado */}
+                            <div style={{ 
+                                backgroundColor: item.color,
+                                borderRadius: '4px', 
+                                overflow: 'hidden',
+                                margin: '1px'
+                            }}>
+                                <Badge
+                                    status={item.type} 
+                                    color={item.color}
+//                                    text={item.content}
+                                >
+                                  <span style={{ padding: '5px', cursor: 'pointer' }}>
+                                    <Text 
+                                      style={{ 
+                                        maxWidth: 100,
+                                        color: '#ffffff',
+                                      }} // Define o limite de largura para o texto
+                                      ellipsis={true}
+                              //        ellipsis={{ tooltip: { title: item.content } }} // Ativa as reticências e o tooltip opcional
+                                    >
+                                      { item.content }
+                                    </Text>
+                                  </span>
+                                </Badge>
+                            </div>
+
                         </span>
                     </li>
 
@@ -467,8 +466,6 @@ const DraftScheduleComponent = () => {
         } else {
             messageApi.error('Erro ao ativar Nova Escala!');
         }        
-
-        return
       })
       
       setLoading(false);
@@ -513,106 +510,106 @@ const DraftScheduleComponent = () => {
 
               setopcaoColaboradoresFiltro([])
               
-              await getAllUsers().then( async (response) => {
+              const dadosAux = await getAllUsers().then( async (response) => response.data)
 
-                const dadosAux = response.data
-                    .filter(user => user.empresas.length > 0 && 
-                            user.situacao === 'ATIVO'
-                    )
-                    .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
-              
-                const formatarUser = dadosAux.map((usuario) => ({
-                    label:    usuario.nome,
-                    value:    usuario._id,
-                    empresas: usuario.empresas,
-                    userID:   usuario._id,
-                }))     
+              const usuariosAtivo = dadosAux 
+                  .filter(user => user.empresas.length > 0 && 
+                          user.situacao === 'ATIVO'
+                  )
+                  .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
+            
+              const formatarUser = usuariosAtivo.map((usuario) => ({
+                  label:    usuario.nome,
+                  value:    usuario._id,
+                  empresas: usuario.empresas,
+                  userID:   usuario._id,
+              }))     
 
-                setopcaoColaboradoresFiltro([{ label: 'Todos os Colaboradores', value: 'ALL' }, ...formatarUser])
-                setColaboradores(formatarUser)    //Carrega todos os colabores
-                setListarColab(formatarUser)      //Filtrar os colaboradores por empresa
+              setopcaoColaboradoresFiltro([{ label: 'Todos os Colaboradores', value: 'ALL' }, ...formatarUser])
+              setColaboradores(formatarUser)    //Carrega todos os colabores
+              setListarColab(formatarUser)      //Filtrar os colaboradores por empresa
 
-              })
+              let tipoAux = []
 
-            }
+              await getAllTypeEvents().then( async (response) => {
 
-            let tipoAux = []
-
-            await getAllTypeEvents().then( async (response) => {
-
-              tipoAux = response.data.filter(tipo => tipo.ativo)
-                                      .map(type => ({
-                id:     type._id,
-                label:  type.tipoEvento,
-                value:  type.tipoEvento,
-                cor:    type.cor
-              }))
-
-              setTypeEvent(tipoAux)
-
-            })
-
-            setIsNewEventos(true)
-            let dadosEvento = ([])
-
-            try {
-              await getAllDrafSchedules().then( async (response) =>{
-
-                const draftAux = response.data
-
-                dadosEvento = draftAux
-                            .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
-                            .map(evento => ({
-                  id:           evento._id,
-                  key:          evento._id,                
-                  empresaID:    evento.empresa._id,
-                  userID:       evento.usuario._id,
-                  content:      evento.usuario.nome,
-                  tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
-                  tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
-                  color:        evento.tipoEvento ? evento.tipoEvento.cor         : "#DA291C",  // Caso o Tipo de Evento tenha sido eliminado
-                  dia:          dayjs(evento.dia).startOf('day'),
-                  start:        dayjs(evento.dia).startOf('day'),
-                  end:          dayjs(evento.dia).endOf('day'),
-                  type:         'success', // Define o tipo de status do Badge (success, error, warning)
+                tipoAux = response.data.filter(tipo => tipo.ativo)
+                                        .map(type => ({
+                  id:     type._id,
+                  label:  type.tipoEvento,
+                  value:  type.tipoEvento,
+                  cor:    type.cor
                 }))
 
-                setEventosInic(dadosEvento)
-                setEventos(dadosEvento)
-                setIsNewEventos(false)
+                setTypeEvent(tipoAux)
 
               })
-            } catch (error) {
 
-            }
+              setIsNewEventos(true)
+              let dadosEvento = ([])
 
-            if (dadosEvento.length === 0) {
+              try {
+                await getAllDrafSchedules().then( async (response) =>{
 
-              await getAllSchedules().then( async (response) => {
+                  const draftAux = response.data
 
-                const scheduleAux = response.data
+                  dadosEvento = draftAux
+                              .filter(evento => usuariosAtivo.find(ativo => ativo._id === evento.usuario._id))
+                              .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
+                              .map(evento => ({
+                    id:           evento._id,
+                    key:          evento._id,                
+                    empresaID:    evento.empresa._id,
+                    userID:       evento.usuario._id,
+                    content:      evento.usuario.nome,
+                    tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
+                    tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
+                    color:        evento.tipoEvento ? evento.tipoEvento.cor         : "#DA291C",  // Caso o Tipo de Evento tenha sido eliminado
+                    dia:          dayjs(evento.dia).startOf('day'),
+                    start:        dayjs(evento.dia).startOf('day'),
+                    end:          dayjs(evento.dia).endOf('day'),
+                    type:         'success', // Define o tipo de status do Badge (success, error, warning)
+                  }))
 
-                dadosEvento = scheduleAux
-                            .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
-                            .map(evento => ({
-                  id:           evento._id,
-                  key:          evento._id,                
-                  empresaID:    evento.empresa._id,
-                  userID:       evento.usuario._id,
-                  content:      evento.usuario.nome,
-                  tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
-                  tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
-                  color:        evento.tipoEvento ? evento.tipoEvento.cor         : "#DA291C", // Caso o Tipo de Evento tenha sido eliminado
-                  dia:          dayjs(evento.dia).startOf('day'),
-                  start:        dayjs(evento.dia).startOf('day'),
-                  end:          dayjs(evento.dia).endOf('day'),
-                  type:         'success', // Define o tipo de status do Badge (success, error, warning)
-                }))
+                  setEventosInic(dadosEvento)
+                  setEventos(dadosEvento)
+                  setIsNewEventos(false)
 
-                setEventosInic(dadosEvento)
-                setEventos(dadosEvento)
+                })
+              } catch (error) {
 
-              })
+              }
+
+              if (dadosEvento.length === 0) {
+
+                await getAllSchedules().then( async (response) => {
+
+                  const scheduleAux = response.data
+
+                  dadosEvento = scheduleAux
+                              .filter(evento => usuariosAtivo.find(ativo => ativo._id === evento.usuario._id))
+                              .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
+                              .map(evento => ({
+                    id:           evento._id,
+                    key:          evento._id,                
+                    empresaID:    evento.empresa._id,
+                    userID:       evento.usuario._id,
+                    content:      evento.usuario.nome,
+                    tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
+                    tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
+                    color:        evento.tipoEvento ? evento.tipoEvento.cor         : "#DA291C", // Caso o Tipo de Evento tenha sido eliminado
+                    dia:          dayjs(evento.dia).startOf('day'),
+                    start:        dayjs(evento.dia).startOf('day'),
+                    end:          dayjs(evento.dia).endOf('day'),
+                    type:         'success', // Define o tipo de status do Badge (success, error, warning)
+                  }))
+
+                  setEventosInic(dadosEvento)
+                  setEventos(dadosEvento)
+
+                })
+
+              }
 
             }
 

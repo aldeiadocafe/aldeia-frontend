@@ -222,6 +222,7 @@ const UsersComponent = () => {
                 valeTransporte: values.valeTransporte,
                 valeRefeicao:   values.valeRefeicao,
                 empresas:       values.empresas,
+                situacao:       values.situacao,
                 usuarioCriacao:     user ? user._id : null,
                 usuarioAlteracao:   user ? user._id : null,
             };
@@ -236,7 +237,8 @@ const UsersComponent = () => {
                 telefone:       values.telefone ? values.telefone.replace(/\D/g, '') : "",
                 valeTransporte: values.valeTransporte,
                 valeRefeicao:   values.valeRefeicao,
-                empresas:   values.empresas,
+                empresas:       values.empresas,
+                situacao:       values.situacao,
                 usuarioCriacao:     user ? user._id : null,
                 usuarioAlteracao:   user ? user._id : null,
             };
