@@ -299,7 +299,7 @@ const ScheduleComponent = () => {
                             size="small"
                             title="Selecionar Empresa"
                             placeholder="Selecionar Empresa"
-                            style={{ width: 380 }}
+                            style={{ width: 400 }}
                             disabled={empresa.length === 1}
 //                            allowClear  //Permite limpar seleção
                             mode="multiple"
