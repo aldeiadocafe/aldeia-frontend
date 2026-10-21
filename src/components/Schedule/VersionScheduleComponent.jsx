@@ -492,8 +492,8 @@ const VersionScheduleComponent = () => {
               
               {/* Painel Esquerdo: Menu em Árvore */}
               <Splitter.Panel 
-                defaultSize="10%" 
-                min="5%" 
+                defaultSize="15%" 
+                min="10%" 
                 max="50%" 
                 style={{ 
                   backgroundColor: '#ffffff',
