@@ -418,13 +418,24 @@ const ScheduleComponent = () => {
 
               setopcaoColaboradoresFiltro([])
               
-              const dadosAux = await getAllUsers().then( async (response) => response.data)
+              let usuariosAtivo = []
 
-              const usuariosAtivo = dadosAux
-                  .filter(user => user.empresas.length > 0 && 
-                          user.situacao === 'ATIVO'
-                  )
-                  .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
+              if (user.visualizarEscalas) {
+
+                const dadosAux = await getAllUsers().then( async (response) => response.data)
+
+                usuariosAtivo = dadosAux
+                    .filter(user => user.empresas.length > 0 && 
+                            user.situacao === 'ATIVO'
+                    )
+                    .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
+
+
+              } else {
+                
+                usuariosAtivo = [user]
+
+              }
 
               const formatarUser = usuariosAtivo.map((usuario) => ({
                   label:    usuario.nome,

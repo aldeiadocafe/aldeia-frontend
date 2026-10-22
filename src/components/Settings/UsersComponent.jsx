@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, EyeTwoTone, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Row, Col, InputNumber} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Row, Col, InputNumber, Checkbox} from 'antd'
 import { PatternFormat } from 'react-number-format'; // Recomendado: PatternFormat para máscaras fixas
 import { cpf, cnpj } from 'cpf-cnpj-validator';
 
@@ -36,8 +36,9 @@ const UsersComponent = () => {
     const [isEditing, setIsEditing]         = useState(true);
     const [idUser, setIdUser]               = useState();
 
-    const [valeRefeicao,    setValeRefeicao]    = useState(0)
-    const [valeTransporte,  setValeTransporte]  = useState(0)
+    const [valeRefeicao,        setValeRefeicao]        = useState(0)
+    const [valeTransporte,      setValeTransporte]      = useState(0)
+    const [visualizarEscalas,   setVisualizarEscalas]   = useState(false)
 
     // Formata o número para o padrão pt-BR (ex: 1.234,56)
     const brazilianFormatter = (num) => {
@@ -215,14 +216,15 @@ const UsersComponent = () => {
         if (senhaAux) {
 
             usuario = {
-                _id:            values._id,
-                email:          values.email.toUpperCase(),
-                nome:           values.nome.toUpperCase(),
-                telefone:       values.telefone ? values.telefone.replace(/\D/g, '') : "",
-                valeTransporte: values.valeTransporte,
-                valeRefeicao:   values.valeRefeicao,
-                empresas:       values.empresas,
-                situacao:       values.situacao,
+                _id:                values._id,
+                email:              values.email.toUpperCase(),
+                nome:               values.nome.toUpperCase(),
+                telefone:           values.telefone ? values.telefone.replace(/\D/g, '') : "",
+                valeTransporte:     values.valeTransporte,
+                valeRefeicao:       values.valeRefeicao,
+                visualizarEscalas:  values.visualizarEscalas,
+                empresas:           values.empresas,
+                situacao:           values.situacao,
                 usuarioCriacao:     user ? user._id : null,
                 usuarioAlteracao:   user ? user._id : null,
             };
@@ -230,15 +232,16 @@ const UsersComponent = () => {
         } else {
 
             usuario = {
-                _id:            values._id,
-                email:          values.email.toUpperCase(),
-                nome:           values.nome.toUpperCase(),
-                senha:          values.senha,
-                telefone:       values.telefone ? values.telefone.replace(/\D/g, '') : "",
-                valeTransporte: values.valeTransporte,
-                valeRefeicao:   values.valeRefeicao,
-                empresas:       values.empresas,
-                situacao:       values.situacao,
+                _id:                values._id,
+                email:              values.email.toUpperCase(),
+                nome:               values.nome.toUpperCase(),
+                senha:              values.senha,
+                telefone:           values.telefone ? values.telefone.replace(/\D/g, '') : "",
+                valeTransporte:     values.valeTransporte,
+                valeRefeicao:       values.valeRefeicao,
+                visualizarEscalas:  values.visualizarEscalas,
+                empresas:           values.empresas,
+                situacao:           values.situacao,
                 usuarioCriacao:     user ? user._id : null,
                 usuarioAlteracao:   user ? user._id : null,
             };
@@ -349,15 +352,16 @@ const UsersComponent = () => {
             await getAllUsers().then((response) => {
 
                 const dadosAux = response.data.map(user => ({
-                    _id:            user._id,
-                    email:          user.email,
-                    nome:           user.nome,
-                    senha:          user.senha,
-                    telefone:       user.telefone,
-                    situacao:       user.situacao,
-                    valeTransporte: user.valeTransporte,
-                    valeRefeicao:   user.valeRefeicao,
-                    empresas:       user.empresas,
+                    _id:                user._id,
+                    email:              user.email,
+                    nome:               user.nome,
+                    senha:              user.senha,
+                    telefone:           user.telefone,
+                    situacao:           user.situacao,
+                    valeTransporte:     user.valeTransporte,
+                    valeRefeicao:       user.valeRefeicao,
+                    visualizarEscalas:  user.visualizarEscalas,
+                    empresas:           user.empresas,
                 }))
                 setDados(dadosAux);
 
@@ -397,15 +401,16 @@ const UsersComponent = () => {
 
             setIdUser(value._id)
             form.setFieldsValue({
-                _id:            value._id,
-                email:          value.email.toUpperCase(),
-                nome:           value.nome.toUpperCase(),
-                senha:          value.senha,
-                telefone:       value.telefone,
-                situacao:       value.situacao,
-                valeTransporte: value.valeTransporte,
-                valeRefeicao:   value.valeRefeicao,
-                empresas:       value.empresas
+                _id:                value._id,
+                email:              value.email.toUpperCase(),
+                nome:               value.nome.toUpperCase(),
+                senha:              value.senha,
+                telefone:           value.telefone,
+                situacao:           value.situacao,
+                valeTransporte:     value.valeTransporte,
+                valeRefeicao:       value.valeRefeicao,
+                visualizarEscalas:  value.visualizarEscalas,
+                empresas:           value.empresas
                                     ? value.empresas.map(empresa => empresa._id)
                                     : null
             })
@@ -425,15 +430,16 @@ const UsersComponent = () => {
 
             setIdUser(value._id)
             form.setFieldsValue({
-                _id:            value._id,
-                email:          value.email.toUpperCase(),
-                nome:           value.nome.toUpperCase(),
-                senha:          value.senha,
-                telefone:       value.telefone,
-                situacao:       value.situacao,
-                valeTransporte: value.valeTransporte,
-                valeRefeicao:   value.valeRefeicao,
-                empresas:       value.empresas
+                _id:                value._id,
+                email:              value.email.toUpperCase(),
+                nome:               value.nome.toUpperCase(),
+                senha:              value.senha,
+                telefone:           value.telefone,
+                situacao:           value.situacao,
+                valeTransporte:     value.valeTransporte,
+                valeRefeicao:       value.valeRefeicao,
+                visualizarEscalas:  value.visualizarEscalas,
+                empresas:           value.empresas
                                     ? value.empresas.map(empresa => empresa._id)
                                     : null
             })
@@ -450,15 +456,16 @@ const UsersComponent = () => {
         if(value) {
 
             form.setFieldsValue({
-                _id:            value._id,
-                email:          value.email.toUpperCase(),
-                nome:           value.nome.toUpperCase(),
-                senha:          value.senha,
-                telefone:       value.telefone,
-                situacao:       value.situacao,
-                valeTransporte: value.valeTransporte,
-                valeRefeicao:   value.valeRefeicao,
-                empresas:       value.empresas
+                _id:                value._id,
+                email:              value.email.toUpperCase(),
+                nome:               value.nome.toUpperCase(),
+                senha:              value.senha,
+                telefone:           value.telefone,
+                situacao:           value.situacao,
+                valeTransporte:     value.valeTransporte,
+                valeRefeicao:       value.valeRefeicao,
+                visualizarEscalas:  value.visualizarEscalas,
+                empresas:           value.empresas
                                     ? value.empresas.map(empresa => empresa._id)
                                     : null
             })
@@ -539,7 +546,10 @@ const UsersComponent = () => {
                 <Form
                     form={form}
                     layout='vertical'
-                    initialValues={{situacao: 'ATIVO'}}
+                    initialValues={{
+                        situacao: 'ATIVO',
+                        visualizarEscalas: false
+                    }}
                     >
                     <Item
                         name={"_id"}
@@ -658,6 +668,19 @@ const UsersComponent = () => {
                                     parser={brazilianParser}
                                     onChange={(val) => setValeTransporte(val)}
                                 />
+                            </Item>
+                        </Col>
+                        <Col>
+                            <Item
+                                name="visualizarEscalas"                                    
+                                valuePropName='checked'
+                                label="Escalas"
+                            >
+                                <Checkbox
+                                    disabled={!isEditing}
+                                >
+                                    Visualizar Escalas
+                                </Checkbox>
                             </Item>
                         </Col>
                                 
@@ -839,7 +862,19 @@ const UsersComponent = () => {
                                 />
                             </Item>
                         </Col>
-                                
+                        <Col>
+                            <Item
+                                name="visualizarEscalas"                                    
+                                valuePropName='checked'
+                                label="Escalas"
+                            >
+                                <Checkbox
+                                    disabled={!isEditing}
+                                >
+                                    Visualizar Escalas
+                                </Checkbox>
+                            </Item>
+                        </Col>                                
                     </Row>
                     <Row gutter={[16, 16]}>
                         <Col span={18}>

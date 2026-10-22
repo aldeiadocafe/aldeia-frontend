@@ -323,16 +323,26 @@ const VersionScheduleComponent = () => {
 
                 setopcaoColaboradoresFiltro([])
 
-                const allUsers      = await getAllUsers().then( async (response) => response.data)
+                const allUsersAux      = await getAllUsers().then( async (response) => response.data)
                 const allTypeEvents = await getAllTypeEvents().then( async (response) => response.data)
                 
-                const dadosAux = allUsers
-                    .filter(user => user.empresas.length > 0 
-//                        && user.situacao === 'ATIVO'
-                    )
-                    .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
+                let allUsers = []
+
+                if (user.visualizarEscalas) {
+
+                  allUsers = allUsersAux
+                      .filter(user => user.empresas.length > 0 
+  //                        && user.situacao === 'ATIVO'
+                      )
+                      .filter(colab => colab.empresas.some(emp => empAux.includes(emp._id)))
               
-                const formatarUser = dadosAux.map((usuario) => ({
+                } else {
+
+                  allUsers = [user]
+
+                }
+
+                const formatarUser = allUsers.map((usuario) => ({
                     label:    usuario.nome,
                     value:    usuario._id,
                     empresas: usuario.empresas,
