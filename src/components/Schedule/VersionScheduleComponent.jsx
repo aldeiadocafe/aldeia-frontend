@@ -196,7 +196,7 @@ const VersionScheduleComponent = () => {
                             size="small"
                             title="Selecionar Empresa"
                             placeholder="Selecionar Empresa"
-                            style={{ width: 310 }}
+                            style={{ width: 450 }}
                             disabled={empresa.length === 1}
 //                            allowClear  //Permite limpar seleção
                             mode="multiple"
