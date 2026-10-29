@@ -414,17 +414,25 @@ const ScheduleComponent = () => {
               setSelectEmpresas(empAux)
               setOptionEmpresas(formatarDados)
             
-              //Usuários
+              const [profileAllUsers,profileAllTypeEvents,profileAllSchedules] = await Promise.allSettled([    // Promise.all( >> Se alguma requeste falhar, o programa para
+                getAllUsers().then( async response => response.data),
+                getAllTypeEvents().then( async (response) => response.data),
+                getAllSchedules().then( async (response) => response.data)
+              ])
 
+              const allUsers          = profileAllUsers?.status           === 'fulfilled' ? profileAllUsers.value           : null
+              const allTypeEvents     = profileAllTypeEvents?.status      === 'fulfilled' ? profileAllTypeEvents.value      : null
+              const allSchedules      = profileAllSchedules?.status       === 'fulfilled' ? profileAllSchedules.value       : null
+
+
+              //Usuários
               setopcaoColaboradoresFiltro([])
               
               let usuariosAtivo = []
 
               if (user.visualizarEscalas) {
 
-                const dadosAux = await getAllUsers().then( async (response) => response.data)
-
-                usuariosAtivo = dadosAux
+                usuariosAtivo = allUsers
                     .filter(user => user.empresas.length > 0 && 
                             user.situacao === 'ATIVO'
                     )
@@ -448,46 +456,35 @@ const ScheduleComponent = () => {
               setColaboradores(formatarUser)    //Carrega todos os colabores
               setListarColab(formatarUser)      //Filtrar os colaboradores por empresa
 
-              let tipoAux = []
-              await getAllTypeEvents().then( async (response) => {
+              const tipoAux = allTypeEvents
+                                .filter(tipo => tipo.ativo)
+                                .map(type => ({
+                id:     type._id,
+                label:  type.tipoEvento,
+                value:  type.tipoEvento,
+                cor:    type.cor
+              }))
 
-                tipoAux = response.data
-                                  .filter(tipo => tipo.ativo)
-                                  .map(type => ({
-                  id:     type._id,
-                  label:  type.tipoEvento,
-                  value:  type.tipoEvento,
-                  cor:    type.cor
-                }))
+              setTypeEvent(tipoAux)
 
-                setTypeEvent(tipoAux)
-
-              })
-
-              await getAllSchedules().then( async (response) => {
-
-                const scheduleAux = response.data
-
-                const dadosAux = scheduleAux
-                                    .filter(evento => usuariosAtivo.find(ativo => ativo._id === evento.usuario._id))
-                                    .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
-                                    .map(evento => ({
-                  id:           evento._id,
-                  key:          evento._id,                
-                  empresaID:    evento.empresa._id,
-                  userID:       evento.usuario._id,
-                  content:      evento.usuario.nome,
-                  tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
-                  tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
-                  color:        evento.tipoEvento ? evento.tipoEvento.cor         : "#DA291C",  // Caso o Tipo de Evento tenha sido eliminado
-                  dia:          dayjs(evento.dia).startOf('day'),
-                  start:        dayjs(evento.dia).startOf('day'),
-                  end:          dayjs(evento.dia).endOf('day'),
-                  type:         'success', // Define o tipo de status do Badge (success, error, warning)
-                }))
-                setEventos(dadosAux)
-
-              })
+              const dadosAux = allSchedules
+                                  .filter(evento => usuariosAtivo.find(ativo => ativo._id === evento.usuario._id))
+                                  .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
+                                  .map(evento => ({
+                id:           evento._id,
+                key:          evento._id,                
+                empresaID:    evento.empresa._id,
+                userID:       evento.usuario._id,
+                content:      evento.usuario.nome,
+                tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
+                tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
+                color:        evento.tipoEvento ? evento.tipoEvento.cor         : "#DA291C",  // Caso o Tipo de Evento tenha sido eliminado
+                dia:          dayjs(evento.dia).startOf('day'),
+                start:        dayjs(evento.dia).startOf('day'),
+                end:          dayjs(evento.dia).endOf('day'),
+                type:         'success', // Define o tipo de status do Badge (success, error, warning)
+              }))
+              setEventos(dadosAux)
 
             }
 
