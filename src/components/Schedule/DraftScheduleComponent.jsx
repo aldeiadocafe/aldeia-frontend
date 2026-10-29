@@ -626,10 +626,14 @@ const DraftScheduleComponent = () => {
         } catch (error) {
             console.error(error);
         } finally {
-            setLoading(false);
+//            setLoading(false);
         }
 
     }
+
+    useEffect(() => {
+      setLoading(!eventos)
+    }, [eventos])
 
     useEffect(() => {
         carregarEventos();
