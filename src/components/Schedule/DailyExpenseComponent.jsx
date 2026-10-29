@@ -121,17 +121,17 @@ const DailyExpenseComponent = () => {
             ellipsis: true,
         },
         {
-            title: 'Dias',
+            title: 'Dias Trabalhados',
             dataIndex: 'dias',
             key: 'dias',
-            width: '8%',
+            width: '10%',
             align: 'right',
         },
         {
             title: 'Vale Transporte',
             dataIndex: 'valeTransporte',
             key: 'valeTransporte',
-            width: '15%',
+            width: '12%',
             align: 'right',
             render: (value) => formatter.format(value)
         },
@@ -139,7 +139,7 @@ const DailyExpenseComponent = () => {
             title: 'Vale Refeição',
             dataIndex: 'valeRefeicao',
             key: 'valeRefeicao',
-            width: '15%',
+            width: '12%',
             align: 'right',
             render: (value) => formatter.format(value)
         },
