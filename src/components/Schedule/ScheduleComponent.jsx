@@ -394,7 +394,7 @@ const ScheduleComponent = () => {
 
         try {
 
-            setLoading(true);
+//            setLoading(true);
             setEmpresa(null);
             setOptColaboradores([])
             setTypeEvent([])
@@ -495,11 +495,17 @@ const ScheduleComponent = () => {
             console.error(error);
         } finally {
 
-            setLoading(false);
+//            setLoading(false);
 
         }
 
     }
+
+    useEffect(() => {
+
+      setLoading(!eventos)
+
+    },[eventos])
 
     useEffect(() => {
         carregarDados();
