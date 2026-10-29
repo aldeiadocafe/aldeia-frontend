@@ -394,7 +394,7 @@ const ScheduleComponent = () => {
 
         try {
 
-//            setLoading(true);
+            setLoading(true);
             setEmpresa(null);
             setOptColaboradores([])
             setTypeEvent([])
