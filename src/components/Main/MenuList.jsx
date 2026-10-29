@@ -198,6 +198,16 @@ const allMenuItems = [
                             </Link>,
 
                     },
+                    {
+                        key: 'SCHEDULEDAILYEXPENSES',
+//                            icon: <FunnelPlotOutlined />,
+                        icon: <HistoryOutlined />,
+                        label: 
+                            <Link to="/dailyExpensesSchedule">
+                                Desp Diária
+                            </Link>,
+
+                    },
                 ]
             }
 

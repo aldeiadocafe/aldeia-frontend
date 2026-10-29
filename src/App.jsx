@@ -41,6 +41,8 @@ import SafetyStockComponent from './components/Stock/SafetyStockComponent';
 import ScheduleComponent from './components/Schedule/ScheduleComponent';
 import DraftScheduleComponent from './components/Schedule/DraftScheduleComponent';
 import TypeEventComponent from './components/Schedule/TypeEventComponent';
+import VersionScheduleComponent from './components/Schedule/VersionScheduleComponent';
+import DailyExpenseComponent from './components/Schedule/DailyExpenseComponent';
 
 import './App.css';
 
@@ -48,7 +50,6 @@ import './App.css';
 import { LocaleManager } from '@bryntum/calendar';
 
 import '@bryntum/calendar/locales/calendar.locale.PtBr.js'
-import VersionScheduleComponent from './components/Schedule/VersionScheduleComponent';
 
 // Define o idioma para Português do Brasil
 LocaleManager.locale = 'PtBr';
@@ -276,6 +277,13 @@ function App() {
                       </PrivateRoute>
                     }/>                    
 
+                  {/* http://localhost:5173/dailyExpensesSchedule */}
+                  <Route path='/dailyExpensesSchedule'    
+                    element={
+                      <PrivateRoute>
+                        <DailyExpenseComponent/>
+                      </PrivateRoute>
+                    }/>                    
 
               </Route>
               
