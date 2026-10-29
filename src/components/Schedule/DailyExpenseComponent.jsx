@@ -161,7 +161,7 @@ const DailyExpenseComponent = () => {
 
                 setEmpresas(user.empresas)
 
-                //Carregar Colabordores
+                //Carregar Colabordor
                 let usuariosAtivo = [user]
                 
                 if (user.visualizarEscalas) {
