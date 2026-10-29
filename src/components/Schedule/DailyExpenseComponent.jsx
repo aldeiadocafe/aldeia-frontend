@@ -321,7 +321,23 @@ const DailyExpenseComponent = () => {
 
         })
 
-        setDados(Object.values(agrupado))
+        const auxAgrupado = Object.values(agrupado)
+        const ordAgrupado = auxAgrupado.sort ((a, b) => {
+
+            //1. Comparar o campo 'empresa'
+            const comparacaoEmpresa = a.empresa.localeCompare(b.empresa)
+
+            //2. Se as empresas forem diferente, retorna o resultado
+            if (comparacaoEmpresa !== 0) {
+                return comparacaoEmpresa
+            }
+
+            // 3. Se for a mesma empresa, desempata ordenando pelo 'colaborador'
+            return a.colaborador.localeCompare(b.colaborador);
+
+        })
+
+        setDados(ordAgrupado)
 
         setLoading(false)
 
