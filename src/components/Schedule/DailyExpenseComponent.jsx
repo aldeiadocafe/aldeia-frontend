@@ -269,77 +269,83 @@ const DailyExpenseComponent = () => {
 
     }
 
-    const btnCalcular = (values) => {
+    const btnCalcular = async (values) => {
 
-        setLoading(true)
+        try {
 
-        const dadosCalcular = schedules
-                            .filter(eventos => eventos.value === values.escala)
-                            .map(eventos => {
+            setLoading(true)
 
-                                return {
-                                    ...eventos,
+            const dadosCalcular = schedules
+                                .filter(eventos => eventos.value === values.escala)
+                                .map(eventos => {
 
-                                    //Filtrar por data
-                                    eventos: eventos.eventos.filter(evento => {
-                                        return evento.dia >= values.periodo[0] && evento.dia <= values.periodo[1]
-                                    })
-                                }
+                                    return {
+                                        ...eventos,
 
-                            })
+                                        //Filtrar por data
+                                        eventos: eventos.eventos.filter(evento => {
+                                            return evento.dia >= values.periodo[0] && evento.dia <= values.periodo[1]
+                                        })
+                                    }
 
-        if (!dadosCalcular || 
-            dadosCalcular[0].eventos.length === 0) {
+                                })
 
-            message.error('Nenhum registro encontrado!')
-            setLoading(false)
-            return
+            if (!dadosCalcular || 
+                dadosCalcular[0].eventos.length === 0) {
 
-        }
+                message.error('Nenhum registro encontrado!')
+                setLoading(false)
+                return
 
-        //Extrai todos os eventos de dentro da escala (caso haja mais de uma escala no array)
-        const todosEventos = dadosCalcular.flatMap(escala => escala.eventos || [])
+            }
 
-        const agrupado = {}
-        todosEventos.map(eventos => {
+            //Extrai todos os eventos de dentro da escala (caso haja mais de uma escala no array)
+            const todosEventos = dadosCalcular.flatMap(escala => escala.eventos || [])
 
-            const chave = `${eventos.empresa.nome} | ${eventos.user.nome}` 
+            const agrupado = {}
+            todosEventos.map(eventos => {
 
-            if (!agrupado[chave]) {
-                agrupado[chave] = {
-                    empresa: eventos.empresa.nome,
-                    colaborador: eventos.user.nome,
-                    dias: 0,
-                    valeTransporte: 0,
-                    valeRefeicao:   0
+                const chave = `${eventos.empresa.nome} | ${eventos.user.nome}` 
+
+                if (!agrupado[chave]) {
+                    agrupado[chave] = {
+                        empresa: eventos.empresa.nome,
+                        colaborador: eventos.user.nome,
+                        dias: 0,
+                        valeTransporte: 0,
+                        valeRefeicao:   0
+                    }
                 }
-            }
 
-            agrupado[chave].dias  += 1
-            agrupado[chave].valeTransporte  += eventos.user.valeTransporte
-            agrupado[chave].valeRefeicao    += eventos.user.valeRefeicao
+                agrupado[chave].dias  += 1
+                agrupado[chave].valeTransporte  += eventos.user.valeTransporte
+                agrupado[chave].valeRefeicao    += eventos.user.valeRefeicao
 
-        })
+            })
 
-        const auxAgrupado = Object.values(agrupado)
-        const ordAgrupado = auxAgrupado.sort ((a, b) => {
+            const auxAgrupado = Object.values(agrupado)
+            const ordAgrupado = auxAgrupado.sort ((a, b) => {
 
-            //1. Comparar o campo 'empresa'
-            const comparacaoEmpresa = a.empresa.localeCompare(b.empresa)
+                //1. Comparar o campo 'empresa'
+                const comparacaoEmpresa = a.empresa.localeCompare(b.empresa)
 
-            //2. Se as empresas forem diferente, retorna o resultado
-            if (comparacaoEmpresa !== 0) {
-                return comparacaoEmpresa
-            }
+                //2. Se as empresas forem diferente, retorna o resultado
+                if (comparacaoEmpresa !== 0) {
+                    return comparacaoEmpresa
+                }
 
-            // 3. Se for a mesma empresa, desempata ordenando pelo 'colaborador'
-            return a.colaborador.localeCompare(b.colaborador);
+                // 3. Se for a mesma empresa, desempata ordenando pelo 'colaborador'
+                return a.colaborador.localeCompare(b.colaborador);
 
-        })
+            })
 
-        setDados(ordAgrupado)
+            setDados(ordAgrupado)
 
-        setLoading(false)
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
 
     }
 
