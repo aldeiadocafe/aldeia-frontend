@@ -13,6 +13,7 @@ import { getAllUsers } from '../../services/UserService';
 import { getAllVersionSchedules } from '../../services/VersionScheduleService';
 import { getAllCompanys } from '../../services/CompanyService';
 import { FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
+import Text from 'antd/es/typography/Text';
 
 const { RangePicker } = DatePicker
 
@@ -273,7 +274,7 @@ const DailyExpenseComponent = () => {
 
         try {
 
-            setLoading(true)
+//            setLoading(true)
 
             const dadosCalcular = schedules
                                 .filter(eventos => eventos.value === values.escala)
@@ -287,11 +288,20 @@ const DailyExpenseComponent = () => {
                                             return evento.dia >= values.periodo[0] && evento.dia <= values.periodo[1]
                                         })
                                     }
-
                                 })
 
-            if (!dadosCalcular || 
-                dadosCalcular[0].eventos.length === 0) {
+            if (!dadosCalcular  || 
+                dadosCalcular.length === 0){
+
+//                || dadosCalcular[0].eventos.length === 0){
+
+                message.error('Nenhum registro encontrado!')
+                setLoading(false)
+                return
+
+            }
+
+            if (dadosCalcular[0].eventos.length === 0) {
 
                 message.error('Nenhum registro encontrado!')
                 setLoading(false)
@@ -476,6 +486,43 @@ const DailyExpenseComponent = () => {
                             size='small'
                             rowKey={record => record._id}
                             pagination={false}
+                            //Implementacao da linha de resumo (Subtotatis / Totais)
+                            summary={(eventos) => {
+
+                                let totalValeTransporte     = 0
+                                let totalValeRefeicao       = 0
+
+                                //Calcular valores
+                                eventos.map(({ valeTransporte, valeRefeicao }) => {
+                                    totalValeRefeicao   += valeRefeicao
+                                    totalValeTransporte += valeTransporte                                    
+                                })
+
+                                return (
+                                    <>
+                                        <Table.Summary.Row
+                                            style={{ backgroundColor: '#fafafa' }}
+                                        >
+                                            {/* index determina a ordem física da célula de acordo com as colunas */}
+                                            {/* colSpan une as duas primeiras colunas (Produto e Categoria) */}
+                                            <Table.Summary.Cell index={0} colSpan={2}>
+                                                <Text strong>Total Geral</Text>
+                                            </Table.Summary.Cell>
+
+                                            {/* Deixa o espaço do preço unitário vazio na linha de totais */}
+                                            <Table.Summary.Cell index={2} />
+
+                                            <Table.Summary.Cell index={3} align="right">
+                                                <Text strong>R$ {formatter.format(totalValeTransporte)}</Text>
+                                            </Table.Summary.Cell>
+
+                                            <Table.Summary.Cell index={4} align="right">
+                                                <Text strong>R$ {formatter.format(totalValeRefeicao)}</Text>                                                    
+                                            </Table.Summary.Cell>
+                                        </Table.Summary.Row>
+                                    </>
+                                )
+                            }}
                         >
 
                         </Table>
