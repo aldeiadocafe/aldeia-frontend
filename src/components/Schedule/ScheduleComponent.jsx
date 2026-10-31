@@ -307,6 +307,8 @@ const ScheduleComponent = () => {
                             options={optionEmpresas}
                             value={selectEmpresas}
                             onChange={handleChangeEmpresa}
+                            showSearch
+                            optionFilterProp={"label"}
                             />
                         </Col>
                         <Col>
@@ -320,6 +322,8 @@ const ScheduleComponent = () => {
                             mode='multiple'
                             options={opcaoColaboradoresFiltro}
                             onChange={(value) => setFilterResource(value)}
+                            showSearch
+                            optionFilterProp={"label"}
                           />                        
                         </Col>
                         <Col className="ocultar-objetos">
@@ -572,6 +576,8 @@ const ScheduleComponent = () => {
                   <Select
                     options={optionEmpresas}
                     onChange={handleListEmpresas}
+                    showSearch
+                    optionFilterProp={"label"}
                   />                        
                 </Form.Item>
                 <Form.Item
@@ -581,6 +587,8 @@ const ScheduleComponent = () => {
                 >
                   <Select
                     options={optColaboradores}
+                    showSearch
+                    optionFilterProp={"label"}
                   />                        
                 </Form.Item>
                 <Form.Item

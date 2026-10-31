@@ -88,32 +88,62 @@ const DraftScheduleComponent = () => {
 
     }
 
-    const handleSalvar = async () => {
+    const handleSalvar = async (e) => {
 
+      e.preventDefault()
       setLoading(true);   
+/*
+      //Verificar o que mudou
+      const diferencas = {}
+      Object.keys(eventos).map( key => {
+     
+        if (eventos[key] !== eventosInic[key]) {
+          diferencas[key] = {
+            antes: eventosInic[key],
+            depois: eventos[key]
+          };
+        }
 
-      const dadosSalvar = eventos.map((eventos) => ({
-        empresa:    eventos.empresaID,
-        usuario:    eventos.userID,
-        tipoEvento: eventos.tipoEventoID,
-        dia:        eventos.dia
+      })
+
+      // Se não houver mudanças, interrompe o envio
+      if (Object.keys(diferencas).length === 0) {
+        setLoading(false)
+        return
+      }
+*/
+      const dadosSalvar = eventos.map((event) => ({
+        empresa:    event.empresaID,
+        usuario:    event.userID,
+        tipoEvento: event.tipoEventoID,
+        dia:        event.dia
       }))
+/*
+    // 1. Calcula o tamanho antes de enviar
+    const jsonString = JSON.stringify(dadosSalvar);
+    const tamanhoBytes = new Blob([jsonString]).size;
+    
+    console.log(`Tamanho do PUT: ${tamanhoBytes} bytes`);      
+*/
 
       await saveAllDraft(dadosSalvar).then(response => {
         message.success('Registro criado com sucesso!')
-        carregarEventos();
+//        carregarEventos();
       }).catch((error) => {
 
         if (error.response) {
+            console.log(error.response)          
             messageApi.error(error.response.data.message || 'Erro no servidor');
         } else {
             messageApi.error('Erro ao criar!');
         }        
 
-        return
+      }).finally(() => {
+
+        setLoading(false);
+
       })
       
-      setLoading(false);
 
     }
 
@@ -362,6 +392,8 @@ const DraftScheduleComponent = () => {
                             options={optionEmpresas}
                             value={selectEmpresas}
                             onChange={handleChangeEmpresa}
+                            showSearch
+                            optionFilterProp={"label"}
                             />
                         </Col>
                         <Col>
@@ -375,6 +407,8 @@ const DraftScheduleComponent = () => {
                             mode="multiple"
                             options={opcaoColaboradoresFiltro}
                             onChange={(value) => setFilterResource(value)}
+                            showSearch
+                            optionFilterProp={"label"}
                           />                        
                         </Col>
                         <Col className="ocultar-objetos">
@@ -752,6 +786,8 @@ const DraftScheduleComponent = () => {
                 rules={[{ required: true, message: 'Por favor escolher uma empresa!' }]}
               >
                 <Select
+                  showSearch
+                  optionFilterProp={"label"}
                   options={optionEmpresas}
                   onChange={handleListEmpresas}
                 />                        
@@ -762,6 +798,8 @@ const DraftScheduleComponent = () => {
                 rules={[{ required: true, message: 'Por favor escolher colaborador!' }]}
               >
                 <Select
+                  showSearch
+                  optionFilterProp={"label"}
                   options={optColaboradores}
                 />                        
               </Form.Item>
