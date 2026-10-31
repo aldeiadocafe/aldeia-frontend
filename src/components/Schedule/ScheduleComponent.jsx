@@ -394,11 +394,9 @@ const ScheduleComponent = () => {
       message.success('Evento excluído com sucesso!');
     };
 
-    const carregarDados = async (e) => {
+    const carregarDados = async () => {
 
         try {
-
-          e.preventDefault()          
 
           setLoading(true);
           setEmpresa(null);

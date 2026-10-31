@@ -516,11 +516,9 @@ const DraftScheduleComponent = () => {
       message.success('Evento excluído com sucesso!');
     };
 
-    const carregarEventos = async (e) => {
+    const carregarEventos = async () => {
 
         try {
-
-          e.preventDefault()
 
           setLoading(true);            
           setEmpresa(null);
