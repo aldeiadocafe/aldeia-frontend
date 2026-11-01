@@ -283,48 +283,60 @@ const DashComponent = () => {
     ];
     
     // Vencidos
-    dataAux[0].total = dados
+    dataAux[0].total = formatter.format(
+                dados
                   .filter(item => (
                     dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day')) <= 0 
                   )
                   .reduce((sum, item) => sum + item.quantidade, 0)
+                )
 
     // 5 dias
-    dataAux[1].total = dados
+    dataAux[1].total = formatter.format(
+                dados
                   .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 0)
                   .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 4)
                   .reduce((sum, item) => sum + item.quantidade, 0)
-
+                )
     // 10 dias
-    dataAux[2].total = dados
+    dataAux[2].total = formatter.format(
+              dados
                   .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 4)
                   .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 9)
                   .reduce((sum, item) => sum + item.quantidade, 0)
+            )
 
     // 15 dias
-    dataAux[3].total = dados
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 9)
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 14)
-                  .reduce((sum, item) => sum + item.quantidade, 0)
+    dataAux[3].total = formatter.format(
+              dados
+                .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 9)
+                .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 14)
+                .reduce((sum, item) => sum + item.quantidade, 0)
+            )
 
     // 20 dias
-    dataAux[4].total = dados
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 14)
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 19)
-                  .reduce((sum, item) => sum + item.quantidade, 0)
+    dataAux[4].total = formatter.format(
+              dados
+                .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 14)
+                .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 19)
+                          .reduce((sum, item) => sum + item.quantidade, 0)
+              )
 
     // 25 dias
-    dataAux[5].total = dados
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 19)
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 24)
-                  .reduce((sum, item) => sum + item.quantidade, 0)
+    dataAux[5].total = formatter.format(
+              dados
+                .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 19)
+                .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 24)
+                .reduce((sum, item) => sum + item.quantidade, 0)
+            )
 
     // 30 dias
-    dataAux[6].total = dados
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 24)
-                  .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 29)
-                  .reduce((sum, item) => sum + item.quantidade, 0)
-
+    dataAux[6].total = formatter.format(
+              dados
+                          .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') > 24)
+                          .filter(item => dayjs(new Date(item.dataValidade).toISOString().split('T')[0]).diff(hoje, 'day') <= 29)
+                          .reduce((sum, item) => sum + item.quantidade, 0)
+            )
   /*
     dataAux[0].total = 10
     dataAux[1].total = 30
