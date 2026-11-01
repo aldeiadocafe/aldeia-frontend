@@ -45,7 +45,7 @@ const DashComponent = () => {
 
   const formatter = new Intl.NumberFormat('pt-BR', {
       style: 'decimal',
-      minimumFractionDigits: 3,
+      minimumFractionDigits: 2,
   });
 
   const screens = useBreakpoint();
@@ -347,8 +347,6 @@ const DashComponent = () => {
 
     setData(dataAux)
 
-
-
   }
 
   // 2. Chart configuration
@@ -356,12 +354,34 @@ const DashComponent = () => {
     data,
     xField: 'dias', // Field for the x-axis
     yField: 'total', // Field for the y-axis
+
+    //Configuracao dos Eixos
+//    yAxis: {
+//      label: {
+//        formatter: (val) => Math.floor(Number(val)),
+//        minTickInterval: 1, // Ensure that the minimum tick interval is 1
+//      }
+//    }
+    
+    axis: {
+//      x: {
+//        labelFormatter: (val) => Math.floor(Number(val)).toString(), // Custom formatter for x-axis labels
+//      },
+      y: {
+        labelFormatter: (val) => {
+          return parseInt(val).toString()
+        }, // Custom formatter for y-axis labels
+        tickCount: 10, // Number of ticks on the y-axis
+      }
+    },
+    
     label: {
       // Configuração de labels nas barras
       style: {
         fill: '#f7f5f5',
       },
     },
+
 //    height: plotHeight, // Optional: set a fixed height
     // Opcional: animação ao carregar
     animation: {
@@ -370,6 +390,9 @@ const DashComponent = () => {
         duration: 1000,
       },
     },  
+
+//    loading: loading, // Show loading state when data is being fetched
+
   };
 
   const handleOnChageEmpresa = async (value) => {
@@ -460,8 +483,8 @@ const DashComponent = () => {
             itCodigo:     item.item.itCodigo,
             descricao:    item.item.descricao,
             unidade:      allUnits ? (allUnits.find(unit => unit._id === item.item.unit).unidade) : null,
-            quantidade:   item.quantidade,
-            gcomEstoque:  item.gcomEstoque,
+            quantidade:   Math.floor(item.quantidade * 100) / 100,
+            gcomEstoque:  Math.floor(item.gcomEstoque * 100) / 100,
             diferenca:    item.quantidade - item.gcomEstoque,
             idEmpresa:    item.empresa._id,
             empresa:      item.empresa,
@@ -489,7 +512,7 @@ const DashComponent = () => {
                                       unit:         item.item.unit,
                                       unidade:      (allUnits.find(unit => unit._id === item.item.unit).unidade),
                                       dataValidade: item.dataValidade,
-                                      quantidade:   item.quantidade,
+                                      quantidade:   Math.floor(item.quantidade * 100) / 100,
                                       empresa:      item.empresa,
                                       nomeEmpresa:  item.empresa.nome
                                 }))
@@ -501,7 +524,7 @@ const DashComponent = () => {
             
             atualizarBarra(dados)
 
-            setLoading(false); //Libera a tela
+//            setLoading(false); //Libera a tela
 
           }              
 
@@ -588,67 +611,6 @@ const DashComponent = () => {
                   <Column {...config} />
                 </Card>
 
-{/*
-            <Row 
-              style={{ marginTop: '5px' }}
-              gutter={[16, 16]}>
-
-              {/ * xs={24} para celular (1 card por linha) * /}
-              {/ * md={12} para desktop (2 cards por linha) * /}
-              <Col 
-                xs={24}
-                md={8}
-                span={8}
-                >
-              
-                <Card
-                  title="Total de Produtos à Vencer"
-                  styles={{
-                    body:{ 
-                        height: cardBarra,                        
-                        overflow: 'hidden',
-                        padding: 5,
-                      },
-                  }}
-                >            
-                  <Column {...config} />
-                </Card>
-
-              </Col>
-
-              <Col 
-                xs={24}
-                md={16}
-                span={16}
-                >
-
-                <Card
-                  title="Aldeia X GCom"                  
-                  styles={{
-                    body:{ 
-                        padding: 5,
-                      },
-                  }}
-                >
-
-                  <Table
-                      columns={colunasGCom}
-                      dataSource={dadosGCom}      
-                      showSorterTooltip={true}
-                      size={'small'}
-                      tableLayout="auto"
-                      scroll={{ y: gcomHeight}}               
-                      rowKey={(record) => record._id}
-                      pagination={false}
-//                      loading={loading}
-                  />
-
-                </Card>
-
-              </Col>
-
-            </Row>
-*/}
             <Card 
               title="Produtos por Data de Validade" 
               style={{marginTop: '5px'}}
@@ -660,8 +622,9 @@ const DashComponent = () => {
               >
               <Table
                   columns={colunas} 
-                  dataSource={datesItem} 
+                  dataSource={datesItem || []} 
                   showSorterTooltip={true}
+                  loading={loading}
                   size={'small'}
                   tableLayout="auto"
                   scroll={{ y: "calc(100vh - 460px)" }}                
