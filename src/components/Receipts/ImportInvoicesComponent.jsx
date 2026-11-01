@@ -27,7 +27,7 @@ const ImportInvoicesComponent = () => {
   const [progress, setProgress]   = useState(0)
 
   const [botao,   setBotao]           = useState(false)
-  const [loading, setLoading]         = useState(false);
+  const [loading, setLoading]         = useState(true);
   const [searchText,  setSearchText]  = useState('');
 
   const [exibirTabela,  setExibirTabela]  = useState(false)

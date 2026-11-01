@@ -22,7 +22,7 @@ const ConferenceComponent = () => {
     const [dados,           setDados]           = useState([]);
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
-    const [loading,         setLoading]         = useState(false);
+    const [loading,         setLoading]         = useState(true);
 
     const [form]    = Form.useForm();
     const { Item }  = Form;

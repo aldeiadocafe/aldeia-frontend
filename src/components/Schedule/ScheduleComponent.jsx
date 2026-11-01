@@ -31,7 +31,7 @@ const ScheduleComponent = () => {
     const [optColaboradores, setOptColaboradores] = useState([])
     const [dados,   setDados]   = useState([]);
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [eventos,           setEventos]           = useState([]);
     const [modalVisivel,      setModalVisivel]      = useState(false);
@@ -505,7 +505,8 @@ const ScheduleComponent = () => {
 
       }
 
-        carregarDados();
+      carregarDados();
+
     },[]);
 
   return (

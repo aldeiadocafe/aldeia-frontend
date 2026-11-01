@@ -27,7 +27,7 @@ const PlacesInventoryComponent = () => {
     const [deleteModal,     setDeleteModal]     = useState(false);
     const [formModal,       setFormModal]       = useState(false);
     const [confirmLoading,  setConfirmLoading]  = useState(false);
-    const [loading,         setLoading]         = useState(false);
+    const [loading,         setLoading]         = useState(true);
     
     const [form]    = Form.useForm();
     const { Item }  = Form;

@@ -22,7 +22,7 @@ const ShoppingComponent = () => {
     const [form] = Form.useForm();
     const [dados,           setDados]           = useState([]);
 
-    const [loading,         setLoading]         = useState(false);
+    const [loading,         setLoading]         = useState(true);
 
     const [filterEmpresas,  setFilterEmpresas]  = useState([])
     const [selectEmpresas,  setSelectEmpresas]  = useState([]);

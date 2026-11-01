@@ -32,7 +32,7 @@ const DraftScheduleComponent = () => {
     const [listarColab,       setListarColab]     = useState([])
     const [optColaboradores, setOptColaboradores] = useState([])
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [eventosInic,       setEventosInic]       = useState([]);
     const [eventos,           setEventos]           = useState([]);

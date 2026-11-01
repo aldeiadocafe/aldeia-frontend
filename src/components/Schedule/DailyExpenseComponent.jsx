@@ -35,7 +35,7 @@ const DailyExpenseComponent = () => {
     const [ formPesquisa ]  = Form.useForm();
     const { Item }  = Form;
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
 
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',

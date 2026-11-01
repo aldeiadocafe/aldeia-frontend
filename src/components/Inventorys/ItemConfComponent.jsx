@@ -52,7 +52,7 @@ const ItemConfComponent = () => {
 
     const [startDate, setStartDate] = useState();
 
-    const [loading,         setLoading]         = useState(false);
+    const [loading,         setLoading]         = useState(true);
 
     const [cardCount,   setCardCount]           = useState(false)
 

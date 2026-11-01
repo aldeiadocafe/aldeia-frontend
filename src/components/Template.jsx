@@ -19,7 +19,7 @@ const ListInventoryComponent = () => {
     const [deleteModal,     setDeleteModal]     = useState(false);
     const [formModal,       setFormModal]       = useState(false);
     const [confirmLoading,  setConfirmLoading]  = useState(false);
-    const [loading,         setLoading]         = useState(false);
+    const [loading,         setLoading]         = useState(true);
     
     const [form]    = Form.useForm();
     const { Item }  = Form;
@@ -271,25 +271,27 @@ const ListInventoryComponent = () => {
         }
     }
 
-    const carregarDados = () => {
-        setLoading(true);
-
-        setDados([])
-        getAllInventorys().then((response) => {
-            setDados(response.data);
-        }).catch((error)=> {
-            console.error(error);
-        });
-
-        setTimeout(() => {
-        setSelectedRowKeys([]);
-        setLoading(false);
-        }, 1000);    
-
-    }
-
     useEffect(() => {
+
+        const carregarDados = () => {
+            setLoading(true);
+
+            setDados([])
+            getAllInventorys().then((response) => {
+                setDados(response.data);
+            }).catch((error)=> {
+                console.error(error);
+            });
+
+            setTimeout(() => {
+            setSelectedRowKeys([]);
+            setLoading(false);
+            }, 1000);    
+
+        }
+
         carregarDados();
+        
     },[]);
 
 

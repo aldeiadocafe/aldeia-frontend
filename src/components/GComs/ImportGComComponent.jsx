@@ -25,7 +25,7 @@ const ImportGComEstoqueComponent = () => {
 
   const [fileList, setFileList]       = useState('')
   const [progress, setProgress]       = useState(0)
-  const [loading, setLoading]         = useState(false);
+  const [loading, setLoading]         = useState(true);
   const [botao,   setBotao]           = useState(false)
 
   const [exibirTabela,  setExibirTabela]  = useState(false)

@@ -33,7 +33,7 @@ const ListDatesItemBalanceComponent = () => {
     const [dadosCompleto,   setDadosCompleto]   = useState([])
     const [dados,           setDados]           = useState([])
 
-    const [loading, setLoading]         = useState(false);
+    const [loading, setLoading]         = useState(true);
 
     const [searchText, setSearchText]   = useState([])
 

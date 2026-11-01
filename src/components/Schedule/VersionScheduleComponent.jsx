@@ -32,7 +32,7 @@ const VersionScheduleComponent = () => {
     const [listarColab,       setListarColab]     = useState([])
     const [optColaboradores, setOptColaboradores] = useState([])
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [versions,        setVersions]    = useState([]);
     const [versaoSelec,     setVersaoSelec] = useState([])

@@ -18,7 +18,7 @@ const PasswordsComponent = () => {
     const { user, atualizarUser } = useAuth();
 
     const navigate = useNavigate();
-    const [loading, setLoading]    = useState(false);
+    const [loading, setLoading]    = useState(true);
 
     const carregarDados = async () => {
 

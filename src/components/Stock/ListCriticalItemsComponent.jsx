@@ -40,7 +40,7 @@ const ListCriticalItemsComponent = () => {
 
     const [searchText,      setSearchText]      = useState([])
     
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [tabela,      setTabela]      = useState(1);
 
