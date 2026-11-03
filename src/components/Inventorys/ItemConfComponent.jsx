@@ -167,6 +167,7 @@ const ItemConfComponent = () => {
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('descricao'),
             ellipsis: true,
+            width: '50%',
         },
         {
             dataIndex:  "dataValidade",
