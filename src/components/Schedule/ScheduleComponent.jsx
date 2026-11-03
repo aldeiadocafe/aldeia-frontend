@@ -493,6 +493,12 @@ const ScheduleComponent = () => {
               }))
               setEventos(dadosAux)
 
+              // O setTimeout deve envolver APENAS o fechamento do loading
+              // para dar tempo do React processar a mudança de estado dos dados
+              setTimeout(() => {
+                setLoading(false);
+              }, 100); // Pequeno delay para garantir a renderização
+
             }
 
           } catch (error) {
