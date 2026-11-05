@@ -47,7 +47,9 @@ const LoginComponent = () => {
         
         <Form
           name="normal_login"
-          initialValues={{ remember: true }}
+          initialValues={{ remember: true,
+                           nome: localStorage.getItem('auth-user') || ''
+          }}
           onFinish={onFinish}
           layout="vertical"
         >
