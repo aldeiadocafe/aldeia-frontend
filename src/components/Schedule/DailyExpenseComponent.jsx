@@ -152,7 +152,7 @@ const DailyExpenseComponent = () => {
         // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
         const isSlow = connection && (connection.effectiveType === '2g' || connection.effectiveType === '3g');
-        const timeoutDuration = isSlow ? 15000 : 3000; 
+        const timeoutDuration = isSlow ? 15000 : 4000; 
 
         try {
 
