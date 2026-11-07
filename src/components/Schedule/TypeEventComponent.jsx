@@ -517,7 +517,7 @@ const TypeEventComponent = () => {
                         rules={[{required: true, message: 'Informar Tipo de Evento'}]}
                         >
                         <Input 
-                            disabled={!isEditing || idTypeEvent}
+//                            disabled={!isEditing || idTypeEvent}
                             style={{ textTransform: 'uppercase' }}
                             placeholder='Ex: Trabalho'/>
                     </Item>
