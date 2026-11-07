@@ -567,7 +567,7 @@ const UsersComponent = () => {
                                 >
                                 <Input 
                                     style={{ textTransform: 'uppercase' }}
-                                    disabled={!isEditing || idUser}
+//                                    disabled={!isEditing || idUser}
                                     />
                             </Item>
                         </Col>
