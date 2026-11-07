@@ -24,7 +24,8 @@ const ScheduleComponent = () => {
     const [optionEmpresas,  setOptionEmpresas]= useState([])
     const [selectEmpresas,  setSelectEmpresas]= useState([])
 
-    const [typeEvent, setTypeEvent] = useState([])
+    const [typeEvent,   setTypeEvent]   = useState([])
+    const [eventosUtil, setEventosUtil] = useState([])
 
     const [colaboradores,     setColaboradores]   = useState([])
     const [listarColab,       setListarColab]     = useState([])
@@ -496,7 +497,13 @@ const ScheduleComponent = () => {
               end:          dayjs(evento.dia).endOf('day'),
               type:         'success', // Define o tipo de status do Badge (success, error, warning)
             }))
+
             setEventos(dadosAux)
+
+            // Criar array com Tipo de Eventos Unicos
+            const tipoEventosUnicos = [...new Set(dadosAux.map(evento => evento.tipoEventoID))];
+
+            setEventosUtil(allTypeEvents.filter(tipo => tipoEventosUnicos.includes(tipo._id)))
 
             // O setTimeout deve envolver APENAS o fechamento do loading
             // para dar tempo do React processar a mudança de estado dos dados
@@ -548,19 +555,19 @@ const ScheduleComponent = () => {
 
             <Flex 
               style={{ border: '1px solid #f0f0f0', borderRadius: '4px' }}>
-              {typeEvent.map((item, index) => (
+              {eventosUtil.map((item, index) => (
                 <div
                   key={index}
                   style={{
                     flex: 1,
                     padding: '2px',
                     textAlign: 'center',
-                    borderRight: index < typeEvent.length - 1 ? '1px solid #f0f0f0' : 'none',
+                    borderRight: index < eventosUtil.length - 1 ? '1px solid #f0f0f0' : 'none',
                     background: item.cor,
                     color: 'white'
                   }}
                 >
-                  {item.value}
+                  {item.tipoEvento}
                 </div>
               ))}
             </Flex>
