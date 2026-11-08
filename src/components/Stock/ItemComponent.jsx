@@ -25,15 +25,36 @@ const ItemComponent = () => {
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
+    const { custoUnitario, setCustoUnitario } = useState(0);
+
     const [isEditing,   setIsEditing]   = useState(true);
     const [idItem,      setIdItem]      = useState();
     
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
-        minimumFractionDigits: 3,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,   
     });
 
     const { Option, OptGroup } = Select;
+
+    // Formata o número para o padrão pt-BR (ex: 1.234,56)
+    const brazilianFormatter = (num) => {
+        if (num === undefined || num === null || num === '') return '';
+        return new Intl.NumberFormat('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            }).format(num);
+    };
+
+    // Converte a string formatada de volta para número limpo (float)
+    const brazilianParser = (str) => {
+        if (!str) return '';
+            // Remove tudo que não for dígito, vírgula ou sinal de menos
+            const cleaned = str.replace(/[^\d,-]/g, '').replace(',', '.');
+            const parsed = parseFloat(cleaned);
+            return isNaN(parsed) ? '' : parsed;
+    };
 
     //Aplique estilos CSS para centralizar a div container na tela
     const containerPopconfirm = {
@@ -149,6 +170,7 @@ const ItemComponent = () => {
             dataIndex:  "descricao",
             title:      "Descrição",
             key:        'descricao',
+            width:      '40%',
             sorter: (a, b) => a.descricao.localeCompare(b.descricao),
             defaultSortOrder: 'ascend', 
             showSorterTooltip: { target: 'sorter-icon' }, 
@@ -157,7 +179,7 @@ const ItemComponent = () => {
         },
         {
             dataIndex:  "unitDescricao",
-            title:      "Unidade Medida",
+            title:      "Unid Medida",
             sorter: (a, b) => a.unitDescricao.localeCompare(b.unitDescricao),
             showSorterTooltip: { target: 'sorter-icon' }, 
             ...getColumnSearchProps('unitDescricao'),
@@ -173,6 +195,14 @@ const ItemComponent = () => {
             render: (value) => formatter.format(value)
         },
 */        
+        {
+            dataIndex:  "custoUnitario",
+            title:      "Custo Unitário",
+            sorter: (a, b) => a.custoUnitario - b.custoUnitario,
+            showSorterTooltip: { target: 'sorter-icon' }, 
+            align: 'right',
+            render: (value) => formatter.format(value)
+        },
         {
             dataIndex:  "situacao",
             title:      "Situação",
@@ -192,6 +222,7 @@ const ItemComponent = () => {
             unit:               values.unit,
             situacao:           values.situacao.toUpperCase(),
 //            quantidadeMinima:   values.quantidadeMinima,
+            custoUnitario:      values.custoUnitario,
             usuarioCriacao:     user ? user._id : null,
             usuarioAlteracao:   user ? user._id : null,
         };
@@ -281,6 +312,7 @@ const ItemComponent = () => {
                     unit:               item.unit,
                     unitDescricao:      item.unit?.descricao,
                     situacao:           item.situacao,
+                    custoUnitario:      item.custoUnitario,
 //                    quantidadeMinima:   item.quantidadeMinima
                 }))
 
@@ -350,6 +382,7 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
+                custoUnitario:      value.custoUnitario,
 //                quantidadeMinima:   value.quantidadeMinima
             })
 
@@ -373,6 +406,7 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
+                custoUnitario:      value.custoUnitario,
 //                quantidadeMinima:   value.quantidadeMinima
             })
 
@@ -393,6 +427,7 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
+                custoUnitario:      value.custoUnitario,
 //                quantidadeMinima:   value.quantidadeMinima
             })
         }
@@ -475,6 +510,7 @@ const ItemComponent = () => {
                     form={form}
                     layout='vertical'
                     initialValues={{situacao: 'ATIVO',
+                                    custoUnitario: 0,
 //                                    quantidadeMinima: 0
                                 }}
                     >
@@ -522,6 +558,24 @@ const ItemComponent = () => {
                                 </Select>
                             </Item>
                         </Col>
+                        <Col span={12}>
+                            <Item
+                                name="custoUnitario"
+                                label="Custo Unitário"
+                            >
+                                <InputNumber
+                                    prefix="R$"
+                                    style={{ width: '100%' }}
+                                    step={0.01}                                    
+                                    disabled={!isEditing}
+                                    value={custoUnitario}
+                                    formatter={brazilianFormatter}
+                                    parser={brazilianParser}
+                                    onChange={(val) => setCustoUnitario(val)}
+                                />
+                            </Item>
+                        </Col>
+
 {/*                        
                         <Col span={12}>
                             <Item
@@ -628,6 +682,23 @@ const ItemComponent = () => {
                         >
                         </Select>
                     </Item>
+                    <Col span={12}>
+                        <Item
+                            name="custoUnitario"
+                            label="Custo Unitário"
+                        >
+                            <InputNumber
+                                prefix="R$"
+                                style={{ width: '100%' }}
+                                step={0.01}                                    
+                                disabled={!isEditing}
+                                value={custoUnitario}
+                                formatter={brazilianFormatter}
+                                parser={brazilianParser}
+                                onChange={(val) => setCustoUnitario(val)}
+                            />
+                        </Item>
+                    </Col>
 {/*                    
                     <Col>
                         <Item
