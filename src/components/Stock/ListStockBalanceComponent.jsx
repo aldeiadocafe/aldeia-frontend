@@ -458,7 +458,8 @@ const ListStockBalanceComponent = () => {
                 await getAllDatesItem().then( async (response) => {
 
                     const dadosDates = response.data
-                        .filter(dates => items.some(item => item._id === dates.item._id))
+                        .filter(dates => user.empresas.some(empresa => empresa._id === dates.empresa._id))
+                        .filter(dates => items.some(item => item._id === dates.item._id))                        
                         .map(item => ({
                             key:            item._id,
                             empresa:        item.empresa,
@@ -469,8 +470,10 @@ const ListStockBalanceComponent = () => {
 
                     setExpandedDateItem(dadosDates);                
 
+                    const dadosStock = await getAllStockBalances().then( async response => response.data)
+
                     setDadosGCom([])
-                    setDadosStock(await getAllStockBalances().then( async response => response.data))
+                    setDadosStock(dadosStock.filter(dates => user.empresas.some(empresa => empresa._id === dates.empresa._id)))
 
                 })
 
