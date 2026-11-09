@@ -81,8 +81,8 @@ const InventoryComponent = () => {
             const valorLimpo = valorOriginal.replace(/[.-]/g, '');
 
             return { 
-                Local:          "LOJA",
-                Tipo:           "LOJA - TIPO",
+                "LOCAL":        "LOJA",
+                "TIPO":         "TIPO",
                 "CÓDIGO":       item.itCodigo,
                 "PRODUTO":      item.itemDescricao,
                 "UN. MED.":     item.unidDescricao,
@@ -101,8 +101,8 @@ const InventoryComponent = () => {
 
         // Ajustar largura das colunas
         ws['!cols'] = [
-            { wch: 4  }, // Largura da Coluna A
-            { wch: 10 }, // Largura da Coluna B
+            { wch: 6  }, // Largura da Coluna A
+            { wch: 8 }, // Largura da Coluna B
             { wch: 10 }, // Largura da Coluna C
             { wch: 40 }, // Largura da Coluna D
             { wch: 12 }, // Largura da Coluna E
@@ -135,7 +135,7 @@ const InventoryComponent = () => {
         const wb = XLSX.utils.book_new()
 
         // Adiciona a worksheet ao workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Dados')
+        XLSX.utils.book_append_sheet(wb, ws, 'CargaDeDados')
 
         // Gera o arquivo binário e força o download
 //        XLSX.writeFile(wb, 'TabelaDados.xlsx')
