@@ -48,6 +48,8 @@ const InventoryComponent = () => {
     const [inventoryEnd,    setInventoryEnd]    = useState([])
     const [modalFinalizar,  setModalFinalizar]  = useState(false)
 
+    const [listarFinalizado, setListarFinalizado] = useState(false)
+
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
@@ -59,7 +61,7 @@ const InventoryComponent = () => {
         minimumFractionDigits: 3,
     });
 
-    let listarFinalizado = false
+//    let listarFinalizado = false
 
     const { Option, OptGroup } = Select;
 
@@ -474,7 +476,7 @@ const InventoryComponent = () => {
                 createInventory(inventory).then((response) => {
                     message.success('Registro criado com sucesso!')
                     form.resetFields(); //Limpa os campos ao fechar
-                    carregarDados();
+                    carregarDados(listarFinalizado);
                     //setFormModal(false)
 
                 }).catch((error)=> {
@@ -490,7 +492,7 @@ const InventoryComponent = () => {
 
                     message.success('Registro atualizado com sucesso!')
                     form.resetFields(); //Limpa os campos ao fechar
-                    carregarDados();
+                    carregarDados(listarFinalizado);
                     setFormModal(false)
 
                 }).catch((error)=> {
@@ -521,7 +523,7 @@ const InventoryComponent = () => {
         setFormModal(false);
         setDeleteModal(false);
         form.resetFields(); //Limpa os campos ao fechar
-        carregarDados();
+        carregarDados(listarFinalizado);
     };
 
     const handleOk = async () => {
@@ -547,7 +549,7 @@ const InventoryComponent = () => {
         }
     }
 
-    const carregarDados = async () => {
+    const carregarDados = async (lstFinalizado) => {
 
         try {
 
@@ -583,8 +585,8 @@ const InventoryComponent = () => {
 
                 const dadosAux = response.data
                     .filter(item => ids.includes(item.empresa._id))
-                    .filter(item => (listarFinalizado) ||
-                                    (item.situacao.toUpperCase() !== 'FINALIZADO' && !listarFinalizado) )
+                    .filter(item => (lstFinalizado) ||
+                                    (item.situacao.toUpperCase() !== 'FINALIZADO' && !lstFinalizado) )
                     .map(item => ({
                         key:            item._id,
                         _id:            item._id,
@@ -858,9 +860,9 @@ const InventoryComponent = () => {
 
     const handleListarFinalizados = async(e) => {
 
-        listarFinalizado = e.target.checked
+        setListarFinalizado(e.target.checked)
 
-        await carregarDados()
+        await carregarDados(e.target.checked)
     }
 
     const expandedRowRenderDate = (record) => {
@@ -998,6 +1000,7 @@ const InventoryComponent = () => {
                     </Button>
 
                     <Checkbox
+                        checked={listarFinalizado}
                         onChange={handleListarFinalizados}
                     >
                         Listar Finalizados
