@@ -762,7 +762,9 @@ const ListStockBalanceComponent = () => {
 //                scroll={{ x: 'max-content'}}
                 sticky      //Fixa o Header
                 
-                scroll={{ y: 'calc(80vh - 50px)' }}
+                scroll={{ y: 'calc(69vh - 2px)',
+                          x: 'max-content'
+                 }}
                 expandable={{ 
                     expandedRowRender,
                     // 4. Conectar o estado controlado
