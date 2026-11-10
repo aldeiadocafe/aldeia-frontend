@@ -760,7 +760,7 @@ const ListStockBalanceComponent = () => {
                 tableLayout='auto'
     //            onChange={onChange}
                 scroll={{ x: 'max-content', 
-                          y: 'max-content'}}
+                          y: 'calc(80vh - 50px)'}}
                 
 //                scroll={{ y: 'calc(80vh - 50px)' }}
                 expandable={{ 
