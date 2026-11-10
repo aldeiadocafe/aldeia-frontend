@@ -759,10 +759,10 @@ const ListStockBalanceComponent = () => {
                 showSorterTooltip={true}
                 tableLayout='auto'
     //            onChange={onChange}
-                scroll={{ x: 'max-content'}}
+//                scroll={{ x: 'max-content'}}
                 sticky      //Fixa o Header
                 
-//                scroll={{ y: 'calc(80vh - 50px)' }}
+                scroll={{ y: 'calc(80vh - 50px)' }}
                 expandable={{ 
                     expandedRowRender,
                     // 4. Conectar o estado controlado
