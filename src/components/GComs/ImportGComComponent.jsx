@@ -6,13 +6,16 @@ import * as XLSX from 'xlsx';
 import Title from 'antd/es/typography/Title';
 import { gcomCreateStockBalance, updateGComEstoque } from '../../services/StockBalanceService';
 
-import { createItem, createItemsGCom, getAllItems } from '../../services/ItemService';
+import { createItemsGCom, getAllItems } from '../../services/ItemService';
 import { getAllStockBalances } from '../../services/StockBalanceService';
 import { useAuth } from '../Login/AuthContext';
 import { getAllUnits } from '../../services/UnitService';
+import { AtualizarCustoGCom } from '../../services/UnitCostService';
 
 
 const ImportGComEstoqueComponent = () => {
+
+  const [messageApi, contextHolder] = message.useMessage();
 
   const { user } = useAuth();
 
@@ -23,8 +26,9 @@ const ImportGComEstoqueComponent = () => {
   const [empresas,            setEmpresas]            = useState([])
   const [empresaSelecionada,  setEmpresaSelecionada]  = useState('')
 
-  const [fileList, setFileList]       = useState('')
-  const [progress, setProgress]       = useState(0)
+  const [fileList,  setFileList]      = useState([])
+  const [arquivo,    setArquivo]      = useState([])
+  const [progress,  setProgress]      = useState(0)
   const [loading, setLoading]         = useState(true);
   const [botao,   setBotao]           = useState(false)
 
@@ -36,9 +40,16 @@ const ImportGComEstoqueComponent = () => {
   const [searchText,      setSearchText]  = useState('');
 
   
-  const formatter = new Intl.NumberFormat('pt-BR', {
+  const formatter3Dec = new Intl.NumberFormat('pt-BR', {
       style: 'decimal',
       minimumFractionDigits: 3,
+      maximumFractionDigits: 3,
+  });
+
+  const formatter2Dec = new Intl.NumberFormat('pt-BR', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,   
   });
 
   const handleReset = (clearFilters, confirm) => {
@@ -105,6 +116,7 @@ const ImportGComEstoqueComponent = () => {
         title: 'Descrição', 
         dataIndex: 'descricao', 
         key: 'descricao',
+        width: '40%',
         defaultSortOrder: 'ascend', 
         sorter: (a, b) => a.descricao.localeCompare(b.descricao),
         showSorterTooltip: { target: 'sorter-icon' }, 
@@ -118,11 +130,54 @@ const ImportGComEstoqueComponent = () => {
         align: 'right',
         sorter: (a, b) => a.gcomEstoque - b.gcomEstoque,
         showSorterTooltip: { target: 'sorter-icon' }, 
-        render: (value) => formatter.format(value),
+        render: (value) => formatter3Dec.format(value),
     },
+    {
+        dataIndex:  "custoUnitario",
+        title:      "Custo Unitário",
+        sorter: (a, b) => a.custoUnitario - b.custoUnitario,
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        align: 'right',
+        render: (value) => formatter2Dec.format(value)
+    },
+
   ];
 
+  const props = {
+    name: 'file',
+    multiple: false, // Permitir apenas um arquivo    
+    fileList, // 1. Limitar os tipos de arquivo (.xls.xlsx)
+    accept: 'xlsx, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // 2. Validação antes de enviar
 
+    action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
+    headers: {
+      authorization: 'authorization-text',
+    },
+
+    onChange(info) {
+
+      setFileList(info.fileList.slice(-1)); // Mantém apenas o último arquivo selecionado
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        setArquivo(info.file.originFileObj); // Armazena o arquivo selecionado
+        setBotao(true)
+//        messageApi.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        messageApi.error(`${info.file.name} file upload failed.`);
+      }
+    },
+
+    onRemove: () => {
+      setBotao(false)
+      setFileList([]); // Limpa o estado quando o arquivo é removido
+    }
+
+  };
+
+
+/*
   // Propriedades de configuração do Upload
   const props = {    
 
@@ -157,13 +212,37 @@ const ImportGComEstoqueComponent = () => {
         message.error('O arquivo deve ser menor que 2MB!');
         return Upload.LIST_IGNORE;
       }
-*/
+* /
       // Se passou na validação, impede o upload automático (retorna false)
       // e adiciona o arquivo à lista localmente
-      setBotao(true)
-      setExibirTabela(false)
+
+      setArquivo([file]);
       setFileList([file]);
+
+      
+      // Simulação do progresso nativo do Ant Design
+      let progress = 0;
+      file.status = 'uploading';
+      setFileList([{ ...file, percent: 0 }]);
+
+      const interval = setInterval(() => {
+        progress += 25;
+        if (progress <= 100) {
+          setFileList([{ ...file, status: 'uploading', percent: progress }]);
+        } else {
+          clearInterval(interval);
+          setFileList([{ ...file, status: 'done', percent: 100 }]);
+          setBotao(true)
+          // Executa a importação após o "carregamento" terminar
+//          handleExcelImport(file);
+        }
+
+      }, 200); // atualiza a cada 200ms para simular a barra subindo
+
+      setExibirTabela(false)
+
       return false; 
+
     }, 
     
     onChange(info) {      
@@ -182,30 +261,32 @@ const ImportGComEstoqueComponent = () => {
       setFileList([]); // Limpa o estado quando o arquivo é removido
     }
   };
-
+*/
   //Gravar
   const atualizar = async () => {
     
     setBotao(false)
     setExibirTabela(false)
-    setProgress(0)
+    setProgress(10)
 
     const reader = new FileReader();
 
     // Simula progresso de leitura
-    reader.onprogress = (evt) => {
+    reader.onprogress = (event) => {
 
-      if (evt.lengthComputable) {
-        const percent = Math.round((evt.loaded / evt.total) * 100)
-        setProgress(percent)
+      if (event.lengthComputable) {
+        // Atualiza o progresso com base na leitura do arquivo físico
+        const percent = Math.round((event.loaded / event.total) * 50);
+        setProgress({ percent });
       }
-    }
 
+    };
+    
     setLoading(true)
 
     reader.onload = async (evt) => {
 
-      setProgress(50) // Lendo arquivo concluido
+      setProgress(60) // Lendo arquivo concluido
 
       // 1. Ler o arquivo
       const bstr = evt.target.result;
@@ -223,8 +304,14 @@ const ImportGComEstoqueComponent = () => {
         
         const jsonData = XLSX.utils.sheet_to_json(ws, {
           range: 10, // Começa na 11ª linha (pula as primeiras 10)
-          header: ["itCodigo", "descricao", "unidade", "quantidade"]// Opcional: Define nomes de colunas
+          header: ["itCodigo", "descricao", "unidade", "quantidade", "estoqueReservado", "estoqueDisponivel", "custoUnitario"]// Opcional: Define nomes de colunas
         });
+
+        if (jsonData.length === 0) {
+          message.error('Arquivo Excel está vazio.');
+          setLoading(false);
+          return;
+        }
 
         const unit  = await getAllUnits().then(response => response.data)
         let items = await getAllItems().then(response => response.data) 
@@ -233,10 +320,11 @@ const ImportGComEstoqueComponent = () => {
 
         let dadosStock = dadosStockCompleto.filter(stock => stock.empresa._id === empresaSelecionada)
 
-
         // Carregar itens com quantidade <> 0 e diferente de "Total"
-        const itemExcelAux = jsonData.filter(item => item.quantidade != 0 
+        const itemExcelAux = jsonData.filter(item => (item.quantidade != 0 || item.custoUnitario != 0)
                                               && ! item.itCodigo.toUpperCase().trim().startsWith("TOTAL"))
+
+        setProgress(80) // Planilha convertida para Workbook
 
         // Array com Descricao Unica
         const uniqueDescricao = new Set()
@@ -270,7 +358,24 @@ const ImportGComEstoqueComponent = () => {
           items = await getAllItems().then(response => response.data)
 
         }
-        
+
+        let unitCost = []
+        //Atualizar Custo Unitário dos itens que já existem
+        const atualizarCusto = itemExcel
+                            .filter(excel => items.some(item => item.itCodigo === excel.itCodigo.toUpperCase().trim()))
+                            .map(item => ({ 
+                              empresa: empresaSelecionada,
+                              item: items.find(items => items.itCodigo === item.itCodigo.toUpperCase().trim())._id,
+                              custoUnitario: item.custoUnitario,
+                              usuarioAlteracao: user ? user._id : null,
+                            }))
+
+        if (atualizarCusto.length > 0) {
+
+          unitCost = await AtualizarCustoGCom(atualizarCusto).then(response => response.data)
+
+        }
+
         // Criar registro na Stock para os itens que não tem
         let stockCriar = []
         itemExcel
@@ -312,8 +417,8 @@ const ImportGComEstoqueComponent = () => {
         dadosStock = dadosStockCompleto.filter(stock => stock.empresa._id === empresaSelecionada)
 
         const atualizStock = dadosStock          
-                            .filter(stock => itemExcel.some(excel => excel.itCodigo.toUpperCase().trim()) &&
-                                              stock.empresa._id === empresaSelecionada)
+                            .filter(stock => itemExcel.some(excel => excel.itCodigo.toUpperCase().trim() === stock.item.itCodigo)
+                                              /*&& stock.empresa._id === empresaSelecionada*/)
                             .map(stock => {
 
                               const gcomEst = itemExcel.find(excel => excel.itCodigo.toUpperCase().trim() === stock.item.itCodigo)
@@ -323,6 +428,7 @@ const ImportGComEstoqueComponent = () => {
                                 itCodigo:     stock.item.itCodigo.trim().toUpperCase(),
                                 descricao:    stock.item.descricao.trim().toUpperCase(),
                                 gcomEstoque:  gcomEst ? gcomEst.quantidade : 0,                                  
+                                custoUnitario: unitCost.find(cost => cost.item._id === stock.item._id)?.custoUnitario || 0
                               }
                             })
 
@@ -342,7 +448,7 @@ const ImportGComEstoqueComponent = () => {
                   _id:          item._id,
                   itCodigo:     item.itCodigo,
                   descricao:    item.descricao,
-                  gcomEstoque:  item.gcomEstoque
+                  gcomEstoque:  item.gcomEstoque,
                 }
               }
 
@@ -351,7 +457,9 @@ const ImportGComEstoqueComponent = () => {
             setDados(atualizStock)              
             setExibirTabela(true)
 
-            setProgress(100)
+            setTimeout(() => {
+              setProgress(100)              
+            }, 3000);
             setFileList([]); // Limpa o estado quando o arquivo é removido
 
       //      openNotification()
@@ -383,7 +491,7 @@ const ImportGComEstoqueComponent = () => {
 
     }
 
-    reader.readAsBinaryString(fileList[0]);
+    reader.readAsBinaryString(arquivo);
 
   }
 
@@ -467,67 +575,69 @@ const ImportGComEstoqueComponent = () => {
               }}
           >
 
-            <Row gutter={[16, 16]}>
+            <div style={{ width: '70%' }}>
 
               {user.empresas.length !== 1 && (
               
-                <Col span={12}>
+                <Form
+                    form={form}
+                >
 
-                  <Form
-                      form={form}
-                  >
+                    <Item
+                        name={"empresas"}
+                        key={"empresas"}
+                        label={"Selecionar Empresa"}
+                        rules={[{required: true, 
+                                message: 'Informar Empresa'}]}
+                        >
 
-                      <Item
-                          name={"empresas"}
-                          key={"empresas"}
-                          label={"Selecionar Empresa"}
-                          rules={[{required: true, 
-                                  message: 'Informar Empresa'}]}
-                          >
+                        <Select
+                            placeholder="Selecionar Empresa"
+                            loading={loading}         // Mostrar ícone de carregamento
+                            options={selectEmpresas}
+                            onChange={handleOnChangeEmpresa}
+                        />
 
-                          <Select
-                              placeholder="Selecionar Empresa"
-                              loading={loading}         // Mostrar ícone de carregamento
-                              options={selectEmpresas}
-                              onChange={handleOnChangeEmpresa}
-                          />
+                    </Item>
 
-                      </Item>
-
-                  </Form>
-
-                </Col>
+                </Form>
               )}
-              <Col span={8} >
-                <Upload {...props} fileList={fileList}>
-                  <Button 
-                    disabled={empresas.length === 0}
-                    icon={<UploadOutlined />}
-                  >Selecionar Excel</Button>
-                </Upload>
-              </Col>
-              
-            </Row>
 
-            {loading && (
-              <Card style={{ marginTop: 16 }}>
-                <div style={{ textAlign: 'center' }}>
-                  <p>Processando: {progress}%</p>
-                  <Progress percent={progress} status={progress === 100 ? 'success' : 'active'} />
-                </div>
-              </Card>            
-            )}
+              <div style={{ width: '50%' }}>
+                {/*
+                  <Upload {...props} fileList={fileList}>
+                */}      
+                  <Upload {...props}>
+                    <Button 
+                      disabled={empresas.length === 0}
+                      icon={<UploadOutlined />}
+                    >Selecionar Excel</Button>
+                  </Upload>
+              </div>
 
-  {/*          {contextHolder} */}
+              {loading && (
+                <Card style={{ marginTop: 16 }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <p>Processando: {progress}%</p>
+                    <Progress 
+                      percent={progress} 
+                      status={progress < 100 ? 'active' : 'success'} />
+                  </div>
+                </Card>            
+              )}
 
-            <Button
-              type="primary"
-              onClick={atualizar}
-              disabled={!botao}
-              style={{ marginTop: 16}}
-            >
-              Atualizar
-            </Button>
+    {/*          {contextHolder} */}
+
+              <Button
+                type="primary"
+                onClick={atualizar}
+                disabled={!botao}
+                style={{ marginTop: 16}}
+              >
+                Atualizar
+              </Button>
+
+            </div>
 
           </Card>
 

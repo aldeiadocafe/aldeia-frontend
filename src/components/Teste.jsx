@@ -1,35 +1,37 @@
 import React from 'react';
-import { Column } from '@ant-design/plots';
-
+import { UploadOutlined } from '@ant-design/icons';
+import { Button, message, Upload } from 'antd';
 
 const Teste = () => {
 
-  const data = [
-    { type: 'Janeiro', sales: 10.12 },
-    { type: 'Fevereiro', sales: 15.32 },
-    { type: 'Março', sales: 8.45 },
-  ];
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const config = {
-    data,
-    xField: 'type',
-    yField: 'sales',
-    // Configuração dos Eixos
-    axis: {
-//      x: {
-//        labelFormatter: (val) => Math.floor(Number(val)).toString(), // Garante inteiro no X se for numérico
-//      },
-      y: {
-        // Formata os valores do eixo Y para exibir apenas inteiros
-        labelFormatter: (val) => Math.floor(Number(val)).toString(),
-        // Opcional: define o número de divisões (ticks) para ajudar a manter inteiro
-        tickCount: 5, 
-      },
+  const props = {
+    name: 'file',
+    action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info) {
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        messageApi.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        messageApi.error(`${info.file.name} file upload failed.`);
+      }
     },
   };
 
-  return <Column {...config} />;
-
+  return (
+    <>
+      {contextHolder}
+      <Upload {...props}>
+        <Button icon={<UploadOutlined />}>Click to Upload</Button>
+      </Upload>
+    </>
+  );
 };
 
 export default Teste;

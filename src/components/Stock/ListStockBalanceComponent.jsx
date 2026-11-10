@@ -17,6 +17,7 @@ import utc from 'dayjs/plugin/utc'
 import { normalizarTexto } from '../../Funcoes/Utils';
 import { useAuth } from '../Login/AuthContext';
 import { getAllItems } from '../../services/ItemService';
+import { getAllUnitCosts } from '../../services/UnitCostService';
 
 dayjs.extend(utc)
 
@@ -39,6 +40,7 @@ const ListStockBalanceComponent = () => {
     const [dadosItem,       setDadosItem]           = useState([])
     const [dadosUnit,       setDadosUnit]           = useState([])
     const [dadosStock,      setDadosStock]          = useState([])
+    const [dadosUnitCost,   setDadosUnitCost]       = useState([])
 
     const [searchText,      setSearchText]      = useState([])
     
@@ -146,9 +148,11 @@ const ListStockBalanceComponent = () => {
             Item:               item.itCodigo,
             Descrição:          item.descricao,
             Unid:               item.unidade,
+            "Custo Unitário":   formatter.format(item.custoUnitario),
             Quantidade:         formatter.format(item.qtde),
             GCom:               formatter.format(item.gcomEstoque),
             "Estoq - GCOM":     formatter.format(item.diferenca),
+            "Total Custo":      formatter.format(item.custoUnitario * item.qtde),
             "Data Inventário":  item.dataInventario,
             "Data GCom":        item.dataGCom
         }))
@@ -191,6 +195,8 @@ const ListStockBalanceComponent = () => {
         if (ws['G1']) ws['G1'].s = headerStyle;
         if (ws['H1']) ws['H1'].s = headerStyle;
         if (ws['I1']) ws['I1'].s = headerStyle;
+        if (ws['J1']) ws['J1'].s = headerStyle;
+        if (ws['K1']) ws['K1'].s = headerStyle;
 
         // 3. Ajustar largura das colunas
         ws['!cols'] = [
@@ -203,6 +209,8 @@ const ListStockBalanceComponent = () => {
             { wch: 15 }, // Largura da Coluna G
             { wch: 15 }, // Largura da Coluna H
             { wch: 15 }, // Largura da Coluna I
+            { wch: 15 }, // Largura da Coluna J
+            { wch: 15 }, // Largura da Coluna K
         ]
 
         // Obtém o total de linhas (exclui o cabeçalho se json_to_sheet for usado sem customização)
@@ -218,13 +226,16 @@ const ListStockBalanceComponent = () => {
             ws['F' + i].s = rightAlignStyle; // Aplica o estilo
             ws['G' + i].s = rightAlignStyle; // Aplica o estilo
             ws['H' + i].s = rightAlignStyle; // Aplica o estilo
+            ws['I' + i].s = rightAlignStyle; // Aplica o estilo
+
+            ws['J' + i].s = rightAlignStyle; // Aplica o estilo
 
             //Formatar em data
-            ws['H' + i].z = 'dd/mm/yyyy'
-            ws['H' + i].t = 'd' // Define o tipo como Data
+            ws['J' + i].z = 'dd/mm/yyyy'
+            ws['J' + i].t = 'd' // Define o tipo como Data
 
-            ws['I' + i].z = 'dd/mm/yyyy'
-            ws['I' + i].t = 'd' // Define o tipo como Data
+            ws['K' + i].z = 'dd/mm/yyyy'
+            ws['K' + i].t = 'd' // Define o tipo como Data
         }
 
         // Cria um novo workbook
@@ -293,6 +304,7 @@ const ListStockBalanceComponent = () => {
         normalizarTexto(record[dataIndex].toString().toUpperCase()).includes(normalizarTexto(value.toUpperCase())),
     });
 
+//bispo    
   // Colunas principais
   const colunas = [
     {
@@ -300,6 +312,8 @@ const ListStockBalanceComponent = () => {
         dataIndex: 'nomeEmpresa', 
         key: 'empresa',
         filters: filterEmpresas,
+        width: 15,
+//        width: 'max-content',           // 'max-content' faz a coluna se ajustar ao maior texto dela
         // Método de filtragem
         onFilter: (value, record) => {
 //console.log(value)                
@@ -315,6 +329,7 @@ const ListStockBalanceComponent = () => {
         title: 'Item', 
         dataIndex: 'itCodigo', 
         key: 'itCodigo',
+        width: 100,
         sorter: (a, b) => a.itCodigo.localeCompare(b.itCodigo),
         showSorterTooltip: { target: 'sorter-icon' }, 
         ...getColumnSearchProps('itCodigo'),
@@ -340,6 +355,15 @@ const ListStockBalanceComponent = () => {
         ellipsis: true,
     },
     {
+        title: 'Custo Unitário', 
+        dataIndex: 'custoUnitario', 
+        key: 'custoUnitario',
+        align: 'right',
+        sorter: (a, b) => a.custoUnitario - b.custoUnitario,
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        render: (value) => formatter.format(value),
+    },
+    {
         title: 'Quantidade', 
         dataIndex: 'qtde', 
         key: 'qtde',
@@ -363,6 +387,15 @@ const ListStockBalanceComponent = () => {
         key: 'diferenca',
         align: 'right',
         sorter: (a, b) => a.diferenca - b.diferenca,
+        showSorterTooltip: { target: 'sorter-icon' }, 
+        render: (value) => formatter.format(value),
+    },
+    {
+        title: 'Total Custo', 
+        dataIndex: 'totalCusto', 
+        key: 'totalCusto',
+        align: 'right',
+        sorter: (a, b) => a.totalCusto - b.totalCusto,
         showSorterTooltip: { target: 'sorter-icon' }, 
         render: (value) => formatter.format(value),
     },
@@ -470,8 +503,12 @@ const ListStockBalanceComponent = () => {
 
                     setExpandedDateItem(dadosDates);                
 
-                    const dadosStock = await getAllStockBalances().then( async response => response.data)
+                    
+                    const dadosUnitCostAux = await getAllUnitCosts().then( async response => response.data)                  
+                    setDadosUnitCost(dadosUnitCostAux)
 
+                    const dadosStock = await getAllStockBalances().then( async response => response.data)
+                    
                     setDadosGCom([])
                     setDadosStock(dadosStock.filter(dates => user.empresas.some(empresa => empresa._id === dates.empresa._id)))
 
@@ -592,6 +629,11 @@ const ListStockBalanceComponent = () => {
 
                         if (dadosItem.some(item => item._id === stock.item._id)) {
 
+                            const custoUnit = dadosUnitCost.find(cost => cost.item._id === stock.item._id 
+                                                                        && cost.empresa._id === stock.empresa._id)?.custoUnitario || 0  
+
+                            const totalUnit = (stock.quantidade - stock.gcomEstoque) * custoUnit                                                                        
+
                             return ({
                                 key:            stock._id,                                        
                                 idItem:         stock.item._id,
@@ -606,6 +648,8 @@ const ListStockBalanceComponent = () => {
                                 dataGCom:       stock.dataGCom,
                                 empresa:        stock.empresa,
                                 nomeEmpresa:    stock.empresa.nome,
+                                custoUnitario:  custoUnit,
+                                totalCusto:     totalUnit,
                             })
 
                         }
@@ -715,7 +759,9 @@ const ListStockBalanceComponent = () => {
                 showSorterTooltip={true}
                 tableLayout='auto'
     //            onChange={onChange}
-                scroll={{ y: 'calc(80vh - 50px)' }}
+                scroll={{ x: 'max-content' }}
+                
+//                scroll={{ y: 'calc(80vh - 50px)' }}
                 expandable={{ 
                     expandedRowRender,
                     // 4. Conectar o estado controlado
