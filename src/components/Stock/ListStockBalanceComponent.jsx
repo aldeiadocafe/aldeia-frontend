@@ -759,7 +759,8 @@ const ListStockBalanceComponent = () => {
                 showSorterTooltip={true}
                 tableLayout='auto'
     //            onChange={onChange}
-                scroll={{ x: 'max-content' }}
+                scroll={{ x: 'max-content', 
+                          y: 'max-content'}}
                 
 //                scroll={{ y: 'calc(80vh - 50px)' }}
                 expandable={{ 
