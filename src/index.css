@@ -73,3 +73,9 @@
 .ant-menu-submenu::after {
   border-bottom: transparent !important;
 }
+
+
+/* Aumenta o espaço à esquerda do checkbox (afastando-o da seta de expandir) */
+.ant-tree .ant-tree-checkbox {
+  margin-inline-start: 15px; /* O padrão costuma ser 4px ou 8px */
+}

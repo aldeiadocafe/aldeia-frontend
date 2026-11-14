@@ -50,6 +50,7 @@ import './App.css';
 import { LocaleManager } from '@bryntum/calendar';
 
 import '@bryntum/calendar/locales/calendar.locale.PtBr.js'
+import PermissionsComponent from './components/Settings/PermissionsComponent';
 
 // Define o idioma para Português do Brasil
 LocaleManager.locale = 'PtBr';
@@ -130,6 +131,14 @@ function App() {
                     element={
                       <PrivateRoute>
                         <UsersComponent/>
+                      </PrivateRoute>
+                    }/>
+
+                  {/* http://localhost:5173/permissions */}
+                  <Route path='/permissions'    
+                    element={
+                      <PrivateRoute>
+                        <PermissionsComponent/>
                       </PrivateRoute>
                     }/>
 

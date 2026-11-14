@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertOutlined, AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, SafetyOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
+import { AlertOutlined, AppstoreAddOutlined, AppstoreOutlined, BookOutlined, CalculatorOutlined, FunnelPlotOutlined, HistoryOutlined, HomeOutlined, LogoutOutlined, SafetyCertificateOutlined, SafetyOutlined, ScheduleOutlined, SettingOutlined, UnorderedListOutlined, UserOutlined } from '@ant-design/icons';
 
 import { Menu, ConfigProvider, Grid } from 'antd';
 import { Link } from 'react-router-dom';
@@ -270,6 +270,14 @@ const allMenuItems = [
                 label:
                     <Link to="/users">
                         Usuário
+                    </Link>,
+            },
+            {
+                key: 'SYSTEMPERMISSION',
+                icon: <SafetyCertificateOutlined />,
+                label:
+                    <Link to="/permissions">
+                        Níveis de Acesso
                     </Link>,
             }
         ]

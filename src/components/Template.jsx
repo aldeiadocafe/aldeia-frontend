@@ -479,7 +479,12 @@ const ListInventoryComponent = () => {
                 dataSource={dados}      
                 showSorterTooltip={true}
                 size={'small'}
-                scroll={{ y: 'calc(80vh - 90px)' }}                
+                sticky      //Fixa o Header
+                
+                scroll={{ y: 'calc(69vh - 2px)',
+                          x: 'max-content'
+                        }}
+
                 rowKey={(record) => record._id}
                 pagination={false}
     /*            
