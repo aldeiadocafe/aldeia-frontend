@@ -326,6 +326,44 @@ const PermissionsComponent = () => {
 
     }, [])
 
+    useEffect(() => {
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Enter' && modalDuplicar) {
+                event.preventDefault()
+                confirmarDuplicar()
+
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        //Limpar o evento quando o componente desmonta ou modal fecha
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+
+    }, [modalDuplicar])
+
+    useEffect(() => {
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Enter' && modalGravar) {
+                event.preventDefault()
+                confirmarGravar()
+
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        //Limpar o evento quando o componente desmonta ou modal fecha
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+
+    }, [modalGravar])
+
     return (
 
         <div

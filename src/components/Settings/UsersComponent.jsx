@@ -383,6 +383,25 @@ const UsersComponent = () => {
         carregarDados();
     },[]);
 
+    useEffect(() => {
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Enter' && formModal) {
+                event.preventDefault()
+                handleOk()
+
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        //Limpar o evento quando o componente desmonta ou modal fecha
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+
+    }, [formModal])
+
     const showFormModal = () => {
 
         setIsEditing(true);

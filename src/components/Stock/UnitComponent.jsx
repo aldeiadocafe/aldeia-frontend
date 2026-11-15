@@ -242,6 +242,41 @@ const UnitComponent = () => {
         carregarDados();
     },[]);
 
+    useEffect(() => {
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Enter' && formModal) {
+                event.preventDefault()
+                handleOk()
+
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+
+        //Limpar o evento quando o componente desmonta ou modal fecha
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+        }
+
+    }, [formModal])
+
+
+    const handleOk = () => {
+        form
+            .validateFields() // Validação dos campos
+            .then(values => {
+                // Success: Reset fields and call the parent's onSave handler
+                gravarDados(values);
+//                    form.resetFields(); 
+//                    onSave(values);
+            })
+            .catch(info => {
+                message.info('Verificar campo(s)!');
+                // Error handling
+//                    console.log('Validation Failed:', info);
+            });
+    }
 
     const showFormModal = () => {
         setIsEditing(false);
@@ -377,21 +412,7 @@ const UnitComponent = () => {
                 open={formModal}
                 confirmLoading={confirmLoading}
                 onCancel={handleCancel}
-                onOk={() => {
-                    form
-                        .validateFields() // Validação dos campos
-                        .then(values => {
-                            // Success: Reset fields and call the parent's onSave handler
-                            gravarDados(values);
-        //                    form.resetFields(); 
-        //                    onSave(values);
-                        })
-                        .catch(info => {
-                            message.info('Verificar campo(s)!');
-                            // Error handling
-        //                    console.log('Validation Failed:', info);
-                        });
-                }}
+                onOk={handleOk}
             >
                 
                 <Form
