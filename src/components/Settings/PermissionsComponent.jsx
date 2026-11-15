@@ -4,6 +4,7 @@ import Title from 'antd/es/typography/Title';
 import { useEffect, useState } from "react";
 import { useAuth } from "../Login/AuthContext";
 import { getAllUsers, updateUser } from "../../services/UserService";
+import { opcoesMenu } from "../../config/constant";
 
 
 const PermissionsComponent = () => {
@@ -29,6 +30,9 @@ const PermissionsComponent = () => {
     const [modalGravar,     setModalGravar]     = useState(false)
     const [modalDuplicar,   setModalDuplicar]   = useState(false)
 
+    const treeDados = opcoesMenu
+
+/*    
     const treeDados = [
         {
             title: 'Total',
@@ -115,7 +119,7 @@ const PermissionsComponent = () => {
             ]
         },
     ];
-
+*/
     // Dispara ao expandir ou recolher um nó
     const onExpand = (expandedKeysValue) => {
         setExpandedKeysPrincipal(expandedKeysValue);
@@ -185,6 +189,11 @@ const PermissionsComponent = () => {
 
     const onCheck = (checkedKeysValue) => {
 
+        if (checkedKeysValue.length === 0) {
+            setCheckedKeys([])
+            return
+        }
+
         setCheckedKeys(checkedKeysValue)
 
     }
@@ -212,7 +221,7 @@ const PermissionsComponent = () => {
                         _id:                userPrincipal._id,
                         email:              userPrincipal.email.toUpperCase(),
                         nome:               userPrincipal.nome.toUpperCase(),
-                        senha:              userPrincipal.senha,
+                        //senha:              userPrincipal.senha,
                         telefone:           userPrincipal.telefone ? userPrincipal.telefone.replace(/\D/g, '') : "",
                         valeTransporte:     userPrincipal.valeTransporte,
                         valeRefeicao:       userPrincipal.valeRefeicao,

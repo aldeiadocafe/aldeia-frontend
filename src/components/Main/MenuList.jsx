@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { BiBox, BiBuilding, BiUnite } from 'react-icons/bi';
 import { BsBoxSeam, BsCashStack, BsCart2, BsListTask, BsCalendar2Range, BsCalendar3 } from 'react-icons/bs';
 import { useAuth } from '../Login/AuthContext';
+import { opcoesMenu } from '../../config/constant';
 
 const { useBreakpoint } = Grid
 
@@ -319,8 +320,54 @@ const MenuList = () => {
         setCurrent(e.key);
     }
 
+    const encontrarCaminho = (arvore, keyAlvo) => {
+
+        for (const no of arvore) {
+
+            // Se encontrou o nó, retorna ele dentro de um array
+            if (no.key === keyAlvo) {
+                return [no];
+            }
+
+            // Se o nó tiver filhos, busca recursivamente neles
+            if (no.children) {
+                const caminhoFilhos = encontrarCaminho(no.children, keyAlvo);
+                if (caminhoFilhos) {
+                    // Retorna o nó atual concatenado com o caminho encontrado nos filhos
+                    return [no, ...caminhoFilhos];
+                }
+            }
+        }
+        return null;
+    };
+
     useEffect(() => {
-        setAllowedItems(filterMenuItems(allMenuItems, user.permissions))
+
+        //Montar as permissoes do usuário
+        let permissoes = []
+        if (user) {
+
+            if (user.permissions.find(permissao => permissao === 'ALL')) {
+                permissoes= ['ALL']
+            } else {
+
+                // Map retorna um array de arrays: [[item1, item2], [item3]]
+                // flatMap retorna um único array plano: [item1, item2, item3]
+                const caminhoCompleto = user.permissions.flatMap(opcao => encontrarCaminho(opcoesMenu, opcao))
+                        
+                permissoes = [
+                    ...new Set(
+                        caminhoCompleto
+                            .filter(opcao => opcao.key != 'ALL')
+                            .map(opcao => opcao.key)
+                    )
+                ]
+
+            }
+
+        }
+
+        setAllowedItems(filterMenuItems(allMenuItems, permissoes))
     },[user]);
 
   return (

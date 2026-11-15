@@ -75,7 +75,7 @@ const LoginComponent = () => {
 
           <Form.Item>
             <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>Lembrar-me</Checkbox>
+              {/*<Checkbox>Lembrar-me</Checkbox>*/}
             </Form.Item>
             <a className="float-end" href="/recover">Esqueci minha senha</a>
           </Form.Item>
