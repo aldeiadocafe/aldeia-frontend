@@ -68,7 +68,9 @@ const InventoryComponent = () => {
 
     const ExcelGCOM = (value) => {
 
-        const dadosExcel = expandedItem.filter(item => item.inventoryId === value._id)
+        const dadosExcel = expandedItem
+                            .filter(item => item.inventoryId === value._id)
+                            .filter(item => item.quantidade != undefined)
 
         if (dadosExcel.length === 0) {
             message.info('Não existem itens para gerar o Excel GCOM!')

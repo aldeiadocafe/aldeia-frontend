@@ -68,7 +68,9 @@ const ListStockBalanceComponent = () => {
             message.info('Não existem itens para gerar o Excel GCOM!')
             return
         }
-        const dadosAux = dados.map(item => {
+        const dadosAux = dados
+                            .filter(item => item.qtde != undefined)
+                            .map(item => {
             
             const valorOriginal = formatter.format(item.qtde)
             // Usa regex para remover pontos (.) e hifens (-)
