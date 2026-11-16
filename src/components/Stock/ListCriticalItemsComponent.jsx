@@ -279,6 +279,11 @@ const ListCriticalItemsComponent = () => {
 
     const CarregarDadosCompleto = async () => {
 
+        // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const isSlow = connection && (connection.effectiveType === '2g' || connection.effectiveType === '3g');
+        const timeoutDuration = isSlow ? 15000 : 3000; 
+
         const dias = form.getFieldValue('diasAVencer') || 0
         const hoje = dayjs(new Date().toISOString().split('T')[0])
 
@@ -377,12 +382,21 @@ const ListCriticalItemsComponent = () => {
                                                       item.quantidadeEstoque === undefined))
 */
 
+            // O setTimeout deve envolver APENAS o fechamento do loading
+            // para dar tempo do React processar a mudança de estado dos dados
+            setTimeout(() => {
+              setLoading(false);
+            }, timeoutDuration); // Pequeno delay para garantir a renderização
+
             setDados(dadosAux)
-            setLoading(false);
 
         } catch (error) {
             console.error(error);
             setLoading(false);
+        } finally {
+
+            setLoading(false);
+
         }
 
     }

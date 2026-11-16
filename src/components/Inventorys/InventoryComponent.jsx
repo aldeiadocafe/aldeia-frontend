@@ -551,6 +551,11 @@ const InventoryComponent = () => {
 
     const carregarDados = async (lstFinalizado) => {
 
+        // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const isSlow = connection && (connection.effectiveType === '2g' || connection.effectiveType === '3g');
+        const timeoutDuration = isSlow ? 15000 : 3000; 
+
         try {
 
             setLoading(true);
@@ -646,6 +651,13 @@ const InventoryComponent = () => {
                 setExpandedDate(countAux)                        
                 
             })
+
+            // O setTimeout deve envolver APENAS o fechamento do loading
+            // para dar tempo do React processar a mudança de estado dos dados
+            setTimeout(() => {
+              setLoading(false);
+            }, timeoutDuration); // Pequeno delay para garantir a renderização
+
 
         } catch (error) {
             console.error(error);

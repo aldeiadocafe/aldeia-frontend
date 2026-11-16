@@ -347,21 +347,44 @@ const ItemComponent = () => {
 
 //        setLoading(true)
 
-        await getAllUnits().then((response) => {
+        // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const isSlow = connection && (connection.effectiveType === '2g' || connection.effectiveType === '3g');
+        const timeoutDuration = isSlow ? 15000 : 3000; 
 
-            // Formatar os dados
-            const formatarDados = response.data.map((unit) => ({
-                value: unit._id,
-                label: unit.descricao
-            }))
+        try {
 
-            setSelectUnits(formatarDados)
+            await getAllUnits().then((response) => {
 
-        }).catch((error) => {
-            console.error(error)
-        })
+                // Formatar os dados
+                const formatarDados = response.data.map((unit) => ({
+                    value: unit._id,
+                    label: unit.descricao
+                }))
+
+                setSelectUnits(formatarDados)
+
+            }).catch((error) => {
+                console.error(error)
+            })
 
 //        setLoading(false)
+
+            // O setTimeout deve envolver APENAS o fechamento do loading
+            // para dar tempo do React processar a mudança de estado dos dados
+            setTimeout(() => {
+              setLoading(false);
+            }, timeoutDuration); // Pequeno delay para garantir a renderização
+
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+
+            setLoading(false);
+
+        }
+
         
     }
 
