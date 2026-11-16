@@ -105,6 +105,28 @@ export const AuthProvider = ({ children }) => {
     return userData ? JSON.parse(userData) : null
 //    return localStorage.getItem('auth-user') ? localStorage.getItem('auth-user') : null
   });
+
+  useEffect(() => {
+
+    const currentVersion = import.meta.env.PACKAGE_VERSION; // ou process.env.REACT_APP_VERSION
+    const savedVersion = localStorage.getItem('app_version');
+
+    if (savedVersion && savedVersion !== currentVersion) {
+      // 1. Limpa tokens e dados do usuário
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // 2. Salva a nova versão
+      localStorage.setItem('app_version', currentVersion);
+
+      // 3. Redireciona para o login forçando o recarregamento do cache
+      window.location.href = '/login';
+      
+    } else if (!savedVersion) {
+      localStorage.setItem('app_version', currentVersion);
+    }
+
+  }, [])
   
   return (
     <AuthContext.Provider value={{ token, user, login, logout, atualizarUser }}>  {/* São os campos "globais" do contexto e as funções */}
