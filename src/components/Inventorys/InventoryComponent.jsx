@@ -23,6 +23,7 @@ const InventoryComponent = () => {
     
     const { user } = useAuth();
 
+    const [dadosCompleto,   setDadosCompleto]   = useState([]);
     const [dados,           setDados]           = useState([]);
     const [empresa,         setEmpresa]         = useState(null)
     const [filterEmpresas,  setFilterEmpresas]  = useState([])
@@ -476,7 +477,7 @@ const InventoryComponent = () => {
                 createInventory(inventory).then((response) => {
                     message.success('Registro criado com sucesso!')
                     form.resetFields(); //Limpa os campos ao fechar
-                    carregarDados(listarFinalizado);
+                    carregarDados();
                     //setFormModal(false)
 
                 }).catch((error)=> {
@@ -492,7 +493,7 @@ const InventoryComponent = () => {
 
                     message.success('Registro atualizado com sucesso!')
                     form.resetFields(); //Limpa os campos ao fechar
-                    carregarDados(listarFinalizado);
+                    carregarDados();
                     setFormModal(false)
 
                 }).catch((error)=> {
@@ -523,7 +524,7 @@ const InventoryComponent = () => {
         setFormModal(false);
         setDeleteModal(false);
         form.resetFields(); //Limpa os campos ao fechar
-        carregarDados(listarFinalizado);
+        carregarDados();
     };
 
     const handleOk = async () => {
@@ -549,7 +550,7 @@ const InventoryComponent = () => {
         }
     }
 
-    const carregarDados = async (lstFinalizado) => {
+    const carregarDados = async () => {
 
         // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -558,7 +559,7 @@ const InventoryComponent = () => {
 
         try {
 
-            setLoading(true);
+            setLoading(true)
             setEmpresa(null)
 
             if (user.empresas) {
@@ -583,6 +584,7 @@ const InventoryComponent = () => {
             const dadosPlaces   = await getAllPlacesInventory().then(response => response.data)
             const dadosCount    = await getAllCountPlaces().then(response => response.data)
 
+            setDadosCompleto([])
             setDados([])        
             await getAllInventorys().then( async (response) => {
 
@@ -590,8 +592,8 @@ const InventoryComponent = () => {
 
                 const dadosAux = response.data
                     .filter(item => ids.includes(item.empresa._id))
-                    .filter(item => (lstFinalizado) ||
-                                    (item.situacao.toUpperCase() !== 'FINALIZADO' && !lstFinalizado) )
+//                    .filter(item => (listarFinalizado) ||
+//                                    (item.situacao.toUpperCase() !== 'FINALIZADO' && !listarFinalizado) )
                     .map(item => ({
                         key:            item._id,
                         _id:            item._id,
@@ -603,7 +605,10 @@ const InventoryComponent = () => {
                         situacao:       item.situacao.toUpperCase(),
 
                 }))
-                setDados(dadosAux);
+
+                setDadosCompleto(dadosAux)
+                setDados(dadosAux.filter(item => (listarFinalizado) ||
+                                        (item.situacao.toUpperCase() !== 'FINALIZADO' && !listarFinalizado) ));
 
                 //Unidade
                 const unit = await getAllUnits().then( async (response) => response.data)
@@ -811,7 +816,7 @@ const InventoryComponent = () => {
 
             } finally {
                 setModalReabrir(false)
-                setLoading(false)
+//                setLoading(false)
             }
 
         }
@@ -892,7 +897,11 @@ const InventoryComponent = () => {
 
         setListarFinalizado(e.target.checked)
 
-        await carregarDados(e.target.checked)
+        setDados([])
+        setDados(dadosCompleto.filter(item => (e.target.checked) ||
+                                (item.situacao.toUpperCase() !== 'FINALIZADO' && !e.target.checked) ));
+
+
     }
 
     const expandedRowRenderDate = (record) => {
