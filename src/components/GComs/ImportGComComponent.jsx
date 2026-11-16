@@ -156,9 +156,12 @@ const ImportGComEstoqueComponent = () => {
 
     onChange(info) {
 
+      setDados([])
+      setExibirTabela(false)
+
       setFileList(info.fileList.slice(-1)); // Mantém apenas o último arquivo selecionado
       if (info.file.status !== 'uploading') {
-        console.log(info.file, info.fileList);
+//        console.log(info.file, info.fileList);
       }
       if (info.file.status === 'done') {
         setArquivo(info.file.originFileObj); // Armazena o arquivo selecionado
@@ -303,7 +306,7 @@ const ImportGComEstoqueComponent = () => {
         // Ou base 0: {s: {r: 3, c: 0}, e: {r: 1000, c: 3}} (Linha 4, Col A até Col D)
         
         const jsonData = XLSX.utils.sheet_to_json(ws, {
-          range: 10, // Começa na 11ª linha (pula as primeiras 10)
+          range: 9, // Começa na 11ª linha (pula as primeiras 10)
           header: ["itCodigo", "descricao", "unidade", "quantidade", "estoqueReservado", "estoqueDisponivel", "custoUnitario"]// Opcional: Define nomes de colunas
         });
 
@@ -321,14 +324,13 @@ const ImportGComEstoqueComponent = () => {
         let dadosStock = dadosStockCompleto.filter(stock => stock.empresa._id === empresaSelecionada)
 
         // Carregar itens com quantidade <> 0 e diferente de "Total"
-        const itemExcelAux = jsonData.filter(item => (item.quantidade != 0 || item.custoUnitario != 0)
+        const itemExcel = jsonData.filter(item => (item.quantidade != 0 || item.custoUnitario != 0)
                                               && ! item.itCodigo.toUpperCase().trim().startsWith("TOTAL"))
 
         setProgress(80) // Planilha convertida para Workbook
-
+/*
         // Array com Descricao Unica
-        const uniqueDescricao = new Set()
-
+        const uniqueDescricao = [... new Set(jsonData.map(item => item.descricao))]
         const itemExcel = itemExcelAux.filter( item => {
           if (uniqueDescricao.has(item.descricao)) {
             return false
@@ -337,12 +339,12 @@ const ImportGComEstoqueComponent = () => {
             return true
           }
         })
+*/          
 
         //Verificar se todos os itens já estão cadastrados
         const novosItens = itemExcel
-                            .filter(excel => !items.some(item => item.itCodigo.trim().toUpperCase() === excel.itCodigo.trim().toUpperCase()))
+                            .filter(excel => !items.some(item => item.itCodigo.trim().toUpperCase() === excel.itCodigo.trim().toUpperCase().trim()))
                             .filter(excel => unit.some(unid => unid.unidade.toUpperCase().trim() === excel.unidade.toUpperCase().trim()))
-
         if (novosItens.length > 0) {
 
           const criar = novosItens.map(item => ({
@@ -363,6 +365,7 @@ const ImportGComEstoqueComponent = () => {
         //Atualizar Custo Unitário dos itens que já existem
         const atualizarCusto = itemExcel
                             .filter(excel => items.some(item => item.itCodigo === excel.itCodigo.toUpperCase().trim()))
+                            .filter(excel => excel.custoUnitario != undefined && excel.custoUnitario != 0)
                             .map(item => ({ 
                               empresa: empresaSelecionada,
                               item: items.find(items => items.itCodigo === item.itCodigo.toUpperCase().trim())._id,
