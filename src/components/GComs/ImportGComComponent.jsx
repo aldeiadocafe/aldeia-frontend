@@ -13,7 +13,7 @@ import { getAllUnits } from '../../services/UnitService';
 import { AtualizarCustoGCom } from '../../services/UnitCostService';
 
 
-const ImportGComEstoqueComponent = () => {
+const ImportEstoqueGComComponent = () => {
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -565,7 +565,7 @@ const ImportGComEstoqueComponent = () => {
         <div style={{ textAlign: 'center' }}>
             <Title level={2}
                 style={{ color: 'var(--primary-color)'}}
-            >Atualizar Quantidade de Estoque GCom</Title>
+            >Atualizar Quantidade de Estoque Atual GCom</Title>
         </div>
       
           <Card
@@ -682,4 +682,4 @@ const ImportGComEstoqueComponent = () => {
 
 }
 
-export default ImportGComEstoqueComponent
+export default ImportEstoqueGComComponent

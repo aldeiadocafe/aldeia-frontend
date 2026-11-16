@@ -75,7 +75,8 @@ export const opcoesMenu = [
                     title:  'GCom',
                     key:    'MNUGCOM',
                     children: [
-                        { title: 'Atualizar Estoque', key: 'STOCKGCOM' },
+                        { title: 'Estoque Atual', key: 'GCOMSTOCK' },
+                        { title: 'Estoque Em...', key: 'GCOMSTOCKIN' },
                     ],
                 },
                 {

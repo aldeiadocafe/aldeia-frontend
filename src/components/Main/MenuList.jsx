@@ -219,13 +219,22 @@ const allMenuItems = [
         key: 'MNUGCOM',
         icon: <BsCashStack/>,
         label: "GCom",
-        children: [
+        children: [            
             {
                 key: 'STOCKGCOM',
                 icon: <BsBoxSeam/>,
                 label: 
                     <Link to="/stockgcom">
-                        Atualizar Estoque
+                        Estoque Atual
+                    </Link>,
+
+            },
+            {
+                key: 'GCOMSTOCKIN',
+                icon: <BsBoxSeam/>,
+                label: 
+                    <Link to="/stockingcom">
+                        Estoque Em...
                     </Link>,
 
             },

@@ -51,6 +51,7 @@ import { LocaleManager } from '@bryntum/calendar';
 
 import '@bryntum/calendar/locales/calendar.locale.PtBr.js'
 import PermissionsComponent from './components/Settings/PermissionsComponent';
+import ImportGComStockInComponent from './components/GComs/ImportGComStockInComponent';
 
 // Define o idioma para Português do Brasil
 LocaleManager.locale = 'PtBr';
@@ -179,6 +180,14 @@ function App() {
                     element={
                       <PrivateRoute>
                         <ImportEstoqueGComComponent/>
+                      </PrivateRoute>
+                    }/>
+
+                  {/* http://localhost:5173/estoquegcom */}
+                  <Route path='/stockingcom'    
+                    element={
+                      <PrivateRoute>
+                        <ImportGComStockInComponent/>
                       </PrivateRoute>
                     }/>
 
