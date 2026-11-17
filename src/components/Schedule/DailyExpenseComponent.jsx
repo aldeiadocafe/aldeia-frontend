@@ -210,6 +210,7 @@ const DailyExpenseComponent = () => {
 
                     //Carregar Schedule
                     const auxSchedule = allSchedule
+                                    .filter(evento => evento.usuario?._id && evento.tipoEvento?._id)
                                     .filter(evento => usuariosAtivo.find(ativo => ativo._id === evento.usuario._id))
                                     .filter(evento => typeID.find(tipo => tipo === evento.tipoEvento._id))
                                     .map(evento => {
