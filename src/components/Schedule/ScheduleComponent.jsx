@@ -426,7 +426,7 @@ const ScheduleComponent = () => {
 
             setSelectEmpresas(empAux)
             setOptionEmpresas(formatarDados)
-          
+
             const [profileAllUsers,profileAllTypeEvents,profileAllSchedules] = await Promise.allSettled([    // Promise.all( >> Se alguma requeste falhar, o programa para
               getAllUsers().then( async response => response.data),
               getAllTypeEvents().then( async (response) => response.data),
@@ -481,6 +481,7 @@ const ScheduleComponent = () => {
             setTypeEvent(tipoAux)
 
             const dadosAux = allSchedules
+                                .filter(evento => evento.usuario?._id && evento.tipoEvento?._id)
                                 .filter(evento => usuariosAtivo.find(ativo => ativo._id === evento.usuario._id))
                                 .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
                                 .map(evento => ({
