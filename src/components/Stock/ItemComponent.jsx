@@ -37,7 +37,7 @@ const ItemComponent = () => {
     
     const formatter = new Intl.NumberFormat('pt-BR', {
         style: 'decimal',
-        minimumFractionDigits: 4,
+        minimumFractionDigits: 2,
         maximumFractionDigits: 4,   
     });
 
@@ -48,7 +48,7 @@ const ItemComponent = () => {
         if (num === undefined || num === null || num === '') return '';
         return new Intl.NumberFormat('pt-BR', {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
+            maximumFractionDigits: 4,
             }).format(num);
     };
 
