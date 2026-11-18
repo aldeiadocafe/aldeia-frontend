@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, InputNumber, Row, Col} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, InputNumber, Row, Col, DatePicker} from 'antd'
 import Title from 'antd/es/typography/Title';
 
 import { createItem, deleteItem, getAllItems, updateItem } from '../../services/ItemService';
 import { getAllUnits } from '../../services/UnitService';
 import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
+
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 const ItemComponent = () => {
 
@@ -25,7 +30,7 @@ const ItemComponent = () => {
     const [form]    = Form.useForm();
     const { Item }  = Form;
 
-    const { custoUnitario, setCustoUnitario } = useState(0);
+    const { valorCompra, setValorCompra } = useState(0);
 
     const [isEditing,   setIsEditing]   = useState(true);
     const [idItem,      setIdItem]      = useState();
@@ -185,23 +190,22 @@ const ItemComponent = () => {
             ...getColumnSearchProps('unitDescricao'),
             ellipsis: true,
         },
-/*        
         {
-            dataIndex:  "quantidadeMinima",
-            title:      "Qtde Mínima",
-            sorter: (a, b) => a.quantidadeMinima - b.quantidadeMinima,
+            dataIndex:  "dataCompra",
+            title:      "Data Compra",
+            sorter: (a, b) => new Date(a.dataCompra).getTime() - new Date(b.dataCompra).getTime(),
+            // Optional: set a default sort order
+            defaultSortOrder: 'descend', 
             showSorterTooltip: { target: 'sorter-icon' }, 
-            align: 'right',
-            render: (value) => formatter.format(value)
+            ellipsis: true,
+            render: (text) => dayjs.utc(text).format('DD/MM/YYYY'),
+
         },
-*/        
         {
-            dataIndex:  "custoUnitario",
-            title:      "Custo Unitário",
-            sorter: (a, b) => a.custoUnitario - b.custoUnitario,
-            showSorterTooltip: { target: 'sorter-icon' }, 
+            dataIndex:  "valorCompra",
+            title:      "Valor Compra",
             align: 'right',
-            render: (value) => formatter.format(value)
+            render: (value) => formatter.format(value? value : 0)
         },
         {
             dataIndex:  "situacao",
@@ -222,7 +226,8 @@ const ItemComponent = () => {
             unit:               values.unit,
             situacao:           values.situacao.toUpperCase(),
 //            quantidadeMinima:   values.quantidadeMinima,
-            custoUnitario:      values.custoUnitario,
+            dataCompra:         dayjs.utc(values.dataCompra),        
+            valorCompra:        values.valorCompra,
             usuarioCriacao:     user ? user._id : null,
             usuarioAlteracao:   user ? user._id : null,
         };
@@ -317,7 +322,8 @@ const ItemComponent = () => {
                     unit:               item.unit,
                     unitDescricao:      item.unit?.descricao,
                     situacao:           item.situacao,
-                    custoUnitario:      item.custoUnitario,
+                    dataCompra:         dayjs.utc(item.dataCompra),        
+                    valorCompra:        item.valorCompra,
 //                    quantidadeMinima:   item.quantidadeMinima
                 }))
 
@@ -404,28 +410,6 @@ const ItemComponent = () => {
         setFormModal(true);
     };
 
-    const btnVisualizar = (value) => {
-
-        setIsEditing(false)
-        if(value) {
-
-            setIdItem(value._id)
-            form.setFieldsValue({
-                _id:                value._id,
-                itCodigo:           value.itCodigo,
-                descricao:          value.descricao,
-                unit:               value.unit._id,
-                situacao:           value.situacao,
-                custoUnitario:      value.custoUnitario,
-//                quantidadeMinima:   value.quantidadeMinima
-            })
-
-            setFormModal(true);
-                
-        }
-            
-    }
-
     const btnEditar = (value) => {
 
         setIsEditing(true);
@@ -440,7 +424,8 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
-                custoUnitario:      value.custoUnitario,
+                dataCompra:         dayjs.utc(value.dataCompra),
+                valorCompra:        value.valorCompra,
 //                quantidadeMinima:   value.quantidadeMinima
             })
 
@@ -461,7 +446,8 @@ const ItemComponent = () => {
                 descricao:          value.descricao,
                 unit:               value.unit._id,
                 situacao:           value.situacao,
-                custoUnitario:      value.custoUnitario,
+                dataCompra:         dayjs.utc(value.dataCompra),
+                valorCompra:        value.valorCompra,
 //                quantidadeMinima:   value.quantidadeMinima
             })
         }
@@ -539,12 +525,14 @@ const ItemComponent = () => {
                 confirmLoading={confirmLoading}
                 onCancel={handleCancel}        
                 onOk={handleOk}
+                centered
             >        
                 <Form
                     form={form}
                     layout='vertical'
                     initialValues={{situacao: 'ATIVO',
-                                    custoUnitario: 0,
+                                    dataCompra: null,
+                                    valorCompra: 0,
 //                                    quantidadeMinima: 0
                                 }}
                     >
@@ -592,39 +580,39 @@ const ItemComponent = () => {
                                 </Select>
                             </Item>
                         </Col>
+                    </Row>
+                    <Row gutter={[16,16]}>
                         <Col span={12}>
                             <Item
-                                name="custoUnitario"
-                                label="Custo Unitário"
+                                name="dataCompra"
+                                label="Data Compra"
+                            >
+                            <DatePicker 
+                                format={"DD/MM/YYYY"}
+                                placeholder='Data Compra'
+                                style={{ width: 140 }}
+                                disabled={!isEditing}
+                            />
+                            </Item>
+                        </Col>
+                        <Col span={12}>
+                            <Item
+                                name="valorCompra"
+                                label="Valor Compra"
                             >
                                 <InputNumber
                                     prefix="R$"
                                     style={{ width: '100%' }}
                                     step={0.01}                                    
                                     disabled={!isEditing}
-                                    value={custoUnitario}
+                                    value={valorCompra}
                                     formatter={brazilianFormatter}
                                     parser={brazilianParser}
-                                    onChange={(val) => setCustoUnitario(val)}
+                                    onChange={(val) => setValorCompra(val)}
                                 />
                             </Item>
                         </Col>
 
-{/*                        
-                        <Col span={12}>
-                            <Item
-                                name={"quantidadeMinima"}
-                                key={"quantidadeMinima"}
-                                label="Qtde Mínima"
-                                >
-                                <InputNumber 
-                                    disabled={!isEditing}
-                                    placeholder='Quantidade mínima de estoque'
-                                    decimalSeparator=','
-                                    />
-                            </Item>
-                        </Col>
-*/}                        
                     </Row>
                     <Item
                         name={"situacao"}
@@ -649,6 +637,8 @@ const ItemComponent = () => {
                 open={deleteModal}
                 confirmLoading={confirmLoading}
                 onCancel={handleCancel}        
+                centered
+
 //                onOk={() => setIsPopupOpen(true)}
 
                 footer = {[
@@ -716,38 +706,39 @@ const ItemComponent = () => {
                         >
                         </Select>
                     </Item>
-                    <Col span={12}>
-                        <Item
-                            name="custoUnitario"
-                            label="Custo Unitário"
-                        >
-                            <InputNumber
-                                prefix="R$"
-                                style={{ width: '100%' }}
-                                step={0.01}                                    
-                                disabled={!isEditing}
-                                value={custoUnitario}
-                                formatter={brazilianFormatter}
-                                parser={brazilianParser}
-                                onChange={(val) => setCustoUnitario(val)}
-                            />
-                        </Item>
-                    </Col>
-{/*                    
-                    <Col>
-                        <Item
-                            name={"quantidadeMinima"}
-                            key={"quantidadeMinima"}
-                            label="Qtde Mínima"
+                    <Row gutter={[16,16]}>
+                        <Col span={12}>
+                            <Item
+                                name="dataCompra"
+                                label="Data Compra"
                             >
-                            <InputNumber 
+                            <DatePicker 
+                                format={"DD/MM/YYYY"}
+                                placeholder='Data Compra'
+                                style={{ width: 140 }}
                                 disabled={!isEditing}
-                                placeholder='Quantidade mínima de estoque'
-                                decimalSeparator=','
+                            />
+                            </Item>
+                        </Col>
+                        <Col span={12}>
+                            <Item
+                                name="valorCompra"
+                                label="Valor Compra"
+                            >
+                                <InputNumber
+                                    prefix="R$"
+                                    style={{ width: '100%' }}
+                                    step={0.01}                                    
+                                    disabled={!isEditing}
+                                    value={valorCompra}
+                                    formatter={brazilianFormatter}
+                                    parser={brazilianParser}
+                                    onChange={(val) => setValorCompra(val)}
                                 />
-                        </Item>
-                    </Col>
-*/}                    
+                            </Item>
+                        </Col>
+
+                    </Row>
                     <Item
                         name={"situacao"}
                         key={"situacao"}

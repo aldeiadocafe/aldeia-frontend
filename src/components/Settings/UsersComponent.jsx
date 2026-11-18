@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AppstoreAddOutlined, CheckOutlined, CheckSquareOutlined, DeleteOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, EyeTwoTone, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
-import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, DatePicker, Row, Col, InputNumber, Checkbox} from 'antd'
+import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, Row, Col, InputNumber, Checkbox} from 'antd'
 import { PatternFormat } from 'react-number-format'; // Recomendado: PatternFormat para máscaras fixas
 import { cpf, cnpj } from 'cpf-cnpj-validator';
 
