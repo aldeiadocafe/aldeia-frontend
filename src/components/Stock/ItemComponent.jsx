@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AppstoreAddOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
+import { AppstoreAddOutlined, DeleteOutlined, DownloadOutlined, EditOutlined, ExclamationCircleOutlined, EyeOutlined, FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
 import { Table, Input, Button, Space, Modal, Form, message, Tooltip, Popconfirm, Spin, Select, InputNumber, Row, Col, DatePicker} from 'antd'
 import Title from 'antd/es/typography/Title';
 
@@ -12,6 +12,9 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 
 dayjs.extend(utc)
+
+import * as XLSX from 'xlsx-js-style'
+import { saveAs } from 'file-saver';
 
 const ItemComponent = () => {
 
@@ -128,17 +131,6 @@ const ItemComponent = () => {
             align: 'center',
             render: (text, record) => (
                 <Space size="small">
-{/*
-                    <Tooltip title="Visualizar">
-                        <Button
-                            type="primary"
-                            shape='circle'
-                            className={'rotate-icon'}
-                            icon={<EyeOutlined rotate={0} />}
-                            onClick={() => btnVisualizar(record)}
-                        />
-                    </Tooltip>       
-*/}
                     <Tooltip title="Editar">
                         <Button
                             type="primary"
@@ -322,7 +314,7 @@ const ItemComponent = () => {
                     unit:               item.unit,
                     unitDescricao:      item.unit?.descricao,
                     situacao:           item.situacao,
-                    dataCompra:         dayjs.utc(item.dataCompra),        
+                    dataCompra:         item.dataCompra,
                     valorCompra:        item.valorCompra,
 //                    quantidadeMinima:   item.quantidadeMinima
                 }))
@@ -394,20 +386,99 @@ const ItemComponent = () => {
         
     }
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter' && formModal) {
-            event.preventDefault()
-            handleOk()
+    const exportToExcel = () => {
+
+        const dadosExcel = dados
+                        .map(item => ({
+                Item:               item.itCodigo,
+                Descrição:          item.descricao,
+                Unid:               item.unit? item.unit.unidade : '',
+                "Data Compra":      new Date(item.dataCompra).toLocaleDateString('pt-BR'),
+                "Valor Compra":     item.valorCompra
+        }))
+
+        // Cria worksheet / Converte os dados (JSON) em worksheet
+        const ws = XLSX.utils.json_to_sheet(dadosExcel)
+
+
+        // Definir Estilos (Header)
+        const headerStyle = {
+            font: { bold: true, color: { rgb: "FFFFFF" } },
+            fill: { fgColor: { rgb: "4F81BD" } },
+            alignment: { horizontal: "center" },
+            border: {
+                bottom: { style: "thin", color: { rgb: "000000" } }
+            }
+        }
+
+        const rightAlignStyle = {
+        alignment: {
+            horizontal: 'right', // Opções: 'left', 'center', 'right'
+        },
+        };
+
+        const centerAlignStyle = {
+        alignment: {
+            horizontal: 'center', // Opções: 'left', 'center', 'right'
+        },
+        };
+
+        // Aplicar estilo aos cabeçalhos (A1, B1, C1)
+        if (ws['A1']) ws['A1'].s = headerStyle;
+        if (ws['B1']) ws['B1'].s = headerStyle;
+        if (ws['C1']) ws['C1'].s = headerStyle;
+        if (ws['D1']) ws['D1'].s = headerStyle;
+        if (ws['E1']) ws['E1'].s = headerStyle;
+
+        // 3. Ajustar largura das colunas
+        ws['!cols'] = [
+            { wch: 10 }, // Largura da Coluna B
+            { wch: 45 }, // Largura da Coluna C
+            { wch: 5  }, // Largura da Coluna D
+            { wch: 15 }, // Largura da Coluna E
+            { wch: 15 }, // Largura da Coluna F
+        ]
+        
+
+        // Obtém o total de linhas (exclui o cabeçalho se json_to_sheet for usado sem customização)
+        // O !ref contém o intervalo, ex: "A1:B3"
+        const range = XLSX.utils.decode_range(ws['!ref']);
+
+        // Exemplo para a coluna B2:B10
+        for (let i = 2; i <= (range.e.r + 1); i++) {
+//            const cellAddress = 'D' + i;
+            if (!ws['E' + i]) continue; // Pular se a célula estiver vazia
+
+            ws['D' + i].s = centerAlignStyle; // Aplica o estilo
+            ws['E' + i].s = rightAlignStyle; // Aplica o estilo
+/*
+            //Formatar em data
+            ws['D' + i].z = 'dd/mm/yyyy'            
+            ws['D' + i].t = 'd' // Define o tipo como Data
+*/
 
         }
+
+        // Cria um novo workbook
+        const wb = XLSX.utils.book_new()
+
+        // Adiciona a worksheet ao workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Dados')
+
+        // Gera o arquivo binário e força o download
+//        XLSX.writeFile(wb, 'TabelaDados.xlsx')
+
+        // 5. Gerar arquivo e baixar
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(data, 'item.xlsx');
+
     }
 
-    window.addEventListener('keydown', handleKeyDown)
-
-    //Limpar o evento quando o componente desmonta ou modal fecha
-    return () => {
-        window.removeEventListener('keydown', handleKeyDown)
-    }
+    useEffect(() => {
+        carregarSelectUnit()
+        carregarDados();
+    },[]);
 
     useEffect(() => {
 
@@ -428,10 +499,6 @@ const ItemComponent = () => {
 
     }, [formModal])
 
-    useEffect(() => {
-        carregarSelectUnit()
-        carregarDados();
-    },[]);
 
     const showFormModal = () => {
 
@@ -530,13 +597,26 @@ const ItemComponent = () => {
 
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button 
-                    type='primary'
-                    icon={<AppstoreAddOutlined />}
-                    onClick={showFormModal}
+                <Space
+                    style={{ padding: 0,
+                             margin: 0
+                    }}
+                >
+                    <Button 
+                        type='primary'
+                        icon={<AppstoreAddOutlined />}
+                        onClick={showFormModal}
+                        >
+                            Cadastrar
+                    </Button>
+                    <Button 
+                        type="primary" 
+                        icon={<DownloadOutlined />} 
+                        onClick={exportToExcel}
                     >
-                        Cadastrar
-                </Button>
+                        Excel
+                    </Button>                
+                </Space>
                 <br></br>
                 <br></br>
             </div>
