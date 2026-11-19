@@ -628,6 +628,7 @@ const DraftScheduleComponent = () => {
             } else {
 
               const dadosEvento = allSchedules
+                            .filter(evento => evento.usuario?._id && evento.tipoEvento?._id)
                             .filter(evento => usuariosAtivo.find(ativo => ativo._id === evento.usuario._id))
                             .filter(evento => tipoAux.find(tipo => tipo.id === evento.tipoEvento._id))
                             .map(evento => ({
