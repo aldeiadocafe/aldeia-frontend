@@ -363,6 +363,12 @@ const UsersComponent = () => {
         const isSlow = connection && (connection.effectiveType === '2g' || connection.effectiveType === '3g');
         const timeoutDuration = isSlow ? 15000 : 3000; 
 
+            // O setTimeout deve envolver APENAS o fechamento do loading
+            // para dar tempo do React processar a mudança de estado dos dados
+            setTimeout(() => {
+              setLoading(false);
+            }, timeoutDuration); // Pequeno delay para garantir a renderização
+
         try {
 
             setLoading(true);
@@ -386,12 +392,6 @@ const UsersComponent = () => {
 
             })
 
-            // O setTimeout deve envolver APENAS o fechamento do loading
-            // para dar tempo do React processar a mudança de estado dos dados
-            setTimeout(() => {
-              setLoading(false);
-            }, timeoutDuration); // Pequeno delay para garantir a renderização
-
 
         } catch (error) {
             console.error(error);
@@ -408,6 +408,18 @@ const UsersComponent = () => {
         carregarSelectEmpresa()
         carregarDados();
     },[]);
+//bispo
+    if (loading) {
+        return <div> 
+            <Spin 
+                spinning={loading} 
+                size='large' 
+                description="Carregando..."
+    //            fullscreen
+                />
+
+        </div>
+    }
 
     useEffect(() => {
 
@@ -546,14 +558,14 @@ const UsersComponent = () => {
                 style={{ color: 'var(--primary-color)'}}
             >Usuário</Title>
         </div>
-
+{/*
         <Spin 
             spinning={loading} 
             size='large' 
             description="Carregando..."
 //            fullscreen
             >
-
+*/}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button 
@@ -945,7 +957,7 @@ const UsersComponent = () => {
                 </Form>
             </Modal>
 
-        </Spin>
+{/*        </Spin> */}
 
     </div>
 
