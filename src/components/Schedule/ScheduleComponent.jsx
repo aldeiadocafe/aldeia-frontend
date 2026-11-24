@@ -427,15 +427,16 @@ const ScheduleComponent = () => {
             setSelectEmpresas(empAux)
             setOptionEmpresas(formatarDados)
 
-            const [profileAllUsers,profileAllTypeEvents,profileAllSchedules] = await Promise.allSettled([    // Promise.all( >> Se alguma requeste falhar, o programa para
-              getAllUsers().then( async response => response.data),
-              getAllTypeEvents().then( async (response) => response.data),
-              getAllSchedules().then( async (response) => response.data)
+            const [resAllUsers,resAllTypeEvents,resAllSchedules] = await Promise.allSettled([    // Promise.all( >> Se alguma requeste falhar, o programa para
+              getAllUsers(),
+              getAllTypeEvents(),
+              getAllSchedules(),
             ])
 
-            const allUsers          = profileAllUsers?.status           === 'fulfilled' ? profileAllUsers.value           : null
-            const allTypeEvents     = profileAllTypeEvents?.status      === 'fulfilled' ? profileAllTypeEvents.value      : null
-            const allSchedules      = profileAllSchedules?.status       === 'fulfilled' ? profileAllSchedules.value       : null
+//            const allUsers          = resAllUsers?.status           === 'fulfilled' ? resAllUsers.value           : null
+            const allUsers          = resAllUsers.data
+            const allTypeEvents     = resAllTypeEvents.data
+            const allSchedules      = resAllSchedules.data
 
 
             //Usuários
