@@ -18,27 +18,23 @@ dayjs.extend(utc)
 const UsersComponent = () => {
 
     const { user } = useAuth();
-    
-    const [dados,           setDados]           = useState([]);
+
+    const [usuarios, setUsuarios] = useState([])
+    const [empresas, setEmpresas] = useState([])
+    const [loading,  setLoading]  = useState(false)
+
+    const [valeRefeicao,    setValeRefeicao]    = useState(0)
+    const [valeTransporte,  setValeTransporte]  = useState(0)
+
+    const [modalVisible, setModalVisible] = useState(false)
+    const [deleteModal,  setDeleteModal]  = useState(false)
+    const [editingUser,  setEditingUser]  = useState(null)
+
     const [searchText,      setSearchText]      = useState('');
     const [SelectedRowKeys, setSelectedRowKeys] = useState();
 
-    const [selectEmpresas,  setSelectEmpresas]  = useState([])
-
-    const [deleteModal,     setDeleteModal]     = useState(false);
-    const [formModal,       setFormModal]       = useState(false);
-    const [confirmLoading,  setConfirmLoading]  = useState(false);
-    const [loading,         setLoading]         = useState(true);
-    
-    const [form]    = Form.useForm();
+    const [form] = Form.useForm()
     const { Item }  = Form;
-
-    const [isEditing, setIsEditing]         = useState(true);
-    const [idUser, setIdUser]               = useState();
-
-    const [valeRefeicao,        setValeRefeicao]        = useState(0)
-    const [valeTransporte,      setValeTransporte]      = useState(0)
-    const [visualizarEscalas,   setVisualizarEscalas]   = useState(false)
 
     // Formata o número para o padrão pt-BR (ex: 1.234,56)
     const brazilianFormatter = (num) => {
@@ -48,6 +44,11 @@ const UsersComponent = () => {
             maximumFractionDigits: 2,
             }).format(num);
     };
+
+    const formatter = new Intl.NumberFormat('pt-BR', {
+        style: 'decimal',
+        minimumFractionDigits: 3,
+    });
 
     // Converte a string formatada de volta para número limpo (float)
     const brazilianParser = (str) => {
@@ -60,14 +61,6 @@ const UsersComponent = () => {
 
     // Exemplo: Limitar para 4 linhas (4 * 32px = 128px)
     const limitHeight = 4 * 32; 
-
-    //Aplique estilos CSS para centralizar a div container na tela
-    const containerPopconfirm = {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh', // Ocupa 100% da altura da viewport para centralizar verticalmente
-    }
 
     const handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
@@ -129,23 +122,13 @@ const UsersComponent = () => {
             render: (text, record) => (
                 <Space size="small">
 
-                    <Tooltip title="Visualizar">
-                        <Button
-                            type="primary"
-                            shape='circle'
-                            className={'rotate-icon'}
-                            icon={<EyeOutlined rotate={0} />}
-                            onClick={() => btnVisualizar(record)}
-                        />
-                    </Tooltip>       
-
                     <Tooltip title="Editar">
                         <Button
                             type="primary"
                             shape='circle'
                             className={'rotate-icon'}
                             icon={<EditOutlined rotate={0} />}
-                            onClick={() => btnEditar(record)}
+                            onClick={() => handleOpenModal(record)}
                         />
                     </Tooltip>
                     <Tooltip title="Eliminar">                        
@@ -198,11 +181,77 @@ const UsersComponent = () => {
             ...getColumnSearchProps('situacao'),
             ellipsis: true,
         },
+        {
+            dataIndex:  "valeTransporte",
+            title:      "Vale Transporte",
+            align: 'right',
+            render: (value) => formatter.format(value)
+        },
+        {
+            dataIndex:  "valeRefeicao",
+            title:      "Vale Refeição",
+            align: 'right',
+            render: (value) => formatter.format(value)
+        },
+        
     ]
 
-    const gravarDados = async (values) => {
+    const btnEliminar = (value) => {
 
-        const usuarioAnt = dados.find(item => item._id === values._id)
+        setEditingUser(false)
+        setDeleteModal(true);
+
+        if(value) {
+
+            form.setFieldsValue({
+                _id:                value._id,
+                email:              value.email.toUpperCase(),
+                nome:               value.nome.toUpperCase(),
+                senha:              value.senha,
+                telefone:           value.telefone,
+                situacao:           value.situacao,
+                valeTransporte:     value.valeTransporte,
+                valeRefeicao:       value.valeRefeicao,
+                visualizarEscalas:  value.visualizarEscalas,
+                empresas:           value.empresas
+                                    ? value.empresas.map(empresa => empresa._id)
+                                    : null
+            })
+        }
+    }
+
+    const handleOpenModal = (record = null) => {
+
+        setEditingUser(record)
+        if (record) {
+            //Preenche o formulário com os dados
+            form.setFieldsValue({
+                _id:                record._id,
+                email:              record.email.toUpperCase(),
+                nome:               record.nome.toUpperCase(),
+                senha:              record.senha,
+                telefone:           record.telefone,
+                situacao:           record.situacao,
+                valeTransporte:     record.valeTransporte,
+                valeRefeicao:       record.valeRefeicao,
+                visualizarEscalas:  record.visualizarEscalas,
+                empresas:           record.empresas
+                                    ? record.empresas.map(empresa => empresa._id)
+                                    : null
+            })
+
+        } else {
+            //Limpa o formulario
+            form.resetFields()
+        }
+
+        setModalVisible(true)
+    }
+
+    //Salvar
+    const handleSave = async (values) => {
+
+        const usuarioAnt = usuarios.find(item => item._id === values._id)
         let senhaAux
         let usuario
 
@@ -248,152 +297,60 @@ const UsersComponent = () => {
 
         }
 
-        setLoading(true);    
+        try {
+            if (editingUser) {
 
-        if (!values._id) {
-
-            await createUser(usuario).then((response) => {
-                message.success('Registro criado com sucesso!')
-                form.resetFields(); //Limpa os campos ao fechar
-                carregarDados();
-                //setFormModal(false)
-
-
-            }).catch((error)=> {
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
-                } else {
-                    message.error('Erro ao criar!');
-                }
-            });
-        } else {
-
-            await updateUser(values._id, usuario).then((response) => {
-
+                await updateUser(values._id, usuario)
                 message.success('Registro atualizado com sucesso!')
-                form.resetFields(); //Limpa os campos ao fechar
-                carregarDados();
-                setFormModal(false)
 
-            }).catch((error)=> {
+            } else {
 
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
-                } else {
-                    message.error('Erro ao criar!');
-                }
-            });
-            
-        }        
-            
-        setLoading(false);    
- 
-    };
+                await createUser(usuario)
+                message.success('Registro criado com sucesso!')
 
-    const handleCancel = () => {        
-        setFormModal(false);
-        setDeleteModal(false);
-        form.resetFields(); //Limpa os campos ao fechar
-        carregarDados();
-    };
-
-    const handleOk = async (event) => {
-
-        if (isEditing) {
-
-            try {
-                
-                const values = await form.validateFields();
-
-                //Prossiga com a acao
-                gravarDados(values);
-
-            } catch (errorInfo) {
-                console.log(errorInfo)
-                message.info('Verificar campo(s)!');
             }
+            setModalVisible(false)
+            carregarDados()
 
-        } else {
-            setFormModal(false)
+        } catch (error) {
+            message.error('Erro ao salvar usuário')
+            console.error(error)
         }
     }
 
-    const carregarSelectEmpresa = async () => {
+    const handleDelete = async () => {
 
-        // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
-        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        const isSlow = connection && (connection.effectiveType === '2g' || connection.effectiveType === '3g');
-        const timeoutDuration = isSlow ? 15000 : 3000; 
+        const userID = form.getFieldValue('_id')
+        if (userID) {
 
-        setLoading(true)
+            try {
+                await deleteUser(userID)
+                message.success('Registro eliminado com sucesso!')
+                setDeleteModal(false)
+                carregarDados()
+            } catch (error) {
+                message.error('Erro ao excluir usuário')
+                console.error(error)
+            }
 
-        setSelectEmpresas([])
-
-        await getAllCompanys().then((response) => {
-
-            // Formatar os dados
-            const formatarDados = response.data.map((company) => ({
-                value: company._id,
-                label: company.nome
-            }))
-
-            setSelectEmpresas(formatarDados);
-
-            // O setTimeout deve envolver APENAS o fechamento do loading
-            // para dar tempo do React processar a mudança de estado dos dados
-            setTimeout(() => {
-              setLoading(false);
-            }, timeoutDuration); // Pequeno delay para garantir a renderização
-
-
-        }).catch((error)=> {
-            console.error(error);
-        }).finally(() => {
-
-            setLoading(false)
-
-        });
-
+        }
     }
 
     const carregarDados = async () => {
 
-        // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
-        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-        const isSlow = connection && (connection.effectiveType === '2g' || connection.effectiveType === '3g');
-        const timeoutDuration = isSlow ? 15000 : 3000; 
-
-            // O setTimeout deve envolver APENAS o fechamento do loading
-            // para dar tempo do React processar a mudança de estado dos dados
-            setTimeout(() => {
-              setLoading(false);
-            }, timeoutDuration); // Pequeno delay para garantir a renderização
-
+        setLoading(true)
         try {
 
-            setLoading(true);
+            const [resUsuarios, resEmpresas] = await Promise.all([
+                getAllUsers(),
+                getAllCompanys()
+            ])
 
-            setDados([])
-            await getAllUsers().then((response) => {
-
-                const dadosAux = response.data.map(user => ({
-                    _id:                user._id,
-                    email:              user.email,
-                    nome:               user.nome,
-                    senha:              user.senha,
-                    telefone:           user.telefone,
-                    situacao:           user.situacao,
-                    valeTransporte:     user.valeTransporte,
-                    valeRefeicao:       user.valeRefeicao,
-                    visualizarEscalas:  user.visualizarEscalas,
-                    empresas:           user.empresas,
-                }))
-                setDados(dadosAux);
-
-            })
-
+            setUsuarios(resUsuarios.data)
+            setEmpresas(resEmpresas.data)
 
         } catch (error) {
+//            message.error('Erro ao carregar dados do servidor.');
             console.error(error);
         } finally {
 
@@ -401,154 +358,11 @@ const UsersComponent = () => {
             setLoading(false);
 
         }
-
     }
 
     useEffect(() => {
-        carregarSelectEmpresa()
-        carregarDados();
+        carregarDados()
     },[]);
-//bispo
-    if (loading) {
-        return <div> 
-            <Spin 
-                spinning={loading} 
-                size='large' 
-                description="Carregando..."
-    //            fullscreen
-                />
-
-        </div>
-    }
-
-    useEffect(() => {
-
-        const handleKeyDown = (event) => {
-            if (event.key === 'Enter' && formModal) {
-                event.preventDefault()
-                handleOk()
-
-            }
-        }
-
-        window.addEventListener('keydown', handleKeyDown)
-
-        //Limpar o evento quando o componente desmonta ou modal fecha
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-        }
-
-    }, [formModal])
-
-    const showFormModal = () => {
-
-        setIsEditing(true);
-        setIdUser();
-        if(form) {
-            form.resetFields(); //Limpa os campos ao fechar
-        }
-
-        setFormModal(true);
-    };
-
-    const btnVisualizar = (value) => {
-
-        setIsEditing(false)
-        if(value) {
-
-            setIdUser(value._id)
-            form.setFieldsValue({
-                _id:                value._id,
-                email:              value.email.toUpperCase(),
-                nome:               value.nome.toUpperCase(),
-                senha:              value.senha,
-                telefone:           value.telefone,
-                situacao:           value.situacao,
-                valeTransporte:     value.valeTransporte,
-                valeRefeicao:       value.valeRefeicao,
-                visualizarEscalas:  value.visualizarEscalas,
-                empresas:           value.empresas
-                                    ? value.empresas.map(empresa => empresa._id)
-                                    : null
-            })
-
-            setFormModal(true);
-
-        }
-            
-    }
-
-    const btnEditar = (value) => {
-
-        setIsEditing(true);
-        setFormModal(true);
-
-        if(value) {
-
-            setIdUser(value._id)
-            form.setFieldsValue({
-                _id:                value._id,
-                email:              value.email.toUpperCase(),
-                nome:               value.nome.toUpperCase(),
-                senha:              value.senha,
-                telefone:           value.telefone,
-                situacao:           value.situacao,
-                valeTransporte:     value.valeTransporte,
-                valeRefeicao:       value.valeRefeicao,
-                visualizarEscalas:  value.visualizarEscalas,
-                empresas:           value.empresas
-                                    ? value.empresas.map(empresa => empresa._id)
-                                    : null
-            })
-
-        }
-
-    }
-
-    const btnEliminar = (value) => {
-
-        setIsEditing(false)
-        setDeleteModal(true);
-
-        if(value) {
-
-            form.setFieldsValue({
-                _id:                value._id,
-                email:              value.email.toUpperCase(),
-                nome:               value.nome.toUpperCase(),
-                senha:              value.senha,
-                telefone:           value.telefone,
-                situacao:           value.situacao,
-                valeTransporte:     value.valeTransporte,
-                valeRefeicao:       value.valeRefeicao,
-                visualizarEscalas:  value.visualizarEscalas,
-                empresas:           value.empresas
-                                    ? value.empresas.map(empresa => empresa._id)
-                                    : null
-            })
-        }
-    }
-
-    // Chamado se o usuário confirmar na Popconfirm
-    const handlePopupConfirm = () => {
-        
-        if(form.getFieldValue('_id')){
-
-            deleteUser(form.getFieldValue('_id')).then((response) => {
-                message.success('Registro eliminado com sucesso!')
-                form.resetFields(); //Limpa os campos ao fechar
-                carregarDados();
-                setDeleteModal(false); // Fecha o Modal principal
-
-            }).catch((error)=> {
-                if (error.response) {
-                    message.error(error.response.data || 'Erro no servidor');
-                } else {
-                    message.error('Erro ao criar!');
-                }
-            });
-        }
-    };
 
   return (
     <div>
@@ -558,35 +372,35 @@ const UsersComponent = () => {
                 style={{ color: 'var(--primary-color)'}}
             >Usuário</Title>
         </div>
-{/*
+
         <Spin 
             spinning={loading} 
             size='large' 
             description="Carregando..."
 //            fullscreen
             >
-*/}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button 
                     type='primary'
                     icon={<AppstoreAddOutlined />}
-                    onClick={showFormModal}
+                    onClick={() => handleOpenModal()}
                     >
                         Cadastrar
                 </Button>
                 <br></br>
                 <br></br>
             </div>
-                
+
             <Table
                 columns={colunas}
-                dataSource={dados}      
+                dataSource={usuarios}      
                 showSorterTooltip={true}
                 size={'small'}
                 scroll={{ y: 'calc(80vh - 90px)' }}                
                 rowKey={(record) => record._id}
                 pagination={false}
+                loading={false}
             />
 
             {/* Modal de Form */}
@@ -594,15 +408,14 @@ const UsersComponent = () => {
                 title={ "Manutenção Cadastro Usuário"}
                 width={"100vw"}
                 style={{ top: 20, padding: 0, margin: 15 }}
-                open={formModal}
-                confirmLoading={confirmLoading}
-                onCancel={handleCancel}        
-                onOk={handleOk}
-
+                open={modalVisible}
+                onCancel={() => setModalVisible(false)}        
+                onOk={() => form.submit()} // Dispara o onFinish do Form
             >        
                 <Form
                     form={form}
                     layout='vertical'
+                    onFinish={handleSave}
                     initialValues={{
                         situacao: 'ATIVO',
                         visualizarEscalas: false
@@ -624,7 +437,7 @@ const UsersComponent = () => {
                                 >
                                 <Input 
                                     style={{ textTransform: 'uppercase' }}
-//                                    disabled={!isEditing || idUser}
+//                                    disabled={!editingUser || idUser}
                                     />
                             </Item>
                         </Col>
@@ -640,7 +453,6 @@ const UsersComponent = () => {
                                 <Input 
                                     style={{ textTransform: 'uppercase' }}
                                     placeholder="seu.email@exemplo.com"
-                                    disabled={!isEditing}
                                     />
                             </Item>
                         </Col>
@@ -653,7 +465,6 @@ const UsersComponent = () => {
                                 rules={[{required: true, message: 'Informar Senha'}]}
                                 >
                                 <Input.Password
-                                    disabled={!isEditing}
                                     allowClear
                                     placeholder="Informar Senha"
                                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
@@ -667,7 +478,6 @@ const UsersComponent = () => {
                                 >
                                 {/* Componente de Máscara integrado ao Input do Antd */}
                                 <PatternFormat
-                                    disabled={!isEditing}
                                     customInput={Input} // Usa o estilo do Ant Design
                                     format="(##) #####-####"   // A- Letra, # Numero
                                     mask="_"
@@ -682,7 +492,6 @@ const UsersComponent = () => {
                                 rules={[{required: true, message: 'Selecionar Situação'}]}
                                 >
                                 <Select
-                                    disabled={!isEditing}
                                     placeholder="Selecionar uma situação"
                                     allowClear  //Permite limpar seleção
                                 >
@@ -702,7 +511,6 @@ const UsersComponent = () => {
                                     prefix="R$"
                                     style={{ width: '100%' }}
                                     step={0.01}                                    
-                                    disabled={!isEditing}
                                     value={valeRefeicao}
                                     formatter={brazilianFormatter}
                                     parser={brazilianParser}
@@ -719,7 +527,6 @@ const UsersComponent = () => {
                                     prefix="R$"
                                     style={{ width: '100%' }}
                                     step={0.01}                                    
-                                    disabled={!isEditing}
                                     value={valeTransporte}
                                     formatter={brazilianFormatter}
                                     parser={brazilianParser}
@@ -734,7 +541,6 @@ const UsersComponent = () => {
                                 label="Escalas"
                             >
                                 <Checkbox
-                                    disabled={!isEditing}
                                 >
                                     Visualizar Escalas
                                 </Checkbox>
@@ -746,18 +552,23 @@ const UsersComponent = () => {
                         <Col span={18}>
                             <Item
                                 name="empresas"
+                                label={"Empresas"}
                                 rules={[{required: true, 
                                         message: 'Informar Empresa'}]}
                                 >
                                 <Select
-                                    prefix="Empresas"
-                                    disabled={!isEditing}
-                                    dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
                                     placeholder="Selecionar Empresa"
+                                    optionLabelProp='label'
                                     mode="multiple"
                                     allowClear  //Permite limpar seleção
-                                    loading={loading}   // Mostrar ícone de carregamento
-                                    options={selectEmpresas}
+
+                                    //Mapeia o array de empresas
+                                    options={
+                                        empresas.map( emp => ({
+                                            value: emp._id,
+                                            label: emp.nome
+                                        }))
+                                    }
                                 >
                                 </Select>
                             </Item>
@@ -772,24 +583,22 @@ const UsersComponent = () => {
                 width={"100vw"}
                 style={{ top: 20, padding: 0, margin: 15 }}
                 open={deleteModal}
-                confirmLoading={confirmLoading}
-                onCancel={handleCancel}        
-        //        onOk={() => setIsPopupOpen(true)}
+                onCancel={() => setDeleteModal(false)}        
 
                 footer = {[
-                    <Button key="cancela" onClick={handleCancel}>
+                    <Button key="cancela" onClick={() => setDeleteModal(false)}>
                         Cancelar
                     </Button>,
                     <Popconfirm
                         key="submit"
                         title="Confirma a exclusão do registro?"
                         description="Ao confirmar o registro será elimando permanentemente."
-                        onConfirm={handlePopupConfirm}  
+                        onConfirm={handleDelete}  
                         okText="Sim"
                         cancelText="Não"            
                         placement='topLeft'
                         >
-                        <Button type="primary" loading={confirmLoading}>
+                        <Button type="primary" >
                             OK
                         </Button>
                     </Popconfirm>,
@@ -819,7 +628,7 @@ const UsersComponent = () => {
                                 ]}
                                 >
                                 <Input 
-                                    disabled={!isEditing || idUser}
+                                    disabled
                                     style={{ textTransform: 'uppercase' }}
                                     placeholder="seu.email@exemplo.com"
                                     />
@@ -833,7 +642,7 @@ const UsersComponent = () => {
                                 >
                                 <Input 
                                     style={{ textTransform: 'uppercase' }}
-                                    disabled={!isEditing}
+                                    disabled
                                     />
                             </Item>
                         </Col>
@@ -846,7 +655,7 @@ const UsersComponent = () => {
                                 rules={[{required: true, message: 'Informar Senha'}]}
                                 >
                                 <Input.Password
-                                    disabled={!isEditing}
+                                    disabled
                                     placeholder="Informar Senha"
                                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                                 />            
@@ -859,7 +668,7 @@ const UsersComponent = () => {
                                 >
                                 {/* Componente de Máscara integrado ao Input do Antd */}
                                 <PatternFormat
-                                    disabled={!isEditing}
+                                    disabled
                                     customInput={Input} // Usa o estilo do Ant Design
                                     format="(##) #####-####"   // A- Letra, # Numero
                                     mask="_"
@@ -874,7 +683,7 @@ const UsersComponent = () => {
                                 rules={[{required: true, message: 'Selecionar Situação'}]}
                                 >
                                 <Select
-                                    disabled={!isEditing}
+                                    disabled
                                     placeholder="Selecionar uma situação"
                                     allowClear  //Permite limpar seleção
                                 >
@@ -894,7 +703,7 @@ const UsersComponent = () => {
                                     prefix="R$"
                                     style={{ width: '100%' }}
                                     step={0.01}                                    
-                                    disabled={!isEditing}
+                                    disabled
                                     value={valeRefeicao}
                                     formatter={brazilianFormatter}
                                     parser={brazilianParser}
@@ -911,7 +720,7 @@ const UsersComponent = () => {
                                     prefix="R$"
                                     style={{ width: '100%' }}
                                     step={0.01}                                    
-                                    disabled={!isEditing}
+                                    disabled
                                     value={valeTransporte}
                                     formatter={brazilianFormatter}
                                     parser={brazilianParser}
@@ -926,7 +735,7 @@ const UsersComponent = () => {
                                 label="Escalas"
                             >
                                 <Checkbox
-                                    disabled={!isEditing}
+                                    disabled
                                 >
                                     Visualizar Escalas
                                 </Checkbox>
@@ -937,18 +746,23 @@ const UsersComponent = () => {
                         <Col span={18}>
                             <Item
                                 name="empresas"
+                                label={"Empresa"}
                                 rules={[{required: true, 
                                         message: 'Informar Empresa'}]}
                                 >
                                 <Select
-                                    prefix="Empresas"
-                                    disabled={!isEditing}
-                                    dropdownStyle={{ maxHeight: `${limitHeight}px`, overflow: 'auto' }}
                                     placeholder="Selecionar Empresa"
+                                    optionLabelProp='label'
                                     mode="multiple"
                                     allowClear  //Permite limpar seleção
-                                    loading={loading}   // Mostrar ícone de carregamento
-                                    options={selectEmpresas}
+                                    disabled
+                                    //Mapeia o array de empresas
+                                    options={
+                                        empresas.map( emp => ({
+                                            value: emp._id,
+                                            label: emp.nome
+                                        }))
+                                    }
                                 >
                                 </Select>
                             </Item>
@@ -957,7 +771,7 @@ const UsersComponent = () => {
                 </Form>
             </Modal>
 
-{/*        </Spin> */}
+        </Spin>
 
     </div>
 
