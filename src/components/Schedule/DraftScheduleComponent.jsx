@@ -588,15 +588,31 @@ const DraftScheduleComponent = () => {
             setColaboradores(formatarUser)    //Carrega todos os colabores
             setListarColab(formatarUser)      //Filtrar os colaboradores por empresa
 
-            const tipoAux = allTypeEvents.filter(tipo => tipo.ativo)
-                                          .map(type => ({
-                id:     type._id,
-                label:  type.tipoEvento,
-                value:  type.tipoEvento,
-                cor:    type.cor
-              }))
+            const typeEventsAtivo = allTypeEvents.filter(tipo => tipo.ativo)
 
-            setTypeEvent(tipoAux)
+            if (typeEventsAtivo) {
+              
+              const tipoAux = typeEventsAtivo.map(type => ({
+                  id:     type._id,
+                  label:  type.tipoEvento,
+                  value:  type.tipoEvento,
+                  cor:    type.cor
+                }))
+
+              setTypeEvent(tipoAux)
+
+            } else {
+
+              const tipoAux = allTypeEvents.map(type => ({
+                  id:     type._id,
+                  label:  type.tipoEvento,
+                  value:  type.tipoEvento,
+                  cor:    type.cor
+                }))
+
+              setTypeEvent(tipoAux)
+
+            }
 
             setIsNewEventos(true)
 
@@ -652,7 +668,7 @@ const DraftScheduleComponent = () => {
               // O setTimeout deve envolver APENAS o fechamento do loading
               // para dar tempo do React processar a mudança de estado dos dados
               setTimeout(() => {
-                setLoading(false);
+//                setLoading(false);
               }, timeoutDuration); // Pequeno delay para garantir a renderização
 
 
