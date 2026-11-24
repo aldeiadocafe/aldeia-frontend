@@ -398,7 +398,7 @@ const ScheduleComponent = () => {
 
     useEffect(() => {
 
-      const carregarDados = async () => {
+      async function carregarDados() {
 
         // Detecta o tipo de conexão (padrão é 5 segundos, mas vira 15 segundos se for 3G/2G)
         const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -412,6 +412,7 @@ const ScheduleComponent = () => {
           setOptColaboradores([])
           setTypeEvent([])
           setEventos([])
+          setEventosUtil([])
 
           if (user.empresas) {
 
@@ -427,16 +428,16 @@ const ScheduleComponent = () => {
             setSelectEmpresas(empAux)
             setOptionEmpresas(formatarDados)
 
-            const [resAllUsers,resAllTypeEvents,resAllSchedules] = await Promise.allSettled([    // Promise.all( >> Se alguma requeste falhar, o programa para
-              getAllUsers(),
-              getAllTypeEvents(),
-              getAllSchedules(),
+            const [preAllUsers,preAllTypeEvents,preAllSchedules] = await Promise.allSettled([    // Promise.all( >> Se alguma requeste falhar, o programa para
+              getAllUsers().then( response => response.data),
+              getAllTypeEvents().then( response => response.data),
+              getAllSchedules().then( response => response.data),
             ])
 
-//            const allUsers          = resAllUsers?.status           === 'fulfilled' ? resAllUsers.value           : null
-            const allUsers          = resAllUsers.data
-            const allTypeEvents     = resAllTypeEvents.data
-            const allSchedules      = resAllSchedules.data
+            const allUsers          = preAllUsers?.status           === 'fulfilled' ? preAllUsers.value       : null
+//            const allUsers          = preAllUsers.data
+            const allTypeEvents     = preAllTypeEvents?.status      === 'fulfilled' ? preAllTypeEvents.value  : null
+            const allSchedules      = preAllSchedules?.status       === 'fulfilled' ? preAllSchedules.value   : null
 
 
             //Usuários
@@ -504,13 +505,18 @@ const ScheduleComponent = () => {
 
             // Criar array com Tipo de Eventos Unicos
             const tipoEventosUnicos = [...new Set(dadosAux.map(evento => evento.tipoEventoID))];
+            const tpEvent = allTypeEvents.filter(tipo => tipoEventosUnicos.includes(tipo._id))
 
-            setEventosUtil(allTypeEvents.filter(tipo => tipoEventosUnicos.includes(tipo._id)))
+            if (tpEvent) {
+              setEventosUtil(tpEvent)
+            } else {
+              setEventosUtil(allTypeEvents)
+            }
 
             // O setTimeout deve envolver APENAS o fechamento do loading
             // para dar tempo do React processar a mudança de estado dos dados
             setTimeout(() => {
-              setLoading(false);
+//              setLoading(false);
             }, timeoutDuration); // Pequeno delay para garantir a renderização
 
           }
