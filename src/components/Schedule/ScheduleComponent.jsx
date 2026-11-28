@@ -8,6 +8,13 @@ import { useAuth } from '../Login/AuthContext';
 import { normalizarTexto } from '../../Funcoes/Utils';
 
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+
+
+//Ativa o plugin UTC
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 import './Schedule.css';
 import { getAllUsers } from '../../services/UserService';
@@ -37,6 +44,8 @@ const ScheduleComponent = () => {
     const [eventos,           setEventos]           = useState([]);
     const [modalVisivel,      setModalVisivel]      = useState(false);
     const [eventoSelecionado, setEventoSelecionado] = useState(null);
+
+    const [publicacao,        setPublicacao] = useState("")
 
     // Estado para armazenar o recurso selecionado no filtro
     const [opcaoColaboradoresFiltro,  setopcaoColaboradoresFiltro]  = useState([])
@@ -413,6 +422,7 @@ const ScheduleComponent = () => {
           setTypeEvent([])
           setEventos([])
           setEventosUtil([])
+          setPublicacao("")
 
           if (user.empresas) {
 
@@ -480,7 +490,12 @@ const ScheduleComponent = () => {
               cor:    type.cor
             }))
 
-            setTypeEvent(tipoAux)
+            if (tipoAux) {
+              setTypeEvent(tipoAux)
+            } else {
+              setTypeEvent(allTypeEvents)
+            }
+
 
             const dadosAux = allSchedules
                                 .filter(evento => evento.usuario?._id && evento.tipoEvento?._id)
@@ -491,6 +506,7 @@ const ScheduleComponent = () => {
               key:          evento._id,                
               empresaID:    evento.empresa._id,
               userID:       evento.usuario._id,
+              dataAtivacao: evento.dataAtivacao,
               content:      evento.usuario.nome,
               tipoEventoID: evento.tipoEvento ? evento.tipoEvento._id         : null,
               tipoEvento:   evento.tipoEvento ? evento.tipoEvento.tipoEvento  : null,
@@ -501,6 +517,11 @@ const ScheduleComponent = () => {
               type:         'success', // Define o tipo de status do Badge (success, error, warning)
             }))
 
+            if (dadosAux) {
+              setPublicacao(dayjs.utc(dadosAux[0].dataAtivacao)
+                  .tz('America/Sao_Paulo')
+                  .format('DD/MM/YYYY HH:mm'))
+            }
             setEventos(dadosAux)
 
             // Criar array com Tipo de Eventos Unicos
@@ -548,10 +569,34 @@ const ScheduleComponent = () => {
             size='large' 
             description="Carregando..."
         >
-            <div style={{ textAlign: 'center' }}>
-                <Title level={2}
-                    style={{ color: 'var(--primary-color)'}}
-                >Escala de Folga</Title>
+            <div>
+
+              <Row justify={"space-between"} align={"middle"}>
+
+                <Col>
+                  <Title level={2}
+                      style={{ color: 'var(--primary-color)'}}
+                  >Escala de Folga</Title>
+                </Col>
+
+                <Col>
+                  <Text 
+                    strong
+                    style={{ 
+                      fontSize: 18,
+                      color: 'var(--primary-color)'
+                    }}
+                  >Publicação: </Text>
+                  <Text 
+                    strong
+                    style={{ 
+                      fontSize: 16,
+                    }}>
+                    {publicacao}
+                  </Text>
+                </Col>
+              </Row>
+
             </div>
 
             <Calendar 
